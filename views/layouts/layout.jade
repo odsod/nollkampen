@@ -1,0 +1,16 @@
+doctype 5
+html
+  head
+    title= title
+    // Viewport
+    meta(name='viewport', content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;')
+    // Vendor stylesheets
+    link(rel='stylesheet', href='/stylesheets/vendor/jquery.mobile-1.2.0-alpha.1.min.css')
+    // Vendor scripts
+    script(src='/javascripts/vendor/jquery-1.7.2.min.js')
+    script(src='/javascripts/vendor/jquery.mobile-1.2.0-alpha.1.min.js')
+  body
+    div(data-role="page")
+      include ../includes/head
+      div(data-role="content"): div(data-role="content-primary")
+        block content

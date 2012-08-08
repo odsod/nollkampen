@@ -1,5 +1,38 @@
-extends layout
+extends layouts/layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  ul(data-role="listview")
+    li(data-role="list-divider")
+      span Visa på skärm
+    li: a(href="#")
+      img.ui-li-icon(src="/images/55-network.png")
+      span Sekvens
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/42-photos.png")
+      span Bild
+    li: a(href="#")
+      img.ui-li-icon(src="/images/09-chat-2.png")
+      span Text
+    li(data-role="list-divider") Mata in resultat
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/78-stopwatch.png")
+      span Tider
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/187-pencil.png")
+      span Poäng
+    li(data-role="list-divider") Skapa och ändra
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/112-group.png")
+      span Sektioner
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/63-runner.png")
+      span Tävlingar
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/124-bullhorn.png")
+      span Annonser
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/42-photos.png")
+      span Bilder
+    li: a(href="#") 
+      img.ui-li-icon(src="/images/55-network.png")
+      span Sekvenser
