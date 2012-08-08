@@ -1,16 +1,13 @@
-
-/**
- * Module dependencies.
- */
-
-var express = require('express')
-  , routes = require('./routes')
-  , http = require('http')
-  , path = require('path');
+var
+  express = require('express'),
+  routes = require('./routes'),
+  http = require('http'),
+  path = require('path'),
+  log = require('winston').cli();
 
 var app = express();
 
-app.configure(function(){
+app.configure(function () {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -23,13 +20,21 @@ app.configure(function(){
   app.use(express.static(path.join(__dirname, 'public')));
 });
 
-app.configure('development', function(){
+app.configure('development', function () {
   app.use(express.errorHandler());
 });
 
-app.get('/', routes.index);
-app.get('/section', routes.section);
+app.param('competition', function (req, res, next, id) {
+  log.debug('param');
+  req.competition = 'test';
+  next();
+});
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+app.get('/', routes.index);
+app.get('/sections', routes.section);
+app.get('/competitions', routes.competitions);
+app.get('/competitions/:competition', routes.competition);
+
+http.createServer(app).listen(app.get('port'), function () {
+  log.info("Express server listening on port " + app.get('port'));
 });

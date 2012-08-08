@@ -1,0 +1,8 @@
+extends layouts/layout
+
+block content
+  ul(data-role='listview', data-split-icon='delete', data-split-theme='a')
+    each competition in competitions
+      include includes/competition-item
+  each competition in competitions
+    include includes/competition-delete-dialog

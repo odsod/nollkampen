@@ -2,7 +2,9 @@ extends layouts/layout
 
 block content
   form(action="/sections", method="post")
+    input(type="hidden", name="id", value=section.id)
     label(for="name") Namn:
     input(type="text", name="name", value=section.name)
     label(for="initials") Initialer:
     input(type="text", name="initials", value=section.initials)
+    include includes/form-controls
