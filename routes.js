@@ -10,6 +10,7 @@ exports.listSections = function (req, res) {
   db.Section.find(function (err, sections) {
     res.render('sections/list', {
       title: 'Sektioner',
+      id: 'section-list',
       sections: sections
     });
   });
@@ -18,6 +19,7 @@ exports.listSections = function (req, res) {
 exports.newSection = function (req, res) {
   res.render('sections/new', {
     title: 'Skapa ny sektion',
+    id: 'section-form',
     section: {}
   });
 };
@@ -25,6 +27,7 @@ exports.newSection = function (req, res) {
 exports.editSection = function (req, res) {
   res.render('sections/edit', {
     title: 'Modifiera sektion',
+    id: 'section-form',
     section: req.section
   });
 };
@@ -56,6 +59,7 @@ exports.listCompetitions = function (req, res) {
   db.Competition.find(function (err, competitions) {
     res.render('competitions/list', {
       title: 'Grenar',
+      id: 'competitions-list',
       competitions: competitions
     });
   });
@@ -64,6 +68,7 @@ exports.listCompetitions = function (req, res) {
 exports.newCompetition = function (req, res) {
   res.render('competitions/new', {
     title: 'Skapa ny gren',
+    id: 'competition-form',
     competition: {}
   });
 };
@@ -71,6 +76,7 @@ exports.newCompetition = function (req, res) {
 exports.editCompetition = function (req, res) {
   res.render('competitions/edit', {
     title: 'Modifiera gren',
+    id: 'competition-form',
     competition: req.competition
   });
 };

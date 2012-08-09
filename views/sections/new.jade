@@ -1,6 +1,6 @@
 extends ../layouts/layout
 
 block content
-  form(method='POST', action='/sections')
+  form(method='POST', action='/sections', enctype='multipart/form-data', data-ajax='false')
     include form
     include ../includes/form-controls
