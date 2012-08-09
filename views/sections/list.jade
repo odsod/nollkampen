@@ -1,7 +1,7 @@
-extends ../layouts/layout
+extends ../layout
 
 block content
-  ul(data-role='listview', data-split-icon='delete', data-split-theme='a')
+  ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
     li(data-theme='b', data-icon='plus'): a(href='/sections/new'): h3 Skapa ny sektion
     each section in sections
       include item

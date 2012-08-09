@@ -3,7 +3,10 @@ var
   log = require('winston').cli();
 
 exports.index = function (req, res) {
-  res.render('index', { title: 'Nollkampen' });
+  res.render('index', {
+    title: 'Nollkampen',
+    id: 'menu'
+  });
 };
 
 exports.listSections = function (req, res) {
