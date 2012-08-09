@@ -3,6 +3,7 @@ var
   routes = require('./routes'),
   http = require('http'),
   path = require('path'),
+  db = require('./db'),
   log = require('winston').cli();
 
 var app = express();
@@ -25,15 +26,25 @@ app.configure('development', function () {
 });
 
 app.param('competition', function (req, res, next, id) {
-  log.debug('param');
-  req.competition = 'test';
-  next();
+  log.debug(id);
+  db.Competition.findById(id, function (err, competition) {
+    req.competition = competition;
+    next();
+  });
 });
 
 app.get('/', routes.index);
-app.get('/sections', routes.section);
-app.get('/competitions', routes.competitions);
-app.get('/competitions/:competition', routes.competition);
+
+app.get('/sections', routes.listSections);
+app.get('/sections/:section', routes.editSection);
+
+app.post('/competitions', routes.createCompetition);
+app.delete('/competitions/:competition', routes.deleteCompetition);
+app.put('/competitions/:competition', routes.updateCompetition);
+
+app.get('/competitions', routes.listCompetitions);
+app.get('/competitions/new', routes.newCompetition);
+app.get('/competitions/:competition', routes.editCompetition);
 
 http.createServer(app).listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));

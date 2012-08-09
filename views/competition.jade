@@ -1,8 +1,0 @@
-extends layouts/layout
-
-block content
-  form(action="/competitions", method="post")
-    input(type="hidden", name="id", value=competition.id)
-    label(for="name") Namn:
-    input(type="text", name="name", value=competition.name)
-    include includes/form-controls

@@ -1,8 +1,0 @@
-.ui-corner-all(data-role='popup', id='delete' + competition.id, data-overlay-theme='a')
-  .ui-corner-top(data-role='header'): h1 Ta bort tävling
-  .ui-corner-bottom(data-role='content')
-    h4 Vill du verkligen ta bort #{competition.name}?
-    p Du kan inte ångra dig i efterhand.
-    form(action='/competitions/' + competition.id, method='delete')
-      a(data-role='button', data-rel='back', data-inline='true') Avbryt
-      input(type='submit', value='Ta bort', data-theme="a", data-inline='true')

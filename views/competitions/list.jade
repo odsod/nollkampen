@@ -1,8 +1,9 @@
-extends layouts/layout
+extends ../layouts/layout
 
 block content
   ul(data-role='listview', data-split-icon='delete', data-split-theme='a')
+    li(data-theme='b', data-icon='plus'): a(href='/competitions/new'): h3 Skapa ny gren
     each competition in competitions
-      include includes/competition-item
+      include item
   each competition in competitions
-    include includes/competition-delete-dialog
+    include delete-dialog

@@ -1,0 +1,6 @@
+extends ../layouts/layout
+
+block content
+  form(method='PUT', action='/competitions/' + competition.id)
+    include form
+    include ../includes/form-controls
