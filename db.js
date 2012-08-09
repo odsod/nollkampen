@@ -4,6 +4,13 @@ var
   db = mongoose.createConnection('localhost', 'nollkampen');
 
 var
+  imageFileSchema = new mongoose.Schema({
+    suffix: String,
+    url: String
+  }),
+  ImageFile = db.model('ImageFile', imageFileSchema);
+
+var
   competitionSchema = new mongoose.Schema({
     name: String
   }),
@@ -12,11 +19,13 @@ var
 var
   sectionSchema = new mongoose.Schema({
     name: String,
-    initials: String
+    initials: String,
+    saintImageUrl: String
   }),
   Section = db.model('Section', sectionSchema);
 
 module.exports = {
   Competition: Competition,
-  Section: Section
+  Section: Section,
+  ImageFile: ImageFile
 };

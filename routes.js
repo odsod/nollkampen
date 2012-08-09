@@ -3,13 +3,11 @@ var
   fs = require('fs'),
   log = require('winston').cli();
 
-function saveImage(path, name, callback) {
-  new db.Image({
-    type: name.split('.').pop()
-  }).save(function (err, image) {
-    fs.rename(path, './public/upload/' + image.id + '.' + image.type);
-  });
-  fs.rename(path, './public/upload' + name);
+function saveImage(path, filename) {
+  var
+    name = path.split('/').pop() + filename;
+  fs.renameSync(path, __dirname + '/public/uploads/' + name);
+  return name;
 }
 
 exports.index = function (req, res) {
@@ -47,11 +45,23 @@ exports.editSection = function (req, res) {
 
 exports.createSection = function (req, res) {
   log.debug('Files', req.files.saintImage);
+  var
+    saintImageUrl = saveImage(
+      req.files.saintImage.path,
+      req.files.saintImage.name
+    );
+  log.debug('saint', saintImageUrl);
   new db.Section({
     name: req.body.name,
-    initials: req.body.initials
-  }).save(function (err) {
-    exports.listSections(req, res);
+    initials: req.body.initials,
+    saintImageUrl: saintImageUrl
+  }).save(function (err, section) {
+    if (err) {
+      log.debug(err.toString());
+    } else {
+      log.debug('heeelooooo', section.saintImageUrl);
+      exports.listSections(req, res);
+    }
   });
 };
 
