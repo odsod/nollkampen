@@ -1,0 +1,5 @@
+li: a(href='/sections/' + section.id)
+  h3= section.initials
+  p= section.name
+  a(href='#delete' + section.id, data-rel='popup',
+    data-position-to='window') Ta bort

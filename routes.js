@@ -8,7 +8,7 @@ exports.index = function (req, res) {
 
 exports.listSections = function (req, res) {
   db.Section.find(function (err, sections) {
-    res.render('Sections/list', {
+    res.render('sections/list', {
       title: 'Sektioner',
       sections: sections
     });
@@ -39,12 +39,12 @@ exports.createSection = function (req, res) {
 };
 
 exports.deleteSection = function (req, res) {
-  req.Section.remove();
+  req.section.remove();
   exports.listSections(req, res);
 };
 
 exports.updateSection = function (req, res) {
-  req.Section.update({
+  req.section.update({
     name: req.body.name,
     initials: req.body.initials
   }, function (err) {

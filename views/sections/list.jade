@@ -1,1 +1,9 @@
-extends layouts/layout
+extends ../layouts/layout
+
+block content
+  ul(data-role='listview', data-split-icon='delete', data-split-theme='a')
+    li(data-theme='b', data-icon='plus'): a(href='/sections/new'): h3 Skapa ny sektion
+    each section in sections
+      include item
+  each section in sections
+    include delete-dialog

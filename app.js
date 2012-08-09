@@ -26,22 +26,31 @@ app.configure('development', function () {
 });
 
 app.param('competition', function (req, res, next, id) {
-  log.debug(id);
   db.Competition.findById(id, function (err, competition) {
     req.competition = competition;
     next();
   });
 });
 
+app.param('section', function (req, res, next, id) {
+  db.Section.findById(id, function (err, section) {
+    req.section = section;
+    next();
+  });
+});
+
 app.get('/', routes.index);
 
+app.post('/sections', routes.createSection);
+app.delete('/sections/:section', routes.deleteSection);
+app.put('/sections/:section', routes.updateSection);
 app.get('/sections', routes.listSections);
+app.get('/sections/new', routes.newSection);
 app.get('/sections/:section', routes.editSection);
 
 app.post('/competitions', routes.createCompetition);
 app.delete('/competitions/:competition', routes.deleteCompetition);
 app.put('/competitions/:competition', routes.updateCompetition);
-
 app.get('/competitions', routes.listCompetitions);
 app.get('/competitions/new', routes.newCompetition);
 app.get('/competitions/:competition', routes.editCompetition);
