@@ -1,6 +1,16 @@
 var
   db = require('./db'),
+  fs = require('fs'),
   log = require('winston').cli();
+
+function saveImage(path, name, callback) {
+  new db.Image({
+    type: name.split('.').pop()
+  }).save(function (err, image) {
+    fs.rename(path, './public/upload/' + image.id + '.' + image.type);
+  });
+  fs.rename(path, './public/upload' + name);
+}
 
 exports.index = function (req, res) {
   res.render('index', {
@@ -36,17 +46,13 @@ exports.editSection = function (req, res) {
 };
 
 exports.createSection = function (req, res) {
+  log.debug('Files', req.files.saintImage);
   new db.Section({
     name: req.body.name,
     initials: req.body.initials
   }).save(function (err) {
     exports.listSections(req, res);
   });
-};
-
-exports.deleteSection = function (req, res) {
-  req.section.remove();
-  exports.listSections(req, res);
 };
 
 exports.updateSection = function (req, res) {
@@ -56,6 +62,11 @@ exports.updateSection = function (req, res) {
   }, function (err) {
     exports.listSections(req, res);
   });
+};
+
+exports.deleteSection = function (req, res) {
+  req.section.remove();
+  exports.listSections(req, res);
 };
 
 exports.listCompetitions = function (req, res) {
