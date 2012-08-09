@@ -1,10 +1,15 @@
-label(for="name") Namn:
-input(type="text", name="name", value=section.name)
-label(for="initials") Initialer:
-input(type="text", name="initials", value=section.initials)
-label(for="color") Sektionsfärg:
-input.color-picker(type='text', name='color', value=section.color)
-label(for="textColor") Textfärg:
-input.color-picker(type='text', name='textColor', value=section.textColor)
-label(for="textColor") Sektionshelgon:
-input(type='file', name='saintImage', accept='image/*', data-role='button', data-theme='b')
+label(for='name') Namn:
+input(type='text', name='name', id='name', value=section.name)
+label(for='initials') Initialer:
+input(type='text', name='initials', id='initials', value=section.initials)
+label(for='color') Sektionsfärg:
+input.color-picker(type='text', name='color', id='color', value=section.color)
+label(for='textColor') Textfärg:
+input.color-picker(type='text', name='textColor', id='textColor', value=section.textColor)
+label Sektionshelgon:
+input(type='radio', name='uploadSaintImage', id='upload-saint-image-true', value='true', checked='checked')
+label(for='upload-saint-image-true') Ladda upp ny bild
+input(type='file', name='saintImage', id='saint-image', accept='image/*', data-role='button', data-theme='b')
+input(type='radio', name='uploadSaintImage', id='upload-saint-image-false', value='false', disabled=!section.saintImageUrl)
+label(for='upload-saint-image-false') Behåll existerande bild
+img(src=section.saintImageUrl)

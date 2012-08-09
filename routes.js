@@ -5,9 +5,10 @@ var
 
 function saveImage(path, filename) {
   var
-    name = path.split('/').pop() + filename;
-  fs.renameSync(path, __dirname + '/public/uploads/' + name);
-  return name;
+    name = path.split('/').pop() + filename,
+    url = '/uploads/' + name;
+  fs.renameSync(path, __dirname + '/public' + url);
+  return url;
 }
 
 exports.index = function (req, res) {
