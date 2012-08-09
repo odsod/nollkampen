@@ -3,5 +3,5 @@
   .ui-corner-bottom(data-role='content')
     h4 Vill du verkligen ta bort #{section.name}?
     p Du kan inte ångra dig i efterhand.
-    form(method='DELETE', action='/sections/' + section.id)
+    form(method='POST', action='/sections/' + section.id + '/delete')
       include ../includes/form-controls-delete

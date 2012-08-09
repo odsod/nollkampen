@@ -1,6 +1,6 @@
 extends ../layout
 
 block content
-  form(method='PUT', action='/competitions/' + competition.id)
+  form(method='POST', action='/competitions/' + competition.id + '/update')
     include form
     include ../includes/form-controls

@@ -3,5 +3,5 @@
   .ui-corner-bottom(data-role='content')
     h4 Vill du verkligen ta bort #{competition.name}?
     p Du kan inte ångra dig i efterhand.
-    form(method='DELETE', action='/competitions/' + competition.id)
+    form(method='POST', action='/competitions/' + competition.id + '/delete')
       include ../includes/form-controls-delete

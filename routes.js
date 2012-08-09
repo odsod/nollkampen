@@ -85,6 +85,7 @@ exports.editCompetition = function (req, res) {
 };
 
 exports.createCompetition = function (req, res) {
+  log.debug('hej');
   new db.Competition({
     name: req.body.name
   }).save(function (err) {
