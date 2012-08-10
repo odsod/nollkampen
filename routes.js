@@ -22,6 +22,10 @@ exports.index = function (req, res) {
   });
 };
 
+////
+// Sections
+////
+
 exports.listSections = function (req, res) {
   db.Section.find(function (err, sections) {
     res.render('sections/list', {
@@ -101,6 +105,10 @@ exports.deleteSection = function (req, res) {
   exports.listSections(req, res);
 };
 
+////
+// Competitions
+////
+
 exports.listCompetitions = function (req, res) {
   db.Competition.find(function (err, competitions) {
     res.render('competitions/list', {
@@ -128,7 +136,6 @@ exports.editCompetition = function (req, res) {
 };
 
 exports.createCompetition = function (req, res) {
-  log.debug('hej');
   new db.Competition({
     name: req.body.name
   }).save(function (err) {
@@ -146,5 +153,72 @@ exports.updateCompetition = function (req, res) {
     name: req.body.name
   }, function (err) {
     exports.listCompetitions(req, res);
+  });
+};
+
+////
+// Ads
+////
+
+exports.listAds = function (req, res) {
+  db.Ad.find(function (err, ads) {
+    res.render('ads/list', {
+      title: 'Annonser',
+      id: 'ads-list',
+      ads: ads
+    });
+  });
+};
+
+exports.newAd = function (req, res) {
+  res.render('ads/new', {
+    title: 'Skapa ny annons',
+    id: 'ad-form',
+    ad: {}
+  });
+};
+
+exports.editAd = function (req, res) {
+  res.render('ads/edit', {
+    title: 'Modifiera annons',
+    id: 'ad-form',
+    ad: req.ad
+  });
+};
+
+exports.createAd = function (req, res) {
+  log.debug('Files', req.files);
+  var imageUrl;
+  if (req.files && req.files.image) {
+    imageUrl = saveImage(req.files.image);
+  }
+  new db.Ad({
+    name: req.body.name,
+    imageUrl: imageUrl
+  }).save(function (err) {
+    exports.listAds(req, res);
+  });
+};
+
+exports.deleteAd = function (req, res) {
+  req.ad.remove();
+  exports.listAds(req, res);
+};
+
+exports.updateAd = function (req, res) {
+  var newImageUrl;
+  if (req.files && req.files.image) {
+    newImageUrl = saveImage(req.files.image);
+    if (req.ad.imageUrl) {
+      deleteImage(req.ad.imageUrl);
+    }
+  } else {
+    newImageUrl = req.ad.imageUrl;
+  }
+  req.ad.update({
+    name: req.body.name,
+    imageUrl: newImageUrl
+  }, function (err) {
+    exports.listAds(req, res);
   });
 };

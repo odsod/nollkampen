@@ -1,0 +1,9 @@
+extends ../layout
+
+block content
+  ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
+    li(data-theme='b', data-icon='plus'): a(href='/ads/new'): h3 Skapa ny annons
+    each ad in ads
+      include item
+  each ad in ads
+    include delete-dialog

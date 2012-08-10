@@ -27,3 +27,16 @@ $(document).delegate('#section-form', 'pageinit', function () {
       $('input[name=saintImage]').attr('disabled', $(this).val() === 'false');
     }).trigger('change');
 });
+
+$(document).delegate('#ad-form', 'pageinit', function () {
+  // Enhance file chooser
+  $('input[type=file]')
+    .textinput({
+      theme: 'c'
+    });
+  // Radio button toggling of file chooser
+  $('input[name=uploadImage]')
+    .bind('change', function (event, ui) {
+      $('input[name=image]').attr('disabled', $(this).val() === 'false');
+    }).trigger('change');
+});

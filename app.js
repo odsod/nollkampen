@@ -41,8 +41,16 @@ app.param('section', function (req, res, next, id) {
   });
 });
 
+app.param('ad', function (req, res, next, id) {
+  db.Ad.findById(id, function (err, ad) {
+    req.ad = ad;
+    next();
+  });
+});
+
 app.get('/', routes.index);
 
+// Sections CRUD
 app.post('/sections', routes.createSection);
 app.post('/sections/:section/delete', routes.deleteSection);
 app.post('/sections/:section/update', routes.updateSection);
@@ -50,12 +58,21 @@ app.get('/sections', routes.listSections);
 app.get('/sections/new', routes.newSection);
 app.get('/sections/:section', routes.editSection);
 
+// Competitions CRUD
 app.post('/competitions', routes.createCompetition);
 app.post('/competitions/:competition/delete', routes.deleteCompetition);
 app.post('/competitions/:competition/update', routes.updateCompetition);
 app.get('/competitions', routes.listCompetitions);
 app.get('/competitions/new', routes.newCompetition);
 app.get('/competitions/:competition', routes.editCompetition);
+
+// Ads CRUD
+app.post('/ads', routes.createAd);
+app.post('/ads/:ad/delete', routes.deleteAd);
+app.post('/ads/:ad/update', routes.updateAd);
+app.get('/ads', routes.listAds);
+app.get('/ads/new', routes.newAd);
+app.get('/ads/:ad', routes.editAd);
 
 http.createServer(app).listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));

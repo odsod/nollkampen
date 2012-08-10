@@ -8,7 +8,7 @@ var
     suffix: String,
     url: String
   }),
-  ImageFile = db.model('ImageFile', imageFileSchema);
+  Picture = db.model('Picture', imageFileSchema);
 
 var
   competitionSchema = new mongoose.Schema({
@@ -20,12 +20,22 @@ var
   sectionSchema = new mongoose.Schema({
     name: String,
     initials: String,
+    color: String,
+    textColor: String,
     saintImageUrl: String
   }),
   Section = db.model('Section', sectionSchema);
 
+var
+  adSchema = new mongoose.Schema({
+    name: String,
+    imageUrl: String
+  }),
+  Ad = db.model('Ad', adSchema);
+
 module.exports = {
   Competition: Competition,
   Section: Section,
-  ImageFile: ImageFile
+  Picture: Picture,
+  Ad: Ad
 };
