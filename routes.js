@@ -31,6 +31,7 @@ exports.listSections = function (req, res) {
     res.render('sections/list', {
       title: 'Sektioner',
       id: 'section-list',
+      back: '/',
       sections: sections
     });
   });
@@ -40,6 +41,7 @@ exports.newSection = function (req, res) {
   res.render('sections/new', {
     title: 'Skapa ny sektion',
     id: 'section-form',
+    back: '/sections',
     section: {}
   });
 };
@@ -48,6 +50,7 @@ exports.editSection = function (req, res) {
   res.render('sections/edit', {
     title: 'Modifiera sektion',
     id: 'section-form',
+    back: '/sections',
     section: req.section
   });
 };
@@ -114,6 +117,7 @@ exports.listCompetitions = function (req, res) {
     res.render('competitions/list', {
       title: 'Grenar',
       id: 'competitions-list',
+      back: '/',
       competitions: competitions
     });
   });
@@ -123,6 +127,7 @@ exports.newCompetition = function (req, res) {
   res.render('competitions/new', {
     title: 'Skapa ny gren',
     id: 'competition-form',
+    back: '/competitions',
     competition: {}
   });
 };
@@ -131,6 +136,7 @@ exports.editCompetition = function (req, res) {
   res.render('competitions/edit', {
     title: 'Modifiera gren',
     id: 'competition-form',
+    back: '/competitions',
     competition: req.competition
   });
 };
@@ -165,6 +171,7 @@ exports.listAds = function (req, res) {
     res.render('ads/list', {
       title: 'Annonser',
       id: 'ads-list',
+      back: '/',
       ads: ads
     });
   });
@@ -174,6 +181,7 @@ exports.newAd = function (req, res) {
   res.render('ads/new', {
     title: 'Skapa ny annons',
     id: 'ad-form',
+    back: '/ads',
     ad: {}
   });
 };
@@ -182,6 +190,7 @@ exports.editAd = function (req, res) {
   res.render('ads/edit', {
     title: 'Modifiera annons',
     id: 'ad-form',
+    back: '/ads',
     ad: req.ad
   });
 };
@@ -231,6 +240,7 @@ exports.listPictures = function (req, res) {
     res.render('pictures/list', {
       title: 'Bilder',
       id: 'pictures-list',
+      back: '/',
       pictures: pictures
     });
   });
@@ -240,6 +250,7 @@ exports.newPicture = function (req, res) {
   res.render('pictures/new', {
     title: 'Ladda upp bilder',
     id: 'picture-form',
+    back: '/pictures',
     picture: {}
   });
 };
@@ -267,4 +278,19 @@ exports.createPicture = function (req, res) {
 exports.deletePicture = function (req, res) {
   req.picture.remove();
   exports.listPictures(req, res);
+};
+
+////
+// Scores
+////
+
+exports.showScores = function (req, res) {
+  db.Competition.find(function (err, competitions) {
+    res.render('scores/index', {
+      title: 'Poängställning',
+      id: 'scores',
+      back: '/pictures',
+      competitions: competitions
+    });
+  });
 };

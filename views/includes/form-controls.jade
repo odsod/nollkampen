@@ -1,4 +1,4 @@
 div(data-role='footer', data-position='fixed', data-theme='d')
-  fieldset.ui-grid-a
-    .ui-block-a: a(data-role='button', data-rel='back', data-theme='d', data-mini='false') Avbryt
-    .ui-block-b: button(type='submit', name='submit', value='submit-value', data-theme='b', data-mini='false') Spara
+  div(data-role='navbar'): ul
+    li: a(href=back, data-theme='d', data-direction='reverse'): h3 Avbryt
+    li: a.submit-form(href='#', data-theme='b'): h3 Spara
