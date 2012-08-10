@@ -3,12 +3,16 @@ var
   fs = require('fs'),
   log = require('winston').cli();
 
-function saveImage(path, filename) {
+function saveImage(image) {
   var
-    name = path.split('/').pop() + filename,
+    name = image.path.split('/').pop() + image.name,
     url = '/uploads/' + name;
-  fs.renameSync(path, __dirname + '/public' + url);
+  fs.renameSync(image.path, __dirname + '/public' + url);
   return url;
+}
+
+function deleteImage(url) {
+  fs.unlinkSync(__dirname + '/public' + url);
 }
 
 exports.index = function (req, res) {
@@ -45,37 +49,54 @@ exports.editSection = function (req, res) {
 };
 
 exports.createSection = function (req, res) {
-  log.debug('Files', req.files.saintImage);
-  var
-    saintImageUrl = saveImage(
-      req.files.saintImage.path,
-      req.files.saintImage.name
-    );
-  log.debug('saint', saintImageUrl);
+  var saintImageUrl;
+  if (req.files.saintImage) {
+    saintImageUrl = saveImage(req.files.saintImage);
+  }
   new db.Section({
     name: req.body.name,
     initials: req.body.initials,
+    color: req.body.color,
+    textColor: req.body.textColor,
     saintImageUrl: saintImageUrl
   }).save(function (err, section) {
     if (err) {
       log.debug(err.toString());
     } else {
-      log.debug('heeelooooo', section.saintImageUrl);
       exports.listSections(req, res);
     }
   });
 };
 
 exports.updateSection = function (req, res) {
+  var newSaintImageUrl;
+  if (req.files.saintImage) {
+    newSaintImageUrl = saveImage(req.files.saintImage);
+    if (req.section.saintImage) {
+      deleteImage(req.section.saintImageUrl);
+    }
+  } else {
+    newSaintImageUrl = req.section.saintImageUrl;
+  }
   req.section.update({
     name: req.body.name,
-    initials: req.body.initials
+    initials: req.body.initials,
+    color: req.body.color,
+    textColor: req.body.textColor,
+    saintImageUrl: newSaintImageUrl
   }, function (err) {
-    exports.listSections(req, res);
+    if (err) {
+      log.debug(err.toString());
+    } else {
+      exports.listSections(req, res);
+    }
   });
 };
 
 exports.deleteSection = function (req, res) {
+  if (req.section.saintImageUrl) {
+    deleteImage(req.section.saintImageUrl);
+  }
   req.section.remove();
   exports.listSections(req, res);
 };
