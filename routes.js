@@ -50,7 +50,7 @@ exports.editSection = function (req, res) {
 
 exports.createSection = function (req, res) {
   var saintImageUrl;
-  if (req.files.saintImage) {
+  if (req.files && req.files.saintImage) {
     saintImageUrl = saveImage(req.files.saintImage);
   }
   new db.Section({
@@ -69,8 +69,9 @@ exports.createSection = function (req, res) {
 };
 
 exports.updateSection = function (req, res) {
+  log.debug('Request', req);
   var newSaintImageUrl;
-  if (req.files.saintImage) {
+  if (req.files && req.files.saintImage) {
     newSaintImageUrl = saveImage(req.files.saintImage);
     if (req.section.saintImage) {
       deleteImage(req.section.saintImageUrl);
