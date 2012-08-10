@@ -222,3 +222,46 @@ exports.updateAd = function (req, res) {
     exports.listAds(req, res);
   });
 };
+
+////
+// Pictures
+////
+
+exports.listPictures = function (req, res) {
+  db.Picture.find(function (err, pictures) {
+    res.render('pictures/list', {
+      title: 'Bilder',
+      id: 'pictures-list',
+      pictures: pictures
+    });
+  });
+};
+
+exports.newPicture = function (req, res) {
+  res.render('pictures/new', {
+    title: 'Skapa ny bild',
+    id: 'picture-form',
+    picture: {}
+  });
+};
+
+exports.createPicture = function (req, res) {
+  log.debug('Files', req.files);
+  var imageUrl;
+  if (req.files && req.files.image) {
+    imageUrl = saveImage(req.files.image);
+    new db.Picture({
+      name: req.files.image.name.split('.')[0],
+      imageUrl: imageUrl
+    }).save(function (err) {
+      exports.listPictures(req, res);
+    });
+  } else {
+    exports.listPictures(req, res);
+  }
+};
+
+exports.deletePicture = function (req, res) {
+  req.picture.remove();
+  exports.listPictures(req, res);
+};

@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+  ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
+    each picture in pictures
+      include item
+  each picture in pictures
+    include delete-dialog
+
+block foot
+  div(data-role='footer', data-position='fixed', data-theme='b')
+    div(data-role='navbar', data-iconpos='right')
+      ul: li: a(href='/pictures/new', data-icon='plus'): h3 Ladda upp ny bild

@@ -4,11 +4,11 @@ var
   db = mongoose.createConnection('localhost', 'nollkampen');
 
 var
-  imageFileSchema = new mongoose.Schema({
-    suffix: String,
-    url: String
+  pictureSchema = new mongoose.Schema({
+    name: String,
+    imageUrl: String
   }),
-  Picture = db.model('Picture', imageFileSchema);
+  Picture = db.model('Picture', pictureSchema);
 
 var
   competitionSchema = new mongoose.Schema({

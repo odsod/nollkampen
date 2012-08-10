@@ -40,3 +40,11 @@ $(document).delegate('#ad-form', 'pageinit', function () {
       $('input[name=image]').attr('disabled', $(this).val() === 'false');
     }).trigger('change');
 });
+
+$(document).delegate('#picture-form', 'pageinit', function () {
+  // Enhance file chooser
+  $('input[type=file]')
+    .textinput({
+      theme: 'c'
+    });
+});

@@ -1,0 +1,7 @@
+.ui-corner-all(data-role='popup', id='delete' + picture.id)
+  .ui-corner-top(data-role='hepictureer'): h1 Ta bort bild
+  .ui-corner-bottom(data-role='content')
+    h4 Vill du verkligen ta bort #{picture.name}?
+    p Du kan inte ångra dig i efterhand.
+    form(method='POST', action='/pictures/' + picture.id + '/delete')
+      include ../includes/form-controls-delete

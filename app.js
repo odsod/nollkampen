@@ -74,6 +74,13 @@ app.get('/ads', routes.listAds);
 app.get('/ads/new', routes.newAd);
 app.get('/ads/:ad', routes.editAd);
 
+// Pictures CRUD
+app.post('/pictures', routes.createPicture);
+app.post('/pictures/:picture/delete', routes.deletePicture);
+app.get('/pictures', routes.listPictures);
+app.get('/pictures/new', routes.newPicture);
+app.get('/pictures/:picture', routes.editPicture);
+
 http.createServer(app).listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));
 });
