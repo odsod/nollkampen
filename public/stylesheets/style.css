@@ -1,7 +1,9 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.image-preview-form {
+  max-width: 100%;
 }
-a {
-  color: #00b7ff;
+.miniColors-trigger {
+  display: none;
+}
+.color-picker.ui-overlay-c {
+  text-shadow: 0 !important;
 }
