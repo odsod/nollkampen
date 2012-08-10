@@ -69,11 +69,10 @@ exports.createSection = function (req, res) {
 };
 
 exports.updateSection = function (req, res) {
-  log.debug('Request', req);
   var newSaintImageUrl;
   if (req.files && req.files.saintImage) {
     newSaintImageUrl = saveImage(req.files.saintImage);
-    if (req.section.saintImage) {
+    if (req.section.saintImageUrl) {
       deleteImage(req.section.saintImageUrl);
     }
   } else {
