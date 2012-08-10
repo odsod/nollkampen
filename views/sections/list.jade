@@ -2,8 +2,12 @@ extends ../layout
 
 block content
   ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
-    li(data-theme='b', data-icon='plus'): a(href='/sections/new'): h3 Skapa ny sektion
     each section in sections
       include item
   each section in sections
     include delete-dialog
+
+block foot
+  div(data-role='footer', data-position='fixed', data-theme='b')
+    div(data-role='navbar', data-iconpos='right')
+      ul: li: a(href='/sections/new', data-icon='plus'): h3 Skapa ny sektion
