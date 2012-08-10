@@ -187,7 +187,6 @@ exports.editAd = function (req, res) {
 };
 
 exports.createAd = function (req, res) {
-  log.debug('Files', req.files);
   var imageUrl;
   if (req.files && req.files.image) {
     imageUrl = saveImage(req.files.image);
@@ -239,22 +238,26 @@ exports.listPictures = function (req, res) {
 
 exports.newPicture = function (req, res) {
   res.render('pictures/new', {
-    title: 'Skapa ny bild',
+    title: 'Ladda upp bilder',
     id: 'picture-form',
     picture: {}
   });
 };
 
 exports.createPicture = function (req, res) {
-  log.debug('Files', req.files);
-  var imageUrl;
-  if (req.files && req.files.image) {
-    imageUrl = saveImage(req.files.image);
-    new db.Picture({
-      name: req.files.image.name.split('.')[0],
-      imageUrl: imageUrl
-    }).save(function (err) {
-      exports.listPictures(req, res);
+  if (req.files.images) {
+    var numSaved = 0;
+    req.files.images.forEach(function (image) {
+      var imageUrl = saveImage(image);
+      new db.Picture({
+        name: image.name.split('.')[0],
+        imageUrl: imageUrl
+      }).save(function (err) {
+        numSaved += 1;
+        if (numSaved === req.files.images.length) {
+          exports.listPictures(req, res);
+        }
+      });
     });
   } else {
     exports.listPictures(req, res);
