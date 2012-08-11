@@ -90,7 +90,7 @@ app.get('/pictures/:picture', routes.editPicture);
 
 // Scores
 app.post('/scores/:competition', routes.updateCompetitionScores);
-app.get('/scores', routes.showScores);
+app.get('/scores', routes.showTotalScores);
 app.get('/scores/:competition', routes.showCompetitionScores);
 
 http.createServer(app).listen(app.get('port'), function () {

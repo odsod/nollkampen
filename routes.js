@@ -293,13 +293,48 @@ exports.deletePicture = function (req, res) {
 // Scores
 ////
 
-exports.showScores = function (req, res) {
+exports.showTotalScores = function (req, res) {
   db.Competition.find(function (err, competitions) {
-    res.render('scores/index', {
-      title: 'Poängställning',
-      id: 'scores',
-      back: '/',
-      competitions: competitions
+    db.Section.find(function (err, sections) {
+      db.Score.find(function (err, scores) {
+        var totalScores = {};
+        scores.forEach(function (score) {
+          totalScores[score.section] =
+            totalScores[score.section] + score.points
+            || score.points;
+        });
+        res.render('scores/total', {
+          title: 'Poängställning',
+          id: 'scores',
+          back: '/',
+          competitions: competitions,
+          sections: sections,
+          scores: totalScores
+        });
+      });
     });
+  });
+};
+
+exports.showCompetitionScores = function (req, res) {
+  db.Section.find(function (err, sections) {
+    db.Score
+      .find({
+        competition: req.competition.id
+      })
+      .exec(function (err, scores) {
+        var sectionScores = {};
+        scores.forEach(function (score) {
+          sectionScores[score.section] = score.points;
+        });
+        res.render('scores/competition', {
+          title: req.competition.name,
+          id: 'competition-scores',
+          back: '/scores',
+          competition: req.competition,
+          sections: sections,
+          scores: sectionScores
+        });
+      });
   });
 };

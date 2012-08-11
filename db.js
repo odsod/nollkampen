@@ -27,6 +27,14 @@ var
   Section = db.model('Section', sectionSchema);
 
 var
+  scoreSchema = new mongoose.Schema({
+    section: mongoose.Schema.ObjectId,
+    competition: mongoose.Schema.ObjectId,
+    points: Number
+  }),
+  Score = db.model('Score', scoreSchema);
+
+var
   adSchema = new mongoose.Schema({
     name: String,
     imageUrl: String
@@ -37,5 +45,6 @@ module.exports = {
   Competition: Competition,
   Section: Section,
   Picture: Picture,
-  Ad: Ad
+  Ad: Ad,
+  Score: Score
 };

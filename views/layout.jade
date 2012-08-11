@@ -18,7 +18,9 @@ html
     script(src='/javascripts/app.js')
   body
     div(data-role="page", id=id)
-      include includes/head
+      div(data-role="header", data-position="fixed", data-theme="d")
+        include includes/head
+        block head-nav
       div(data-role="content"): div(data-role="content-primary")
         block content
       block foot
