@@ -35,6 +35,15 @@ var
   Score = db.model('Score', scoreSchema);
 
 var
+  timeSchema = new mongoose.Schema({
+    section: mongoose.Schema.ObjectId,
+    competition: mongoose.Schema.ObjectId,
+    minutes: Number,
+    seconds: Number
+  }),
+  Time = db.model('Time', timeSchema);
+
+var
   adSchema = new mongoose.Schema({
     name: String,
     imageUrl: String
@@ -46,5 +55,6 @@ module.exports = {
   Section: Section,
   Picture: Picture,
   Ad: Ad,
-  Score: Score
+  Score: Score,
+  Time: Time
 };

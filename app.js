@@ -90,8 +90,13 @@ app.get('/pictures/:picture', routes.editPicture);
 
 // Scores
 app.post('/scores/:competition', routes.updateCompetitionScores);
-app.get('/scores', routes.showTotalScores);
+app.get('/scores', routes.showScoreTable);
 app.get('/scores/:competition', routes.showCompetitionScores);
+
+// Times
+app.post('/times/:competition', routes.updateCompetitionTimes);
+app.get('/times', routes.showTimeTable);
+app.get('/times/:competition', routes.showCompetitionTimes);
 
 http.createServer(app).listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));

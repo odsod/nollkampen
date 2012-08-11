@@ -293,7 +293,7 @@ exports.deletePicture = function (req, res) {
 // Scores
 ////
 
-exports.showTotalScores = function (req, res) {
+exports.showScoreTable = function (req, res) {
   db.Competition.find(function (err, competitions) {
     db.Section.find(function (err, sections) {
       db.Score.find(function (err, scores) {
@@ -303,7 +303,7 @@ exports.showTotalScores = function (req, res) {
             totalScores[score.section] + score.points
             || score.points;
         });
-        res.render('scores/total', {
+        res.render('scores/table', {
           title: 'Poängställning',
           id: 'scores',
           back: '/',
@@ -361,5 +361,83 @@ exports.updateCompetitionScores = function (req, res) {
         .exec();
     });
   });
-  exports.showTotalScores(req, res);
+  exports.showScoreTable(req, res);
+};
+
+////
+// Times
+////
+
+exports.showTimeTable = function (req, res) {
+  db.Competition.find(function (err, competitions) {
+    db.Section.find(function (err, sections) {
+      db.Time.find(function (err, times) {
+        var timeTable = {};
+        times.forEach(function (time) {
+          timeTable[time.competition][time.section].minutes = time.minutes;
+          timeTable[time.competition][time.section].seconds = time.seconds;
+        });
+        res.render('times/table', {
+          title: 'Tider',
+          id: 'times-table',
+          back: '/',
+          competitions: competitions,
+          sections: sections,
+          times: timeTable
+        });
+      });
+    });
+  });
+};
+
+exports.showCompetitionTimes = function (req, res) {
+  db.Section.find(function (err, sections) {
+    db.Time
+      .find({
+        competition: req.competition.id
+      })
+      .exec(function (err, times) {
+        var sectionTimes = {};
+        times.forEach(function (time) {
+          sectionTimes[time.section] = {
+            minutes: time.minutes,
+            seconds: time.seconds
+          };
+        });
+        db.Competition
+          .find()
+          .select('name')
+          .exec(function (err, competitions) {
+            log.debug(sectionTimes);
+            res.render('times/form', {
+              title: req.competition.name,
+              id: 'times-form',
+              back: '/times',
+              competition: req.competition,
+              competitions: competitions,
+              sections: sections,
+              times: sectionTimes
+            });
+          });
+      });
+  });
+};
+
+exports.updateCompetitionTimes = function (req, res) {
+  db.Section.find(function (err, sections) {
+    sections.forEach(function (section) {
+      log.debug(section.id, { score: req.body[section.id] });
+      db.Score
+        .findOneAndUpdate({
+          section: section.id,
+          competition: req.competition.id
+        }, {
+          points: req.body[section.id]
+        }, {
+          upsert: true
+        })
+        .exec();
+    });
+  });
+  exports.showScoreTable(req, res);
 };
