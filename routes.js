@@ -289,7 +289,7 @@ exports.showScores = function (req, res) {
     res.render('scores/index', {
       title: 'Poängställning',
       id: 'scores',
-      back: '/pictures',
+      back: '/',
       competitions: competitions
     });
   });
