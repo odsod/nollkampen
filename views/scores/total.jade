@@ -2,13 +2,13 @@ extends ../layout
 
 block head-nav
   div(data-role='navbar'): ul
-    li: a(href='/scores', data-theme='d') Poängställning
     each competition in competitions
-      li: a(href='/scores/' + competition.id): = competition.name
+      li: a(href='/scores/' + competition.id, data-theme='c'): h3= competition.name
+
 
 block content
   ul(data-role='listview')
     each section in sections
       li
-        = section.initials
+        h3= section.initials
         span.ui-li-count= scores[section.id] || 0

@@ -65,3 +65,10 @@ $(document).delegate('#picture-form', 'pageinit', function () {
       theme: 'c'
     });
 });
+
+$(document).delegate('#scores-form', 'pageinit', function () {
+  $('.form-submit').click(function () {
+    console.log('hahahahah');
+    $('#scores-form form').submit();
+  });
+});

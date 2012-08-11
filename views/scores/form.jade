@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+  form(method='POST', action='/scores/' + competition.id, data-ajax='false')
+    ul(data-role='listview')
+      each section in sections
+        li(data-role='fieldcontain')
+          label(for=section.id): h3= section.initials
+          input(type='range', name=section.id, id=section.id, data-highlight='true',
+                value=scores[section.id] || 0, min='0', max='20')
+
+block foot
+  include ../includes/form-controls

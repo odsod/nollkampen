@@ -327,14 +327,39 @@ exports.showCompetitionScores = function (req, res) {
         scores.forEach(function (score) {
           sectionScores[score.section] = score.points;
         });
-        res.render('scores/competition', {
-          title: req.competition.name,
-          id: 'competition-scores',
-          back: '/scores',
-          competition: req.competition,
-          sections: sections,
-          scores: sectionScores
-        });
+        db.Competition
+          .find()
+          .select('name')
+          .exec(function (err, competitions) {
+            res.render('scores/form', {
+              title: req.competition.name,
+              id: 'scores-form',
+              back: '/scores',
+              competition: req.competition,
+              competitions: competitions,
+              sections: sections,
+              scores: sectionScores
+            });
+          });
       });
   });
+};
+
+exports.updateCompetitionScores = function (req, res) {
+  db.Section.find(function (err, sections) {
+    sections.forEach(function (section) {
+      log.debug(section.id, { score: req.body[section.id] });
+      db.Score
+        .findOneAndUpdate({
+          section: section.id,
+          competition: req.competition.id
+        }, {
+          points: req.body[section.id]
+        }, {
+          upsert: true
+        })
+        .exec();
+    });
+  });
+  exports.showTotalScores(req, res);
 };
