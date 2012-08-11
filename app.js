@@ -48,6 +48,13 @@ app.param('ad', function (req, res, next, id) {
   });
 });
 
+app.param('picture', function (req, res, next, id) {
+  db.Picture.findById(id, function (err, picture) {
+    req.picture = picture;
+    next();
+  });
+});
+
 app.get('/', routes.index);
 
 // Sections CRUD
