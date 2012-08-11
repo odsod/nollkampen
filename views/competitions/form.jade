@@ -1,2 +1,9 @@
-label(for="name") Namn:
-input(type="text", name="name", value=competition.name)
+extends ../layout
+
+block content
+  form(method='POST', action=formAction, data-ajax='false')
+    label(for="name") Namn:
+    input(type="text", name="name", value=competition.name)
+
+block foot
+  include ../includes/form-controls

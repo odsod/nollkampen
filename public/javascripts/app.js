@@ -49,6 +49,8 @@ $(document).delegate('#ad-form', 'pageinit', function () {
 
 $(document).delegate('#competition-form', 'pageinit', function () {
   $('.form-submit').click(function () {
+    console.log('heheh');
+    console.log($('#competition-form form'));
     $('#competition-form form').submit();
   });
 });

@@ -38,18 +38,20 @@ exports.listSections = function (req, res) {
 };
 
 exports.newSection = function (req, res) {
-  res.render('sections/new', {
+  res.render('sections/form', {
     title: 'Skapa ny sektion',
     id: 'section-form',
+    formAction: '/sections',
     back: '/sections',
     section: {}
   });
 };
 
 exports.editSection = function (req, res) {
-  res.render('sections/edit', {
+  res.render('sections/form', {
     title: 'Modifiera sektion',
     id: 'section-form',
+    formAction: '/sections/' + req.section.id + '/update',
     back: '/sections',
     section: req.section
   });
@@ -57,9 +59,11 @@ exports.editSection = function (req, res) {
 
 exports.createSection = function (req, res) {
   var saintImageUrl;
+  log.debug(JSON.stringify(req.files, '', '  '));
   if (req.files && req.files.saintImage) {
     saintImageUrl = saveImage(req.files.saintImage);
   }
+  log.debug(saintImageUrl);
   new db.Section({
     name: req.body.name,
     initials: req.body.initials,
@@ -68,7 +72,7 @@ exports.createSection = function (req, res) {
     saintImageUrl: saintImageUrl
   }).save(function (err, section) {
     if (err) {
-      log.err(err.toString());
+      log.error(err.toString());
     } else {
       exports.listSections(req, res);
     }
@@ -93,7 +97,7 @@ exports.updateSection = function (req, res) {
     saintImageUrl: newSaintImageUrl
   }, function (err) {
     if (err) {
-      log.err(err.toString());
+      log.error(err.toString());
     } else {
       exports.listSections(req, res);
     }
@@ -124,18 +128,20 @@ exports.listCompetitions = function (req, res) {
 };
 
 exports.newCompetition = function (req, res) {
-  res.render('competitions/new', {
+  res.render('competitions/form', {
     title: 'Skapa ny gren',
     id: 'competition-form',
+    formAction: '/competitions',
     back: '/competitions',
     competition: {}
   });
 };
 
 exports.editCompetition = function (req, res) {
-  res.render('competitions/edit', {
+  res.render('competitions/form', {
     title: 'Modifiera gren',
     id: 'competition-form',
+    formAction: '/competitions/' + req.competition.id + '/update',
     back: '/competitions',
     competition: req.competition
   });
@@ -178,18 +184,20 @@ exports.listAds = function (req, res) {
 };
 
 exports.newAd = function (req, res) {
-  res.render('ads/new', {
+  res.render('ads/form', {
     title: 'Skapa ny annons',
     id: 'ad-form',
+    formAction: '/ads',
     back: '/ads',
     ad: {}
   });
 };
 
 exports.editAd = function (req, res) {
-  res.render('ads/edit', {
+  res.render('ads/form', {
     title: 'Modifiera annons',
     id: 'ad-form',
+    formAction: '/ads/' + req.ad.id + '/update',
     back: '/ads',
     ad: req.ad
   });
@@ -247,9 +255,10 @@ exports.listPictures = function (req, res) {
 };
 
 exports.newPicture = function (req, res) {
-  res.render('pictures/new', {
+  res.render('pictures/form', {
     title: 'Ladda upp bilder',
     id: 'picture-form',
+    formAction: '/pictures',
     back: '/pictures',
     picture: {}
   });

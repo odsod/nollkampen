@@ -1,3 +1,9 @@
-label Bild(er):
+extends ../layout
 
-input(type='file', name='images', id='image-file', accept='image/*', multiple)
+block content
+  form(method='POST', action=formAction, enctype='multipart/form-data', data-ajax='false')
+    label(for='images') Bild(er):
+    input(type='file', name='images', accept='image/*', multiple)
+
+block foot
+    include ../includes/form-controls

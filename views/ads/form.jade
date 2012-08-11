@@ -1,15 +1,22 @@
-label(for='name') Namn:
-input(type='text', name='name', id='name', value=ad.name)
+extends ../layout
 
-label Annonsbild:
+block content
+  form(method='POST', action=formAction, enctype='multipart/form-data', data-ajax='false')
+    label(for='name') Namn:
+    input(type='text', name='name', id='name', value=ad.name)
 
-if ad.imageUrl
-  input(type='radio', name='uploadImage', id='upload-image-radio', value='true', checked='checked')
-  label(for='upload-image-radio') Ladda upp ny bild
+    label Annonsbild:
 
-input(type='file', name='image', id='image-file', accept='image/*')
+    if ad.imageUrl
+      input(type='radio', name='uploadImage', id='upload-image-radio', value='true', checked='checked')
+      label(for='upload-image-radio') Ladda upp ny bild
 
-if ad.imageUrl
-  input(type='radio', name='uploadImage', id='keep-image-radio', value='false', checked='checked')
-  label(for='keep-image-radio') Behåll existerande bild
-  img.image-preview-form(src=ad.imageUrl)
+    input(type='file', name='image', id='image-file', accept='image/*')
+
+    if ad.imageUrl
+      input(type='radio', name='uploadImage', id='keep-image-radio', value='false', checked='checked')
+      label(for='keep-image-radio') Behåll existerande bild
+      img.image-preview-form(src=ad.imageUrl)
+
+block foot
+  include ../includes/form-controls

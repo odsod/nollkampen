@@ -1,24 +1,31 @@
-label(for='name') Namn:
-input(type='text', name='name', id='name', value=section.name)
+extends ../layout
 
-label(for='initials') Initialer:
-input(type='text', name='initials', id='initials', value=section.initials)
+block content
+  form(method='POST', action=formAction, enctype='multipart/form-data', data-ajax='false')
+    label(for='name') Namn:
+    input(type='text', name='name', id='name', value=section.name)
 
-label(for='color') Sektionsfärg:
-input.color-picker(type='text', name='color', id='color', value=section.color || '#ffffff')
+    label(for='initials') Initialer:
+    input(type='text', name='initials', id='initials', value=section.initials)
 
-label(for='textColor') Textfärg:
-input.color-picker(type='text', name='textColor', id='textColor', value=section.textColor || '#000000')
+    label(for='color') Sektionsfärg:
+    input.color-picker(type='text', name='color', id='color', value=section.color || '#ffffff')
 
-label Sektionshelgon:
+    label(for='textColor') Textfärg:
+    input.color-picker(type='text', name='textColor', id='textColor', value=section.textColor || '#000000')
 
-if section.saintImageUrl
-  input(type='radio', name='uploadSaintImage', id='upload-saint-image-radio', value='true', checked='checked')
-  label(for='upload-saint-image-radio') Ladda upp ny bild
+    label Sektionshelgon:
 
-input(type='file', name='saintImage', id='saint-image-file', accept='image/*')
+    if section.saintImageUrl
+      input(type='radio', name='uploadSaintImage', id='upload-saint-image-radio', value='true')
+      label(for='upload-saint-image-radio') Ladda upp ny bild
 
-if section.saintImageUrl
-  input(type='radio', name='uploadSaintImage', id='keep-saint-image-radio', value='false', checked='checked')
-  label(for='keep-saint-image-radio') Behåll existerande bild
-  img.image-preview-form(src=section.saintImageUrl)
+    input(type='file', name='saintImage', id='saint-image-file', accept='image/*')
+
+    if section.saintImageUrl
+      input(type='radio', name='uploadSaintImage', id='keep-saint-image-radio', value='false', checked)
+      label(for='keep-saint-image-radio') Behåll existerande bild
+      img.image-preview-form(src=section.saintImageUrl)
+
+block foot
+  include ../includes/form-controls
