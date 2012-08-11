@@ -1,4 +1,7 @@
 $(document).delegate('#section-form', 'pageinit', function () {
+  $('.form-submit').click(function () {
+    $('#section-form form').submit();
+  });
   // Enhance color pickers
   var $colorPickers = $('.color-picker');
   $('input[name=color]')
@@ -29,6 +32,9 @@ $(document).delegate('#section-form', 'pageinit', function () {
 });
 
 $(document).delegate('#ad-form', 'pageinit', function () {
+  $('.form-submit').click(function () {
+    $('#ad-form form').submit();
+  });
   // Enhance file chooser
   $('input[type=file]')
     .textinput({
@@ -41,7 +47,16 @@ $(document).delegate('#ad-form', 'pageinit', function () {
     }).trigger('change');
 });
 
+$(document).delegate('#competition-form', 'pageinit', function () {
+  $('.form-submit').click(function () {
+    $('#competition-form form').submit();
+  });
+});
+
 $(document).delegate('#picture-form', 'pageinit', function () {
+  $('.form-submit').click(function () {
+    $('#picture-form form').submit();
+  });
   // Enhance file chooser
   $('input[type=file]')
     .textinput({

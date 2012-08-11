@@ -1,5 +1,6 @@
 li: a(href='/sections/' + section.id)
-  img(src=section.saintImageUrl)
+  if section.saintImageUrl
+    img(src=section.saintImageUrl)
   h3= section.initials
   p= section.name
   a(href='#delete' + section.id, data-rel='popup',

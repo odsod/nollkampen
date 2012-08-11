@@ -3,8 +3,10 @@ input(type='text', name='name', id='name', value=ad.name)
 
 label Annonsbild:
 
-input(type='radio', name='uploadImage', id='upload-image-radio', value='true', checked='checked')
-label(for='upload-image-radio') Ladda upp ny bild
+if ad.imageUrl
+  input(type='radio', name='uploadImage', id='upload-image-radio', value='true', checked='checked')
+  label(for='upload-image-radio') Ladda upp ny bild
+
 input(type='file', name='image', id='image-file', accept='image/*')
 
 if ad.imageUrl

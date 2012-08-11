@@ -1,5 +1,6 @@
 li.picture-item: a(href='#')
-  img(src=picture.imageUrl)
+  if picture.imageUrl
+    img(src=picture.imageUrl)
   h3= picture.name
   a(href='#delete' + picture.id, data-rel='popup',
     data-position-to='window') Ta bort

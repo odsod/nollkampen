@@ -1,5 +1,6 @@
 li: a(href='/ads/' + ad.id)
-  img(src=ad.imageUrl)
+  if ad.imageUrl
+    img(src=ad.imageUrl)
   h3= ad.name
   a(href='#delete' + ad.id, data-rel='popup',
     data-position-to='window') Ta bort

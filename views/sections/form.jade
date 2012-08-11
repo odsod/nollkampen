@@ -12,8 +12,10 @@ input.color-picker(type='text', name='textColor', id='textColor', value=section.
 
 label Sektionshelgon:
 
-input(type='radio', name='uploadSaintImage', id='upload-saint-image-radio', value='true', checked='checked')
-label(for='upload-saint-image-radio') Ladda upp ny bild
+if section.saintImageUrl
+  input(type='radio', name='uploadSaintImage', id='upload-saint-image-radio', value='true', checked='checked')
+  label(for='upload-saint-image-radio') Ladda upp ny bild
+
 input(type='file', name='saintImage', id='saint-image-file', accept='image/*')
 
 if section.saintImageUrl

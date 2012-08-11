@@ -68,7 +68,7 @@ exports.createSection = function (req, res) {
     saintImageUrl: saintImageUrl
   }).save(function (err, section) {
     if (err) {
-      log.debug(err.toString());
+      log.err(err.toString());
     } else {
       exports.listSections(req, res);
     }
@@ -93,7 +93,7 @@ exports.updateSection = function (req, res) {
     saintImageUrl: newSaintImageUrl
   }, function (err) {
     if (err) {
-      log.debug(err.toString());
+      log.err(err.toString());
     } else {
       exports.listSections(req, res);
     }
