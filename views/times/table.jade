@@ -1,0 +1,14 @@
+extends ../layout
+
+block head-nav
+  div(data-role='navbar'): ul
+    each competition in competitions
+      li: a(href='/times/' + competition.id, data-theme='c'): h3= competition.name
+
+// 
+// block content
+//   ul(data-role='listview')
+//     each section in sections
+//       li
+//         h3= section.initials
+//         span.ui-li-count= scores[section.id] || 0

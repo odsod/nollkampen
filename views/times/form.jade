@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+  form(method='POST', action='/times/' + competition.id, data-ajax='false')
+    ul(data-role='listview')
+      each section in sections
+        li(data-role='list-divider')= section.initials
+        li(data-role='fieldcontain')
+          label(for=section.id+'-minutes') Minuter
+          input(type='range', name='minutes['+ section.id + ']', id=section.id + '-minutes', data-highlight='true',
+                value=(times[section.id] && times[section.id].minutes) || 0, min='0', max='9')
+        li(data-role='fieldcontain')
+          label(for=section.id+'-seconds') Sekunder
+          input(type='range', name='seconds['+ section.id + ']', id=section.id + '-seconds', data-highlight='true',
+                value=(times[section.id] && times[section.id].seconds) || 0, min='0', max='9')
+
+block foot
+  include ../includes/form-controls
