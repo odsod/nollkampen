@@ -297,25 +297,54 @@ exports.showScoreTable = function (req, res) {
   db.Competition.find(function (err, competitions) {
     db.Section.find(function (err, sections) {
       db.Score.find(function (err, scores) {
-        var totalScores = {};
+        var scoreTable = {};
         scores.forEach(function (score) {
-          totalScores[score.section] =
-            totalScores[score.section] + score.points || 
-            score.points;
+          scoreTable[score.competition] = scoreTable[score.competition] || {};
+          scoreTable[score.competition][score.section] = scoreTable[score.competition][score.section] || {};
+          scoreTable[score.competition][score.section].points = score.points;
+          scoreTable[score.section] = scoreTable[score.section] || {};
+          scoreTable[score.section].total = scoreTable[score.section].total + score.points || score.points;
         });
+        log.debug(JSON.stringify(scoreTable, '', '  '));
         res.render('scores/table', {
           title: 'Poängställning',
           id: 'scores',
           back: '/',
           competitions: competitions,
           sections: sections,
-          scores: totalScores
+          scores: scoreTable
         });
       });
     });
   });
 };
 
+
+exports.showTimeTable = function (req, res) {
+  db.Competition.find(function (err, competitions) {
+    db.Section.find(function (err, sections) {
+      db.Time.find(function (err, times) {
+        log.debug(JSON.stringify(times, '', '  '));
+        var timeTable = {};
+        times.forEach(function (time) {
+          timeTable[time.competition] = timeTable[time.competition] || {};
+          timeTable[time.competition][time.section] = timeTable[time.competition][time.section] || {};
+          timeTable[time.competition][time.section].minutes = time.minutes;
+          timeTable[time.competition][time.section].seconds = time.seconds;
+        });
+        log.debug(JSON.stringify(timeTable, '', '  '));
+        res.render('times/table', {
+          title: 'Tider',
+          id: 'times-table',
+          back: '/',
+          competitions: competitions,
+          sections: sections,
+          times: timeTable
+        });
+      });
+    });
+  });
+};
 exports.showCompetitionScores = function (req, res) {
   db.Section.find(function (err, sections) {
     db.Score
@@ -379,6 +408,7 @@ exports.showTimeTable = function (req, res) {
           timeTable[time.competition][time.section] = timeTable[time.competition][time.section] || {};
           timeTable[time.competition][time.section].minutes = time.minutes;
           timeTable[time.competition][time.section].seconds = time.seconds;
+          timeTable[time.competition][time.section].disqualified = time.disqualified;
         });
         log.debug(JSON.stringify(timeTable, '', '  '));
         res.render('times/table', {

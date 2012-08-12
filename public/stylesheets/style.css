@@ -4,7 +4,7 @@ span.section-initials {
   border-radius: 1em;
   font-weight: bold;
   text-shadow: none;
-  box-shadow: 0.1em 0.1em 0.1em 0.1em #333;
+  box-shadow: 0.1em 0.1em 0.2em 0.1em #333;
 }
 .image-preview-form {
   max-width: 100%;

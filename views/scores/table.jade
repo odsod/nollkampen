@@ -1,14 +1,27 @@
 extends ../layout
 
 block head-nav
-  div(data-role='navbar'): ul
-    each competition in competitions
-      li: a(href='/scores/' + competition.id, data-theme='c'): h3= competition.name
-
+  table.results-table.results-table-header.ui-body-a.ui-content
+    thead
+      th Sektion
+      each competition in competitions
+        th= competition.name
+      th Totalt
 
 block content
-  ul(data-role='listview')
+  ul(data-role='listview') 
     each section in sections
-      li
-        h3= section.initials
-        span.ui-li-count= scores[section.id] || 0
+      li: table.results-table: tr: td 
+        span.section-initials(style='background: ' + section.color + '; color: ' + section.textColor)= section.initials
+          each competition in competitions
+            td= scores[competition.id][section.id].points
+          td= scores[section.id].total
+
+block foot
+  div(data-role='footer', data-position='fixed')
+    div(data-role='navbar'): ul
+      each competition in competitions
+        li: a(href='/scores/' + competition.id, data-theme='c'): h3
+          small Mata in poäng för
+          br
+          = competition.name
