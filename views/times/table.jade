@@ -13,13 +13,13 @@ block content
       li: table.results-table: tr: td 
         span.section-initials(style='background: ' + section.color + '; color: ' + section.textColor)= section.initials
           each competition in competitions
-            td= times[competition.id][section.id].disqualified ? 'Diskad.' : times[competition.id][section.id].minutes + 'm ' + times[competition.id][section.id].seconds + 's'
+            td= times[competition.id][section.id] || ' '
 
 block foot
   div(data-role='footer', data-position='fixed')
     div(data-role='navbar'): ul
       each competition in competitions
-        li: a(href='/times/' + competition.id, data-theme='c'): h3
-          small Mata in:
+        li: a(href='/times/' + competition.id, data-theme='b'): h3
+          small Mata in tider för
           br
           = competition.name

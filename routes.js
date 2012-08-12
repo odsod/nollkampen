@@ -3,6 +3,17 @@ var
   fs = require('fs'),
   log = require('winston').cli();
 
+function findErrors(errors) {
+  var errorsExist = false;
+  errors.forEach(function (err) {
+    if (err) {
+      log.debug(err.toString());
+      errorsExist = true;
+    }
+  });
+  return errorsExist;
+}
+
 function saveImage(image) {
   var
     name = image.path.split('/').pop() + image.name,
@@ -22,18 +33,20 @@ exports.index = function (req, res) {
   });
 };
 
+exports.errorPage = function (req, res) {
+  res.render('error'); 
+};
+
 ////
 // Sections
 ////
 
 exports.listSections = function (req, res) {
-  db.Section.find(function (err, sections) {
-    res.render('sections/list', {
-      title: 'Sektioner',
-      id: 'section-list',
-      back: '/',
-      sections: sections
-    });
+  res.render('sections/list', {
+    title: 'Sektioner',
+    id: 'section-list',
+    back: '/',
+    sections: req.sections
   });
 };
 
@@ -59,11 +72,9 @@ exports.editSection = function (req, res) {
 
 exports.createSection = function (req, res) {
   var saintImageUrl;
-  log.debug(JSON.stringify(req.files, '', '  '));
   if (req.files && req.files.saintImage) {
     saintImageUrl = saveImage(req.files.saintImage);
   }
-  log.debug(saintImageUrl);
   new db.Section({
     name: req.body.name,
     initials: req.body.initials,
@@ -71,11 +82,8 @@ exports.createSection = function (req, res) {
     textColor: req.body.textColor,
     saintImageUrl: saintImageUrl
   }).save(function (err, section) {
-    if (err) {
-      log.error(err.toString());
-    } else {
-      exports.listSections(req, res);
-    }
+    if (err) log.error(err.toString());
+    res.redirect('/sections');
   });
 };
 
@@ -96,11 +104,8 @@ exports.updateSection = function (req, res) {
     textColor: req.body.textColor,
     saintImageUrl: newSaintImageUrl
   }, function (err) {
-    if (err) {
-      log.error(err.toString());
-    } else {
-      exports.listSections(req, res);
-    }
+    if (err) log.error(err.toString());
+    res.redirect('/sections');
   });
 };
 
@@ -109,7 +114,7 @@ exports.deleteSection = function (req, res) {
     deleteImage(req.section.saintImageUrl);
   }
   req.section.remove();
-  exports.listSections(req, res);
+  res.redirect('/sections');
 };
 
 ////
@@ -117,13 +122,11 @@ exports.deleteSection = function (req, res) {
 ////
 
 exports.listCompetitions = function (req, res) {
-  db.Competition.find(function (err, competitions) {
-    res.render('competitions/list', {
-      title: 'Grenar',
-      id: 'competitions-list',
-      back: '/',
-      competitions: competitions
-    });
+  res.render('competitions/list', {
+    title: 'Grenar',
+    id: 'competitions-list',
+    back: '/',
+    competitions: req.competitions
   });
 };
 
@@ -151,20 +154,22 @@ exports.createCompetition = function (req, res) {
   new db.Competition({
     name: req.body.name
   }).save(function (err) {
-    exports.listCompetitions(req, res);
+    if (err) log.error(err.toString());
+    res.redirect('/competitions');
   });
 };
 
 exports.deleteCompetition = function (req, res) {
   req.competition.remove();
-  exports.listCompetitions(req, res);
+  res.redirect('/competitions');
 };
 
 exports.updateCompetition = function (req, res) {
   req.competition.update({
     name: req.body.name
   }, function (err) {
-    exports.listCompetitions(req, res);
+    if (err) log.error(err.toString());
+    res.redirect('/competitions');
   });
 };
 
@@ -173,13 +178,11 @@ exports.updateCompetition = function (req, res) {
 ////
 
 exports.listAds = function (req, res) {
-  db.Ad.find(function (err, ads) {
-    res.render('ads/list', {
-      title: 'Annonser',
-      id: 'ads-list',
-      back: '/',
-      ads: ads
-    });
+  res.render('ads/list', {
+    title: 'Annonser',
+    id: 'ads-list',
+    back: '/',
+    ads: req.ads
   });
 };
 
@@ -212,13 +215,13 @@ exports.createAd = function (req, res) {
     name: req.body.name,
     imageUrl: imageUrl
   }).save(function (err) {
-    exports.listAds(req, res);
+    res.redirect('/ads');
   });
 };
 
 exports.deleteAd = function (req, res) {
   req.ad.remove();
-  exports.listAds(req, res);
+  res.redirect('/ads');
 };
 
 exports.updateAd = function (req, res) {
@@ -235,7 +238,8 @@ exports.updateAd = function (req, res) {
     name: req.body.name,
     imageUrl: newImageUrl
   }, function (err) {
-    exports.listAds(req, res);
+    if (err) log.error(err);
+    res.redirect('/ads');
   });
 };
 
@@ -244,13 +248,11 @@ exports.updateAd = function (req, res) {
 ////
 
 exports.listPictures = function (req, res) {
-  db.Picture.find(function (err, pictures) {
-    res.render('pictures/list', {
-      title: 'Bilder',
-      id: 'pictures-list',
-      back: '/',
-      pictures: pictures
-    });
+  res.render('pictures/list', {
+    title: 'Bilder',
+    id: 'pictures-list',
+    back: '/',
+    pictures: req.pictures
   });
 };
 
@@ -265,7 +267,7 @@ exports.newPicture = function (req, res) {
 };
 
 exports.createPicture = function (req, res) {
-  if (req.files.images) {
+  if (req.files && req.files.images) {
     var numSaved = 0;
     req.files.images.forEach(function (image) {
       var imageUrl = saveImage(image);
@@ -273,20 +275,21 @@ exports.createPicture = function (req, res) {
         name: image.name.split('.')[0],
         imageUrl: imageUrl
       }).save(function (err) {
+        if (err) log.error(err);
         numSaved += 1;
         if (numSaved === req.files.images.length) {
-          exports.listPictures(req, res);
+          res.redirect('/pictures');
         }
       });
     });
   } else {
-    exports.listPictures(req, res);
+    res.redirect('/pictures');
   }
 };
 
 exports.deletePicture = function (req, res) {
   req.picture.remove();
-  exports.listPictures(req, res);
+  res.redirect('/pictures');
 };
 
 ////
@@ -294,103 +297,59 @@ exports.deletePicture = function (req, res) {
 ////
 
 exports.showScoreTable = function (req, res) {
-  db.Competition.find(function (err, competitions) {
-    db.Section.find(function (err, sections) {
-      db.Score.find(function (err, scores) {
-        var scoreTable = {};
-        scores.forEach(function (score) {
-          scoreTable[score.competition] = scoreTable[score.competition] || {};
-          scoreTable[score.competition][score.section] = scoreTable[score.competition][score.section] || {};
-          scoreTable[score.competition][score.section].points = score.points;
-          scoreTable[score.section] = scoreTable[score.section] || {};
-          scoreTable[score.section].total = scoreTable[score.section].total + score.points || score.points;
-        });
-        log.debug(JSON.stringify(scoreTable, '', '  '));
-        res.render('scores/table', {
-          title: 'Poängställning',
-          id: 'scores',
-          back: '/',
-          competitions: competitions,
-          sections: sections,
-          scores: scoreTable
-        });
-      });
-    });
+  var scoreTable = {};
+  req.competitions.forEach(function (competition) {
+    scoreTable[competition.id] = {};
+  });
+  req.scores.forEach(function (score) {
+    scoreTable[score.competition][score.section] = score.points;
+    scoreTable[score.section] = scoreTable[score.section] + score.points || score.points;
+  });
+  res.render('scores/table', {
+    title: 'Poängställning',
+    id: 'scores',
+    back: '/',
+    competitions: req.competitions,
+    sections: req.sections,
+    scores: scoreTable
   });
 };
 
-
-exports.showTimeTable = function (req, res) {
-  db.Competition.find(function (err, competitions) {
-    db.Section.find(function (err, sections) {
-      db.Time.find(function (err, times) {
-        log.debug(JSON.stringify(times, '', '  '));
-        var timeTable = {};
-        times.forEach(function (time) {
-          timeTable[time.competition] = timeTable[time.competition] || {};
-          timeTable[time.competition][time.section] = timeTable[time.competition][time.section] || {};
-          timeTable[time.competition][time.section].minutes = time.minutes;
-          timeTable[time.competition][time.section].seconds = time.seconds;
-        });
-        log.debug(JSON.stringify(timeTable, '', '  '));
-        res.render('times/table', {
-          title: 'Tider',
-          id: 'times-table',
-          back: '/',
-          competitions: competitions,
-          sections: sections,
-          times: timeTable
-        });
-      });
-    });
-  });
-};
 exports.showCompetitionScores = function (req, res) {
-  db.Section.find(function (err, sections) {
-    db.Score
-      .find({
-        competition: req.competition.id
-      })
-      .exec(function (err, scores) {
-        var sectionScores = {};
-        scores.forEach(function (score) {
-          sectionScores[score.section] = score.points;
-        });
-        db.Competition
-          .find()
-          .select('name')
-          .exec(function (err, competitions) {
-            res.render('scores/form', {
-              title: req.competition.name,
-              id: 'scores-form',
-              back: '/scores',
-              competition: req.competition,
-              competitions: competitions,
-              sections: sections,
-              scores: sectionScores
-            });
-          });
-      });
+  db.Score.find({
+    competition: req.competition.id
+  }, function (err, scores) {
+    if (err) log.debug(err.toString());
+    var sectionScores = {};
+    scores.forEach(function (score) {
+      sectionScores[score.section] = score.points;
+    });
+    res.render('scores/form', {
+      title: req.competition.name,
+      id: 'scores-form',
+      back: '/scores',
+      competition: req.competition,
+      competitions: req.competitions,
+      sections: req.sections,
+      scores: sectionScores
+    });
   });
 };
 
 exports.updateCompetitionScores = function (req, res) {
-  db.Section.find(function (err, sections) {
-    sections.forEach(function (section) {
-      log.debug(section.id, { score: req.body[section.id] });
-      db.Score
-        .findOneAndUpdate({
-          section: section.id,
-          competition: req.competition.id
-        }, {
-          points: req.body[section.id]
-        }, {
-          upsert: true
-        })
-        .exec();
+  req.sections.forEach(function (section) {
+    db.Score.findOneAndUpdate({
+      section: section.id,
+      competition: req.competition.id
+    }, {
+      points: req.body[section.id]
+    }, {
+      upsert: true
+    }, function (err) {
+      if (err) log.debug(err);
     });
   });
-  exports.showScoreTable(req, res);
+  res.redirect('/scores');
 };
 
 ////
@@ -398,91 +357,66 @@ exports.updateCompetitionScores = function (req, res) {
 ////
 
 exports.showTimeTable = function (req, res) {
-  db.Competition.find(function (err, competitions) {
-    db.Section.find(function (err, sections) {
-      db.Time.find(function (err, times) {
-        log.debug(JSON.stringify(times, '', '  '));
-        var timeTable = {};
-        times.forEach(function (time) {
-          timeTable[time.competition] = timeTable[time.competition] || {};
-          timeTable[time.competition][time.section] = timeTable[time.competition][time.section] || {};
-          timeTable[time.competition][time.section].minutes = time.minutes;
-          timeTable[time.competition][time.section].seconds = time.seconds;
-          timeTable[time.competition][time.section].disqualified = time.disqualified;
-        });
-        log.debug(JSON.stringify(timeTable, '', '  '));
-        res.render('times/table', {
-          title: 'Tider',
-          id: 'times-table',
-          back: '/',
-          competitions: competitions,
-          sections: sections,
-          times: timeTable
-        });
-      });
-    });
+  var timeTable = {};
+  req.competitions.forEach(function (competition) {
+    timeTable[competition.id] = {};
+  });
+  req.times.forEach(function (time) {
+    if (time.disqualified) {
+      timeTable[time.competition][time.section] = 'Diskad'; 
+    } else {
+      timeTable[time.competition][time.section] =
+        time.minutes + 'm ' + time.seconds + 's';
+    }
+  });
+  res.render('times/table', {
+    title: 'Tider',
+    id: 'times-table',
+    back: '/',
+    competitions: req.competitions,
+    sections: req.sections,
+    times: timeTable
   });
 };
 
 exports.showCompetitionTimes = function (req, res) {
-  db.Section.find(function (err, sections) {
-    db.Time
-      .find({
-        competition: req.competition.id
-      })
-      .exec(function (err, times) {
-        if (err) {
-          log.error(err);
-        }
-        var sectionTimes = {};
-        times.forEach(function (time) {
-          sectionTimes[time.section] = {
-            minutes: time.minutes,
-            seconds: time.seconds
-          };
-        });
-        db.Competition
-          .find()
-          .select('name')
-          .exec(function (err, competitions) {
-            if (err) {
-              log.error(err);
-            }
-            log.debug(sectionTimes);
-            res.render('times/form', {
-              title: req.competition.name,
-              id: 'times-form',
-              back: '/times',
-              competition: req.competition,
-              competitions: competitions,
-              sections: sections,
-              times: sectionTimes
-            });
-          });
-      });
+  db.Time.find({
+    competition: req.competition.id
+  }, function (err, times) {
+    if (err) log.error(err.toString());
+    var sectionTimes = {};
+    times.forEach(function (time) {
+      sectionTimes[time.section] = {
+        minutes: time.minutes,
+        seconds: time.seconds
+      };
+    });
+    res.render('times/form', {
+      title: req.competition.name,
+      id: 'times-form',
+      back: '/times',
+      competition: req.competition,
+      competitions: req.competitions,
+      sections: req.sections,
+      times: sectionTimes
+    });
   });
 };
 
 exports.updateCompetitionTimes = function (req, res) {
-  db.Section.find(function (err, sections) {
-    log.error(err);
-    sections.forEach(function (section) {
-      log.debug(section.id, { score: req.body[section.id] });
-      db.Time
-        .findOneAndUpdate({
-          section: section.id,
-          competition: req.competition.id
-        }, {
-          minutes: req.body[section.id].minutes,
-          seconds: req.body[section.id].seconds,
-          disqualified: req.body[section.id].disqualified === 'true'
-        }, {
-          upsert: true
-        })
-        .exec(function (err) {
-          log.debug(err);
-        });
+  req.sections.forEach(function (section) {
+    db.Time.findOneAndUpdate({
+      section: section.id,
+      competition: req.competition.id
+    }, {
+      minutes: req.body[section.id].minutes,
+      seconds: req.body[section.id].seconds,
+      disqualified: req.body[section.id].disqualified === 'true'
+    }, {
+      upsert: true
+    }, function (err) {
+      if (err) log.debug(err);
+      res.redirect('/times');
     });
   });
-  exports.showTimeTable(req, res);
 };

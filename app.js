@@ -55,48 +55,88 @@ app.param('picture', function (req, res, next, id) {
   });
 });
 
+function loadModel(model, paramName, criteria) {
+  return function (req, res, next) {
+    model.find(function (err, instances) {
+      if (err) {
+        log.error(err);
+        // The DangerZone(tm)
+        return res.send('Shit happened.');
+      }
+      req[paramName] = instances;
+      next();
+    });
+  };
+}
+
 app.get('/', routes.index);
 
 // Sections CRUD
+app.get('/sections', 
+        loadModel(db.Section, 'sections'), 
+        routes.listSections);
+app.get('/sections/new', routes.newSection);
+app.get('/sections/:section', routes.editSection);
 app.post('/sections', routes.createSection);
 app.post('/sections/:section/delete', routes.deleteSection);
 app.post('/sections/:section/update', routes.updateSection);
-app.get('/sections', routes.listSections);
-app.get('/sections/new', routes.newSection);
-app.get('/sections/:section', routes.editSection);
 
 // Competitions CRUD
-app.post('/competitions', routes.createCompetition);
-app.post('/competitions/:competition/delete', routes.deleteCompetition);
-app.post('/competitions/:competition/update', routes.updateCompetition);
-app.get('/competitions', routes.listCompetitions);
+app.get('/competitions', 
+        loadModel(db.Competition, 'competitions'), 
+        routes.listCompetitions);
 app.get('/competitions/new', routes.newCompetition);
 app.get('/competitions/:competition', routes.editCompetition);
+app.post('/competitions', routes.createCompetition);
+app.post('/competitions/:competition/update', routes.updateCompetition);
+app.post('/competitions/:competition/delete', routes.deleteCompetition);
 
 // Ads CRUD
+app.get('/ads', 
+        loadModel(db.Ad, 'ads'), 
+        routes.listAds);
+app.get('/ads/new', routes.newAd);
+app.get('/ads/:ad', routes.editAd);
 app.post('/ads', routes.createAd);
 app.post('/ads/:ad/delete', routes.deleteAd);
 app.post('/ads/:ad/update', routes.updateAd);
-app.get('/ads', routes.listAds);
-app.get('/ads/new', routes.newAd);
-app.get('/ads/:ad', routes.editAd);
 
 // Pictures CRUD
-app.post('/pictures', routes.createPicture);
-app.post('/pictures/:picture/delete', routes.deletePicture);
-app.get('/pictures', routes.listPictures);
+app.get('/pictures', 
+        loadModel(db.Picture, 'pictures'), 
+        routes.listPictures);
 app.get('/pictures/new', routes.newPicture);
 app.get('/pictures/:picture', routes.editPicture);
+app.post('/pictures', routes.createPicture);
+app.post('/pictures/:picture/delete', routes.deletePicture);
 
 // Scores
-app.post('/scores/:competition', routes.updateCompetitionScores);
-app.get('/scores', routes.showScoreTable);
-app.get('/scores/:competition', routes.showCompetitionScores);
+app.get('/scores', 
+        loadModel(db.Competition, 'competitions'), 
+        loadModel(db.Section, 'sections'), 
+        loadModel(db.Score, 'scores'), 
+        routes.showScoreTable);
+app.get('/scores/:competition', 
+        loadModel(db.Competition, 'competitions'), 
+        loadModel(db.Section, 'sections'), 
+        routes.showCompetitionScores);
+app.post('/scores/:competition', 
+         loadModel(db.Section, 'sections'), 
+         routes.updateCompetitionScores);
 
 // Times
-app.post('/times/:competition', routes.updateCompetitionTimes);
-app.get('/times', routes.showTimeTable);
-app.get('/times/:competition', routes.showCompetitionTimes);
+app.get('/times', 
+        loadModel(db.Competition, 'competitions'), 
+        loadModel(db.Section, 'sections'), 
+        loadModel(db.Time, 'times'),
+        routes.showTimeTable);
+app.get('/times/:competition', 
+        loadModel(db.Competition, 'competitions'), 
+        loadModel(db.Section, 'sections'), 
+        routes.showCompetitionTimes);
+app.post('/times/:competition', 
+         loadModel(db.Section, 'sections'), 
+         routes.updateCompetitionTimes);
 
 http.createServer(app).listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));
