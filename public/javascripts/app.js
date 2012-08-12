@@ -78,8 +78,11 @@ $(document).delegate('#times-form', 'pageinit', function () {
   });
   $('.disqualified-slider').change(function () {
     $('input[data-section=' + $(this).data('section') + ']')
-      .val(0)
       .slider($(this).val() === 'true' ? 'disable' : 'enable')
       .slider('refresh');
-  });
+    if ($(this).val() === 'true') {
+      $('input[data-section=' + $(this).data('section') + ']')
+        .val(0);
+    }
+  }).trigger('change');
 });

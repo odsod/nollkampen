@@ -3,17 +3,6 @@ var
   fs = require('fs'),
   log = require('winston').cli();
 
-function findErrors(errors) {
-  var errorsExist = false;
-  errors.forEach(function (err) {
-    if (err) {
-      log.debug(err.toString());
-      errorsExist = true;
-    }
-  });
-  return errorsExist;
-}
-
 function saveImage(image) {
   var
     name = image.path.split('/').pop() + image.name,
@@ -346,7 +335,7 @@ exports.updateCompetitionScores = function (req, res) {
     }, {
       upsert: true
     }, function (err) {
-      if (err) log.debug(err);
+      if (err) log.debug(err.toString());
     });
   });
   res.redirect('/scores');
@@ -388,9 +377,11 @@ exports.showCompetitionTimes = function (req, res) {
     times.forEach(function (time) {
       sectionTimes[time.section] = {
         minutes: time.minutes,
-        seconds: time.seconds
+        seconds: time.seconds,
+        disqualified: time.disqualified
       };
     });
+    log.debug(JSON.stringify(sectionTimes, '', '  '));
     res.render('times/form', {
       title: req.competition.name,
       id: 'times-form',
@@ -409,14 +400,14 @@ exports.updateCompetitionTimes = function (req, res) {
       section: section.id,
       competition: req.competition.id
     }, {
-      minutes: req.body[section.id].minutes,
-      seconds: req.body[section.id].seconds,
+      minutes: req.body[section.id].minutes || 0,
+      seconds: req.body[section.id].seconds || 0,
       disqualified: req.body[section.id].disqualified === 'true'
     }, {
       upsert: true
     }, function (err) {
-      if (err) log.debug(err);
-      res.redirect('/times');
+      if (err) log.debug(err.toString());
     });
   });
+  res.redirect('/times');
 };

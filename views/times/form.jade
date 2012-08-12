@@ -18,7 +18,10 @@ block content
           select.disqualified-slider(name=section.id + '[disqualified]', id=section.id + '-disqualified', 
                  data-role='slider', data-theme='c', data-track-theme='d', data-section=section.id)
             option(value='false') Nej
-            option(value='true', selected=section.disqualified) Ja
+            if times[section.id] && times[section.id].disqualified
+              option(value='true', selected) Ja
+            else
+              option(value='true') Ja
 
 block foot
   include ../includes/form-controls
