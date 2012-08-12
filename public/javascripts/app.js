@@ -68,7 +68,18 @@ $(document).delegate('#picture-form', 'pageinit', function () {
 
 $(document).delegate('#scores-form', 'pageinit', function () {
   $('.form-submit').click(function () {
-    console.log('hahahahah');
     $('#scores-form form').submit();
+  });
+});
+
+$(document).delegate('#times-form', 'pageinit', function () {
+  $('.form-submit').click(function () {
+    $('#times-form form').submit();
+  });
+  $('.disqualified-slider').change(function () {
+    $('input[data-section=' + $(this).data('section') + ']')
+      .val(0)
+      .slider($(this).val() === 'true' ? 'disable' : 'enable')
+      .slider('refresh');
   });
 });

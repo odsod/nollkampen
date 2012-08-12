@@ -1,14 +1,25 @@
 extends ../layout
 
 block head-nav
-  div(data-role='navbar'): ul
-    each competition in competitions
-      li: a(href='/times/' + competition.id, data-theme='c'): h3= competition.name
+  table.results-table.results-table-header.ui-body-a.ui-content
+    thead
+      th Sektion
+      each competition in competitions
+        th= competition.name
 
-// 
-// block content
-//   ul(data-role='listview')
-//     each section in sections
-//       li
-//         h3= section.initials
-//         span.ui-li-count= scores[section.id] || 0
+block content
+  ul(data-role='listview') 
+    each section in sections
+      li: table.results-table: tr: td 
+        span.section-initials(style='background: ' + section.color + '; color: ' + section.textColor)= section.initials
+          each competition in competitions
+            td= times[competition.id][section.id].disqualified ? 'Diskad.' : times[competition.id][section.id].minutes + 'm ' + times[competition.id][section.id].seconds + 's'
+
+block foot
+  div(data-role='footer', data-position='fixed')
+    div(data-role='navbar'): ul
+      each competition in competitions
+        li: a(href='/times/' + competition.id, data-theme='c'): h3
+          small Mata in:
+          br
+          = competition.name

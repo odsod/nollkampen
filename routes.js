@@ -300,8 +300,8 @@ exports.showScoreTable = function (req, res) {
         var totalScores = {};
         scores.forEach(function (score) {
           totalScores[score.section] =
-            totalScores[score.section] + score.points
-            || score.points;
+            totalScores[score.section] + score.points || 
+            score.points;
         });
         res.render('scores/table', {
           title: 'Poängställning',
@@ -372,11 +372,15 @@ exports.showTimeTable = function (req, res) {
   db.Competition.find(function (err, competitions) {
     db.Section.find(function (err, sections) {
       db.Time.find(function (err, times) {
+        log.debug(JSON.stringify(times, '', '  '));
         var timeTable = {};
         times.forEach(function (time) {
+          timeTable[time.competition] = timeTable[time.competition] || {};
+          timeTable[time.competition][time.section] = timeTable[time.competition][time.section] || {};
           timeTable[time.competition][time.section].minutes = time.minutes;
           timeTable[time.competition][time.section].seconds = time.seconds;
         });
+        log.debug(JSON.stringify(timeTable, '', '  '));
         res.render('times/table', {
           title: 'Tider',
           id: 'times-table',
@@ -397,6 +401,9 @@ exports.showCompetitionTimes = function (req, res) {
         competition: req.competition.id
       })
       .exec(function (err, times) {
+        if (err) {
+          log.error(err);
+        }
         var sectionTimes = {};
         times.forEach(function (time) {
           sectionTimes[time.section] = {
@@ -408,6 +415,9 @@ exports.showCompetitionTimes = function (req, res) {
           .find()
           .select('name')
           .exec(function (err, competitions) {
+            if (err) {
+              log.error(err);
+            }
             log.debug(sectionTimes);
             res.render('times/form', {
               title: req.competition.name,
@@ -425,19 +435,24 @@ exports.showCompetitionTimes = function (req, res) {
 
 exports.updateCompetitionTimes = function (req, res) {
   db.Section.find(function (err, sections) {
+    log.error(err);
     sections.forEach(function (section) {
       log.debug(section.id, { score: req.body[section.id] });
-      db.Score
+      db.Time
         .findOneAndUpdate({
           section: section.id,
           competition: req.competition.id
         }, {
-          points: req.body[section.id]
+          minutes: req.body[section.id].minutes,
+          seconds: req.body[section.id].seconds,
+          disqualified: req.body[section.id].disqualified === 'true'
         }, {
           upsert: true
         })
-        .exec();
+        .exec(function (err) {
+          log.debug(err);
+        });
     });
   });
-  exports.showScoreTable(req, res);
+  exports.showTimeTable(req, res);
 };

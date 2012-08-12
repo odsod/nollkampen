@@ -39,7 +39,8 @@ var
     section: mongoose.Schema.ObjectId,
     competition: mongoose.Schema.ObjectId,
     minutes: Number,
-    seconds: Number
+    seconds: Number,
+    disqualified: Boolean
   }),
   Time = db.model('Time', timeSchema);
 
