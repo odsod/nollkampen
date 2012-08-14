@@ -70,6 +70,7 @@ function loadModel(model, paramName, criteria) {
 }
 
 app.get('/', routes.index);
+app.get('/screen', routes.screen);
 
 // Sections CRUD
 app.get('/sections', 

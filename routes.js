@@ -22,8 +22,12 @@ exports.index = function (req, res) {
   });
 };
 
-exports.errorPage = function (req, res) {
-  res.render('error'); 
+////
+// Screen
+////
+
+exports.screen = function (req, res) {
+  res.render('screen');  
 };
 
 ////
