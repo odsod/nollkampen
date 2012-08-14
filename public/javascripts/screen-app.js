@@ -1,16 +1,29 @@
 (function ($) {
   $(function () {
-      $('#test').html(Handlebars.templates.test2({ param: 'fooobaaar'}));
 
-    // $('#test').countDown({
-    //   countStart: 4,
-    //   expandEasing: 'easeOutCirc',
-    //   shrinkEasing: 'easeInExpo',
-    //   expandDuration: 200,
-    //   shrinkDuration: 1500,
-    //   complete: function () {
-    //     console.log('omfggg countdown complete!!');
-    //   }
-    // });
+    Backbone.LayoutManager.configure({
+      fetch: function (template, context) {
+        return Handlebars.templates[template];  
+      },
+      render: function (template, context) {
+        return template(context);
+      },
+      manage: true
+    });
+
+    var ResultsHeader = Backbone.View.extend({
+      template: 'sb-results-header'
+    });
+
+    var scoreBoard = new Backbone.Layout({
+      template: 'sb',
+      views: {
+        '.test': new ResultsHeader()
+      }
+    });
+
+    $('body').empty().append(scoreBoard.el);
+    scoreBoard.render();
+
   });
 }(jQuery));

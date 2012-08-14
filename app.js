@@ -21,8 +21,9 @@ app.configure(function () {
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(require('stylus').middleware(__dirname + '/public'));
-  app.use('/templates.js', connectHandlebars(__dirname + '/public/templates', {
-    exts: ['hbs', 'handlebars']
+  app.use('/templates.js', connectHandlebars(__dirname + '/templates', {
+    exts_re: /.hbs$|.handlebars$/,
+    encoding: 'utf8'
   }));
   app.use(express.static(path.join(__dirname, 'public')));
 });
