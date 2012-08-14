@@ -1,52 +1,67 @@
 (function ($) {
 
   var 
+    namespace = 'countDown',
     defaults = {
       countStart: 10,
-      initialFontSize: 400
+      expandEasing: 'easeOutCirc',
+      shrinkEasing: 'easeInExpo',
+      expandDuration: 200,
+      shrinkDuration: 1500,
+      complete: function () {}
     },
     methods = {
       init: function (options) {
         return this.each(function () {
           var 
             $this = $(this),
-            data = $this.data('countDown'),
-            options = $.extend(defaults, options);
+            data = $this.data(namespace),
+            settings = $.extend(defaults, options),
+            originalFontSize = $this.css('font-size');
           if (!data) {
-            $this.data('countDown', {
-              count: options.countStart, 
-              options: options
+            $this.data(namespace, {
+              count: settings.countStart,
+              originalFontSize: originalFontSize,
+              settings: settings
             });
-            console.log($this.data('countDown'));
             methods.nextCount.call($this);
           }
         });
       },
       nextCount: function () {
-        var data = this.data('countDown');
+        var data = this.data(namespace);
         if (data.count > 0) {
           this.text(data.count); 
           this.animate({
-            'font-size': data.options.initialFontSize
+            'font-size': data.originalFontSize
           }, {
-            duration: 200,
-            easing: 'easeOutCirc',
+            duration: data.settings.expandDuration,
+            easing: data.settings.expandEasing,
             complete: $.proxy(function () {
-              console.log(this);
               this.animate({ 
                 'font-size': 0
               }, {
-                duration: 1500,
-                easing: 'easeInExpo',
+                duration: data.settings.shrinkDuration,
+                easing: data.settings.shrinkEasing,
                 complete: $.proxy(methods.nextCount, this)
               });
               data.count -= 1;
             }, this)
           });
+        } else {
+          data.settings.complete.call(this);
         }
       },
       destroy: function () {
-        
+        return this.each(function () {
+          var 
+            $this = $(this),
+            data = $this.data(namespace);
+          $this.stop(true);
+          $this.css('font-size', data.originalFontSize);
+          $this.text('');
+          $this.removeData(namespace);
+        });
       }
     };
 
