@@ -1,10 +1,41 @@
-html body
+// Height division
+$header-height = 5%
+$content-height = 100% - $header-height
+
+// Width division
+$results-width = 80%
+$ads-width = 100% - $results-width
+
+html
+body
+#sb
     width 100%
     height 100%
     margin 0
     padding 0
 
-#test
-    height 100%
-    text-align center
-    text-shadow 6px 6px 1px #333
+#sb-header
+    width 100%
+    height $header-height
+    background #333
+    #sb-header-results
+        width $results-width
+        height 100%
+        float left
+    #sb-header-ads
+        width $ads-width
+        height 100%
+        float left
+
+#sb-content
+    width 100%
+    height $content-height
+    background #eee
+    #sb-content-results
+        width $results-width
+        height 100%
+        float left
+    #sb-content-ads
+        width $ads-width
+        height 100
+        float left

@@ -12,6 +12,8 @@
     "stylus": "*",
     "mongoose": "*",
     "handlebars": "*",
-    "connect-handlebars": "*"
+    "connect-handlebars": "*",
+    "socket.io": "*",
+    "underscore": "*"
   }
 }

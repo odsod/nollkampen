@@ -1,13 +1,13 @@
 var
   express = require('express'),
-  connectHandlebars = require('connect-handlebars'),
+  app = express(),
+  server = require('http').createServer(app),
+  sockets = require('./sockets').listen(server);
   routes = require('./routes'),
-  http = require('http'),
   path = require('path'),
   db = require('./db'),
+  connectHandlebars = require('connect-handlebars'),
   log = require('winston').cli();
-
-var app = express();
 
 app.configure(function () {
   app.set('port', process.env.PORT || 3000);
@@ -144,6 +144,16 @@ app.post('/times/:competition',
          loadModel(db.Section, 'sections'), 
          routes.updateCompetitionTimes);
 
-http.createServer(app).listen(app.get('port'), function () {
+// Methods that map to websocket messages
+app.post('/screen/scoreboard', 
+         loadModel(db.Competition, 'competitions'),
+         loadModel(db.Section, 'sections'),
+         loadModel(db.Time, 'times'),
+         loadModel(db.Score, 'scores'),
+         sockets.showScoreboard);
+app.post('/screen/picture', sockets.showPicture);
+app.post('/screen/text', sockets.showText);
+
+server.listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));
 });
