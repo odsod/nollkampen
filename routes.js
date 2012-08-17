@@ -106,6 +106,20 @@ exports.deleteSection = function (req, res) {
   if (req.section.saintImageUrl) {
     deleteImage(req.section.saintImageUrl);
   }
+  db.Time.find({
+    section: req.section.id
+  }, function (err, times) {
+    times.forEach(function (time) {
+      time.remove();
+    });
+  });
+  db.Score.find({
+    section: req.section.id
+  }, function (err, scores) {
+    scores.forEach(function (score) {
+      score.remove();
+    });
+  });
   req.section.remove();
   res.redirect('/sections');
 };
@@ -153,6 +167,20 @@ exports.createCompetition = function (req, res) {
 };
 
 exports.deleteCompetition = function (req, res) {
+  db.Time.find({
+    competition: req.competition.id
+  }, function (err, times) {
+    times.forEach(function (time) {
+      time.remove();
+    });
+  });
+  db.Score.find({
+    competition: req.competition.id
+  }, function (err, scores) {
+    scores.forEach(function (score) {
+      score.remove();
+    });
+  });
   req.competition.remove();
   res.redirect('/competitions');
 };
