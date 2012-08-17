@@ -3,6 +3,10 @@ var socket = io.connect('http://localhost');
 
 (function ($) {
 
+  $.fn.scrollScoreboard = function (options) {
+    
+  }
+
 	$.fn.autoStretchFont = function (options) {
 		var defaults = {
 			ratio: 0.5

@@ -8,6 +8,9 @@ body,
   border: 0;
   font-family: "Franklin Gothic Demi";
 }
+#sb-results {
+  overflow: hidden;
+}
 .sb-header-row {
   height: 6%;
   background: #0095d7;
@@ -72,7 +75,7 @@ body,
   box-shadow: 4px 2px 4px #888;
 }
 .sb-empty-row {
-  height: 10%;
+  height: 11%;
   color: #eee;
 }
 .sb-header-results-row {
