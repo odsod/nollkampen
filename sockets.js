@@ -18,7 +18,7 @@ exports.showScoreboard = function (req, res) {
   var data = {
     sections: [],
     competitions: [],
-    ads: [] 
+    ads: req.ads
   };
   req.sections.forEach(function (s) {
     var section = {

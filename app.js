@@ -150,6 +150,7 @@ app.post('/screen/scoreboard',
          loadModel(db.Section, 'sections'),
          loadModel(db.Time, 'times'),
          loadModel(db.Score, 'scores'),
+         loadModel(db.Ad, 'ads'),
          sockets.showScoreboard);
 app.post('/screen/picture', sockets.showPicture);
 app.post('/screen/text', sockets.showText);
