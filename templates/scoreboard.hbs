@@ -1,25 +1,8 @@
 <div id="sb">
-  <div id="sb-header">
-    <ul id="sb-header-results">
-      <li class="place">#</li>
-      {{#each competitions}}
-      <li class="competition">{{competition.name}}</li>  
-      {{/each}}
-      <li class="total">Totalt</li>
-    </ul>
-    <ul id="sb-header-ads">
-      <li class="ad">Sponsorer</li>
-    </ul>
+  <div class="sb-row sb-header-row">
+    {{> scoreboard-header}}
   </div>
-  <div id="sb-content">
-    <ul id="sb-content-results">
-    {{#each sections}}
-    
-    {{/each}}
-    </div>
-    <ul id="sb-content-ads">
-    {{#each ads}}
-    {{/each}}
-    </div>
+  <div class="sb-row sb-content-row">
+    {{> scoreboard-content}}
   </div>
 </div>

@@ -153,6 +153,7 @@ app.post('/screen/scoreboard',
          sockets.showScoreboard);
 app.post('/screen/picture', sockets.showPicture);
 app.post('/screen/text', sockets.showText);
+app.post('/screen/clear', sockets.clear);
 
 server.listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));

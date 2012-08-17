@@ -6,8 +6,12 @@ var
 exports.listen = function (app) {
   io = io.listen(app);
   io.set('logger', log);
-  io.set('log level', 1);
   return exports;
+}
+
+exports.clear = function (req, res) {
+  io.sockets.emit('clear');
+  res.end();
 }
 
 exports.showScoreboard = function (req, res) {
@@ -22,16 +26,17 @@ exports.showScoreboard = function (req, res) {
       initials: s.initials,
       color: s.color,
       textColor: s.textColor,
+      saint: s.saintImageUrl,
       results: []
     }; 
     req.competitions.forEach(function (c) {
       section.results.push({
         time: _.find(req.times, function (t) {
           return t.section == s.id && t.competition == c.id;
-        }),
+        }).text,
         points: _.find(req.scores, function (sc) {
           return sc.section == s.id && sc.competition == c.id;
-        })
+        }).points
       });
     });
     data.sections.push(section);
@@ -41,6 +46,6 @@ exports.showScoreboard = function (req, res) {
       name: c.name
     });
   });
-  io.sockets.emit('hello world', data);
-  res.end();
+  io.sockets.emit('scoreboard', data);
+  res.redirect('/');
 }

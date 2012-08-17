@@ -41,7 +41,11 @@ var
     minutes: Number,
     seconds: Number,
     disqualified: Boolean
-  }),
+  });
+  timeSchema.virtual('text').get(function () {
+    return this.disqualified ? 'Diskad' : this.minutes + 'm ' + this.seconds + 's';
+  });
+var 
   Time = db.model('Time', timeSchema);
 
 var

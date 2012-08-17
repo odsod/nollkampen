@@ -1,10 +1,16 @@
 // Height division
-$header-height = 5%
+$header-height = 8%
 $content-height = 100% - $header-height
 
 // Width division
 $results-width = 80%
 $ads-width = 100% - $results-width
+
+$col-logo-width = 15%
+$col-result-width = 20%
+$col-total-width = 100% - ($col-logo-width + (3 * $col-result-width))
+
+$col-ad-width = 100%
 
 html
 body
@@ -13,29 +19,198 @@ body
     height 100%
     margin 0
     padding 0
+    border 0
+    font-family "Franklin Gothic Demi"
 
-#sb-header
-    width 100%
-    height $header-height
-    background #333
-    #sb-header-results
-        width $results-width
-        height 100%
-        float left
-    #sb-header-ads
-        width $ads-width
-        height 100%
-        float left
+.sb-header-row
+    height 6%
+    background #0095d7
+    background-image -webkit-linear-gradient(#0095d7, #00628c)
+    color #eee
+    text-shadow 0 1px 0 #333
+    text-transform uppercase
+    font-family "Franklin Gothic Demi"
+    font-size 20px
 
-#sb-content
-    width 100%
-    height $content-height
+.sb-content-row
+    height 94%
     background #eee
-    #sb-content-results
-        width $results-width
-        height 100%
-        float left
-    #sb-content-ads
-        width $ads-width
-        height 100
-        float left
+    background-image -webkit-linear-gradient(#eee, #ccc)
+
+.sb-results-col
+    width 80%
+
+.sb-ads-col
+    width 20%
+
+.sb-col
+    height 100%
+    float left
+
+.sb-row
+    width 100%
+
+.sb-cell-wrapper
+    display table
+
+.sb-cell
+    display table-cell
+    text-align center
+    vertical-align middle
+    float none
+    height 100%
+
+.sb-section-col
+    width 20%
+
+.sb-section-row
+    .sb-section-col
+        position relative
+        img
+            height 220%
+            width auto
+            position absolute
+            bottom 0
+            left 0
+
+.sb-result-col
+    width 20%
+
+.sb-total-col
+    width 10%
+
+.sb-section-row
+    width 97%
+    margin-left 3%
+    height (40% / 5)
+    box-shadow 4px 2px 4px #888
+
+.sb-empty-row
+    height 10%
+    color #eee
+
+.sb-header-results-row
+    width 97%
+    margin-left 3%
+    height 100%
+
+.sb-row-shadow-bottom
+    position absolute
+    bottom 0
+    left 0
+    height 0
+    box-shadow 0 0 20px 20px #eee
+
+// .sb-wrapper
+//     height 100%
+//     float left
+//     text-align center
+//     display table
+// 
+// .sb-cell
+//     height 100%
+//     text-align center
+//     display table-cell
+//     vertical-align middle
+// 
+// .sb-result-row
+//     width 100%
+//     height 20%
+// 
+// .sb-results-wrapper
+//     width 80%
+//     overflow hidden
+//     .sb-section-cell
+//         width 20%
+//     .sb-result-cell
+//         width 20%
+//     .sb-total-cell
+//         width 20%
+// .sb-ads-wrapper
+//     overflow hidden
+//     width 20%
+//     .sb-ad-cell
+//         width 100%
+// 
+// 
+// // 
+// // #sb-header
+// //     width 100%
+// //     height $header-height
+// //     text-align center
+// //     text-transform uppercase
+// //     background #0095d7
+// //     color #eee
+// //     box-shadow 6px 2px 2px 2px #999
+// //     #sb-header-results
+// //         width $results-width
+// //         height 100%
+// //         z-index -10
+// //         float left
+// //         box-shadow 0px 2px 2px 2px #999
+// //     #sb-header-ads
+// //         z-index 10
+// //         width $ads-width
+// //         height 100%
+// //         float left
+// //         box-shadow 0px 2px 2px 2px #999
+// // 
+// // #sb-content
+// //     width 100%
+// //     height $content-height
+// //     background #eee
+// //     #sb-content-results
+// //         width $results-width
+// //         height 100%
+// //         float left
+// //         .sb-result-row
+// //             display block
+// //             margin-left 2%
+// //             height 16%
+// //             background #bbb
+// //             box-shadow 6px 2px 2px 2px #999
+// //         .sb-result-row-divider
+// //             height 3%
+// //         // .sb-result-row
+// //         //     height $result-row-height
+// //         //     div
+// //         //         float left
+// //         //         z-index 1
+// //         //     div.sb-col-logo
+// //         //         z-index 0
+// //         //         position relative
+// //         //         img
+// //         //             position absolute
+// //         //             top 0
+// //         //             right -5px
+// //         //             box-shadow 0px 4px 4px 2px #999
+// //         //             overflow hidden
+// //         //             border-top-left-radius 30%
+// //         //             border-bottom-left-radius 30%
+// //         //             width auto
+// //         //             height 100%
+// //     #sb-content-ads
+// //         float left
+// //         width $ads-width
+// //         height 100%
+// //         background #aaa
+// // 
+// // .sb-col-logo
+// //     width $col-logo-width
+// //     height 100%
+// //     float left
+// // 
+// // .sb-col-result
+// //     width $col-result-width
+// //     height 100%
+// //     float left
+// // 
+// // .sb-col-total
+// //     width $col-total-width
+// //     height 100%
+// //     float left
+// // 
+// // .sb-col-ad
+// //     width $col-ad-width
+// //     height 100%
+// //     float left
