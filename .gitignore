@@ -4,3 +4,5 @@ node_modules
 public/uploads
 npm-debug.log
 prototypes
+core
+public/stylesheets/*.css

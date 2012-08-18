@@ -11,11 +11,17 @@ $sectionWidth = 20%
 $resultWidth = 20%
 $totalWidth = 20%
 
+// Ratio: Empty || Result-row
+$resultRowMargin = 3%
+$resultRowWidth = 100% - $resultRowMargin
+
 // Ratio: Empty // Result // Empty // Result
 $resultRowsPerScreen = 5
 $emptyRowHeight = 11%
 $emptyRowsPerScreen = $resultRowsPerScreen + 1
-$resultRowHeight = ((100% - (6 * $emptyRowHeight)) / $resultRowsPerScreen) + $emptyRowsPerScreen * $emptyRowHeight
+$resultRowHeight = ((100% - 6 * $emptyRowHeight) / $resultRowsPerScreen)
+//   (properly fill screen by adding extra height to result rows)
+$resultRowHeight += 1%
 
 // Ratio: Ad // Ad // Ad
 $adsPerScreen = 3
@@ -43,7 +49,7 @@ gradient-bg(start, end)
     background-image -webkit-linear-gradient(start, end)
 
 // Header
-.sb-header-row
+.sb-header
     sb-row($headerHeight)
     gradient-bg(#0095d7, #00628c)
     color #eee
@@ -51,7 +57,7 @@ gradient-bg(start, end)
     text-transform uppercase
 
 // Content: Results || Ads
-.sb-content-row
+.sb-content
     sb-row($contentHeight)
     gradient-bg(#eee, #ccc)
 
