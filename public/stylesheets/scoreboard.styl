@@ -1,28 +1,41 @@
-// Configurable attributes
+// Ratio: Header // Content
 $headerHeight = 6%
-$adWidth = 20%
+$contentHeight = 100% - $headerHeight
+
+// Ratio: Ads || Results
+$adsWidth = 20%
+$resultsWidth = 100% - $adsWidth
+
+// Ratio: Section || Result || Total
+$sectionWidth = 20%
+$resultWidth = 20%
+$totalWidth = 20%
+
+// Ratio: Empty // Result // Empty // Result
 $resultRowsPerScreen = 5
 $emptyRowHeight = 11%
-
-// Derived attributes
-$contentHeight = 100% - $headerHeight
-$resultsWidth = 100% - $adsWidth
 $emptyRowsPerScreen = $resultRowsPerScreen + 1
 $resultRowHeight = ((100% - (6 * $emptyRowHeight)) / $resultRowsPerScreen) + $emptyRowsPerScreen * $emptyRowHeight
 
-// Wraps everything
+// Ratio: Ad // Ad // Ad
+$adsPerScreen = 3
+$adHeight = (100% / $adsPerScreen)
+
+// Top-level container
 .sb
     width 100%
     height 100%
 
-// Cols use full height of parent
-sb-col()
-    height 100%
+// Cols typically use full height of parent
+sb-col(w, h = 100%)
+    width w
+    height h
     float left
 
-// Cols use full width of parent
-sb-row()
-    width 100%
+// Rows typically use full width of parent
+sb-row(h, w = 100%)
+    width w
+    height h
 
 // Gradient mixin, webkit only
 gradient-bg(start, end)
@@ -31,8 +44,7 @@ gradient-bg(start, end)
 
 // Header
 .sb-header-row
-    sb-row()
-    height $headerHeight
+    sb-row($headerHeight)
     gradient-bg(#0095d7, #00628c)
     color #eee
     text-shadow 0 1px 0 #333
@@ -40,30 +52,24 @@ gradient-bg(start, end)
 
 // Content: Results || Ads
 .sb-content-row
-    sb-row()
-    height $contentHeight
+    sb-row($contentHeight)
     gradient-bg(#eee, #ccc)
 
 // Results: Section || Result * 3 || Total
 .sb-results-col
-    sb-col()
-    width $resultsWidth
+    sb-col($resultsWidth)
     .sb-section-col
-        sb-col()
-        width $sectionWidth
+        sb-col($sectionWidth)
     .sb-result-col
-        sb-col()
-        width $resultWidth
+        sb-col($resultWidth)
     .sb-total-col
-        sb-col()
-        width $totalWidth
+        sb-col($totalWidth)
 
-// Ads stack vertically and use full width
+// Ads use full column and stack vertically
 .sb-ads-col
-    sb-col()
-    width $adsWidth
-    .sb-ad-col
-        width 100%
+    sb-col($adsWidth)
+    .sb-ad-row
+        sb-row($adHeight)
 
 // Make containers jQuery-scrollable
 .sb-results-container
@@ -90,25 +96,23 @@ gradient-bg(start, end)
             bottom 0
             left 0
 
-// Full height header
+// Use full height for result row in header
 .sb-header
     .sb-result-row
         height 100%
 
-// Contains the results of a section
+// Use calculated height for result row in content
 .sb-content
     .sb-result-row
         height $resultRowHeight
         box-shadow 4px 2px 4px #888
 
-// Same width and left margin in header/content
+// Create margin for result rows in header/content
 .sb-result-row
-    sb-row()
     width $resultRowWidth
     margin-left $resultRowMargin
 
 // Empty space between results
 .sb-empty-row
-    sb-row()
-    height $emptyRowHeight
+    sb-row($emptyRowHeight)
     color #eee
