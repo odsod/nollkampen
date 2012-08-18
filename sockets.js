@@ -26,6 +26,7 @@ exports.showScoreboard = function (req, res) {
       initials: s.initials,
       color: s.color,
       textColor: s.textColor,
+      alternateTextColor: '#eee',
       saint: s.saintImageUrl,
       results: [],
       total: 0
@@ -56,14 +57,14 @@ exports.showScoreboard = function (req, res) {
     return s2.total - s1.total; 
   });
   // Assign place numbers
-  var currPlace = 1;
+  var currPlace = 0;
   var currTotal = Number.POSITIVE_INFINITY;
   data.sections.forEach(function (section) {
-    section.place = currPlace;
     if (section.total < currTotal) {
       currPlace += 1;
-      currTotal = section.total;
     }
+    section.place = currPlace;
+    currTotal = section.total;
   });
   io.sockets.emit('scoreboard', data);
   res.redirect('/');

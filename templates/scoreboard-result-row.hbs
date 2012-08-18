@@ -3,7 +3,9 @@
     <img src="{{saint}}">
   </div>
   <div class="sb-place-col sb-text">
-    {{place}}
+    <span class="sb-hilight" style="background: {{textColor}}; color: {{alternateTextColor}}">
+      {{place}}
+    </span>
   </div>
   {{#each results}}
   <div class="sb-result-col sb-text">
@@ -11,6 +13,8 @@
   </div>
   {{/each}}
   <div class="sb-total-col sb-text">
-    {{total}}
+    <span class="sb-hilight" style="background: {{textColor}}; color: {{alternateTextColor}};">
+      {{total}}
+    </span>
   </div>
 </div>
