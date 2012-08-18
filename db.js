@@ -43,7 +43,9 @@ var
     disqualified: Boolean
   });
   timeSchema.virtual('text').get(function () {
-    return this.disqualified ? 'Diskad' : this.minutes + 'm ' + this.seconds + 's';
+    var
+      paddedSeconds = this.seconds < 10 ? '0' : '' + this.seconds;
+    return this.disqualified ? 'Diskad' : this.minutes + ' : ' + paddedSeconds;
   });
 var 
   Time = db.model('Time', timeSchema);

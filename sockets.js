@@ -54,7 +54,12 @@ exports.showScoreboard = function (req, res) {
   });
   data.sections.sort(function (s1, s2) {
     // Higher score first
-    return s2.total - s1.total; 
+    return (s2.total - s1.total) || 
+           (s1.initials == 'IT' && -1) || 
+           (s2.initials == 'IT' && 1) || 
+           (s1.initials.toLowerCase() > s2.initials.toLowerCase() && 1) ||
+           (s1.initials.toLowerCase() < s2.initials.toLowerCase() && -1) || 
+           0;
   });
   // Assign place numbers
   var currPlace = 0;

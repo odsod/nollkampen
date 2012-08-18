@@ -3,24 +3,24 @@ var socket = io.connect('http://localhost');
 
 (function ($) {
 
-  $.fn.scrollScoreboard = function (options) {
-    
-  }
-
-	$.fn.autoStretchFont = function (options) {
-		var defaults = {
-			ratio: 0.5
-		};
-		options = $.extend(defaults, options);
-		var $self = this;
-		$(window).bind('resize', function () {
-			$self.css({
-				"font-size": $self.height()*options.ratio+"px"
-			});
-		})
-		$(window).trigger("resize");
-	};
-
+  // $.fn.scrollScoreboard = function (options) {
+  //   
+  // }
+// 
+// 	$.fn.autoStretchFont = function (options) {
+// 		var defaults = {
+// 			ratio: 0.5
+// 		};
+// 		options = $.extend(defaults, options);
+// 		var $self = this;
+// 		$(window).bind('resize', function () {
+// 			$self.css({
+// 				"font-size": $self.height()*options.ratio+"px"
+// 			});
+// 		})
+// 		$(window).trigger("resize");
+// 	};
+// 
   $(function () {
 
     // Register all templates as partials
@@ -36,14 +36,7 @@ var socket = io.connect('http://localhost');
       $('body')
         .empty()
         .html(Handlebars.templates.scoreboard(data));
-      $('.sb-header-row .sb-cell')
-        .autoStretchFont({
-          ratio: 0.45
-        });
-      $('.sb-content-row .sb-cell')
-        .autoStretchFont({
-          ratio: 0.4
-        });
+      $('.sb').scoreboard();
     });
 
   });

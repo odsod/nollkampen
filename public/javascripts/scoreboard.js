@@ -1,75 +1,111 @@
 (function ($) {
 
-  $.fn.autoRotateChildren = function (options) {
-      var defaults = {
-        interval: 3000,
-        crossfade: 0
-      };
-      options = $.extend(defaults, options);
-      var rotations = [];
-      // rotations[i] = jQuery collection of children to show in rotation #i
-      for (var i = 0, $children = $(":eq("+i+")", this);
-         $children.length > 0;
-         $children = $(":eq("+(++i)+")", this)) {
-        rotations[i] = $children;
-        // All children start out as hidden
-        rotations[i].hide();
-      }
-      var currRotation = 0;
-      rotations[currRotation].show();
-      setInterval(function () {
-        rotations[currRotation].hide();
-        currRotation = (currRotation + 1) % rotations.length;
-        rotations[currRotation].show();
-      }, options.interval);
-    };
+  // $.fn.autoRotateChildren = function (options) {
+  //     var defaults = {
+  //       interval: 3000,
+  //       crossfade: 0
+  //     };
+  //     options = $.extend(defaults, options);
+  //     var rotations = [];
+  //     // rotations[i] = jQuery collection of children to show in rotation #i
+  //     for (var i = 0, $children = $(":eq("+i+")", this);
+  //        $children.length > 0;
+  //        $children = $(":eq("+(++i)+")", this)) {
+  //       rotations[i] = $children;
+  //       // All children start out as hidden
+  //       rotations[i].hide();
+  //     }
+  //     var currRotation = 0;
+  //     rotations[currRotation].show();
+  //     setInterval(function () {
+  //       rotations[currRotation].hide();
+  //       currRotation = (currRotation + 1) % rotations.length;
+  //       rotations[currRotation].show();
+  //     }, options.interval);
+  //   };
 
 
-  $.fn.scrollTo = function (target, callback) {
-      var defaults = {
-        target: $(),
-        scrollTime: 2000
-      };
-      $.extend(defaults, options);
-      console.log('scrolling to' + target.offset().top)
-      this.animate({
-        "scrollTop": target.offset().top
-               - this.offset().top
-               + this.scrollTop()
-      }, 3000, callback);
-    };
+  // $.fn.scrollTo = function (target, callback) {
+  //     var defaults = {
+  //       target: $(),
+  //       scrollTime: 2000
+  //     };
+  //     $.extend(defaults, options);
+  //     console.log('scrolling to' + target.offset().top)
+  //     this.animate({
+  //       "scrollTop": target.offset().top
+  //              - this.offset().top
+  //              + this.scrollTop()
+  //     }, 3000, callback);
+  //   };
 
   var 
     namespace = 'scoreboard',
     defaults = {
-      itemsPerScreen: 5
     },
     methods = {
+
       init: function (options) {
-        var 
-          settings = $.extend(defaults, options);
-          lastPivotIndex = this.length - settings.itemsPerScreen;
-          $pivotElements = this.filter(function (i) {
-            if (i >= lastPivotIndex) return i === lastPivotIndex;
-            else return i % settings.itemsPerScreen === 0;
-          });
-          $pivotElements = $pivotElements.prev();
-          console.log(this.first().parent());
-          var $view = this.first().parent();
-          var i = 0;
-          function scrollIt() {
-            i = (i + 1) % $pivotElements.length;
-            console.log($pivotElements.eq(i));
-            $view
-              .delay(4000)
-              .scrollTo($pivotElements.eq(i), function () {
-                scrollIt();
-              })
+        return this.each(function () {
+          var
+            $scoreboard = $(this),
+            $header = $('.sb-header', $scoreboard),
+            $content = $('.sb-content', $scoreboard),
+            $headerTexts = $('.sb-text', $header),
+            $resultsView = $('.sb-results-container', $content),
+            $adsView = $('.sb-ads-container', $scoreboard),
+            $resultRows = $('.sb-result-row', $resultsView),
+            $resultTexts = $('.sb-result-col', $resultRows),
+            $scores = $('.sb-score', $resultRows),
+            $times = $('.sb-time', $resultRows),
+            $highlights = $('.sb-hilight', $resultRows),
+            settings = $.extend(defaults, options);
+          $(window).bind('resize.' + namespace, function () {
+            $headerTexts.css({
+              'font-size': $headerTexts.first().height() * 0.4
+            });
+            console.log($resultTexts);
+            $resultTexts.css({
+              'font-size': $resultRows.first().height() * 0.45
+            });
+            $highlights.css({
+              'font-size': $resultRows.first().height() * 0.40,
+              'padding': '0.2em' 
+            });
+          }).trigger('resize.' + namespace);          
+          function rotateResults() {
           }
-          scrollIt();
-          $('.sb-result', this).autoRotateChildren();
+          function rotateAds() {
+          }
+          rotateResults();
+          rotateAds();
+        });
+        // var 
+        //   settings = $.extend(defaults, options);
+        //   lastPivotIndex = this.length - settings.itemsPerScreen;
+        //   $pivotElements = this.filter(function (i) {
+        //     if (i >= lastPivotIndex) return i === lastPivotIndex;
+        //     else return i % settings.itemsPerScreen === 0;
+        //   });
+        //   $pivotElements = $pivotElements.prev();
+        //   console.log(this.first().parent());
+        //   var $view = this.first().parent();
+        //   var i = 0;
+        //   function scrollIt() {
+        //     i = (i + 1) % $pivotElements.length;
+        //     console.log($pivotElements.eq(i));
+        //     $view
+        //       .delay(4000)
+        //       .scrollTo($pivotElements.eq(i), function () {
+        //         scrollIt();
+        //       })
+        //   }
+        //   scrollIt();
+        //   $('.sb-result', this).autoRotateChildren();
       },
+
       destroy: function () {
+        $(window).unbind('resize.' + namespace);
       }
     };
 
@@ -79,7 +115,7 @@
     } else if (typeof method === 'object' || !method) {
       return methods.init.apply(this, arguments);
     } else {
-      $.error('Method' + method + 'does not exist on jQuery.countDown');
+      $.error('Method' + method + 'does not exist on jQuery.' + namespace);
     }
   };
 
