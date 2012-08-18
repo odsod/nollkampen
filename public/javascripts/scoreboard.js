@@ -1,5 +1,17 @@
 (function ($) {
 
+  function awaitAnimations(n, callback) {
+    var 
+      i = 0,
+      animationCallback = function () {
+        i += 1;
+        if (i === n) {
+          callback();
+        }
+      }
+    return animationCallback;
+  };
+
   // $.fn.autoRotateChildren = function (options) {
   //     var defaults = {
   //       interval: 3000,
@@ -48,6 +60,7 @@
       init: function (options) {
         return this.each(function () {
           var
+            settings = $.extend(defaults, options),
             $scoreboard = $(this),
             $header = $('.sb-header', $scoreboard),
             $content = $('.sb-content', $scoreboard),
@@ -55,16 +68,26 @@
             $resultsView = $('.sb-results-container', $content),
             $adsView = $('.sb-ads-container', $scoreboard),
             $resultRows = $('.sb-result-row', $resultsView),
+            $resultRow = $resultRows.first(),
+            $blankRow = $resultRow.prev(),
             $resultTexts = $('.sb-result-col', $resultRows),
             $scores = $('.sb-score', $resultRows),
             $times = $('.sb-time', $resultRows),
             $highlights = $('.sb-hilight', $resultRows),
-            settings = $.extend(defaults, options);
+            itemsPerScreen = Math.floor(
+              $resultsView.height() / ($resultRow.height() + $blankRow.height())
+            ), 
+            lastResultPivot = $resultRows.length - itemsPerScreen,
+            $resultPivots = $resultRows.filter(function (i) {
+              return i === lastResultPivot || 
+                     i < lastResultPivot && i % itemsPerScreen === 0;
+            }),
+            $blankPivots = $resultPivots.prev();
+          console.log($resultPivots);
           $(window).bind('resize.' + namespace, function () {
             $headerTexts.css({
               'font-size': $headerTexts.first().height() * 0.4
             });
-            console.log($resultTexts);
             $resultTexts.css({
               'font-size': $resultRows.first().height() * 0.45
             });
@@ -73,35 +96,61 @@
               'padding': '0.2em' 
             });
           }).trigger('resize.' + namespace);          
+          console.log($times);
+          console.log($scores);
+          $times.hide();
+
+          var next = $.proxy($scoreboard.dequeue, $scoreboard);
+          var currPivot = 0;
+
           function rotateResults() {
+            $scoreboard
+              // Showing scores
+              .delay(2000)
+              // Hide scores
+              .queue(function() {
+                var callback = awaitAnimations(1, next);
+                $scores.fadeOut(1000, callback);
+              }).delay(200)
+              // Show times
+              .queue(function() {
+                var callback = awaitAnimations(1, next);
+                $times.fadeIn(1000, callback);
+              }).delay(2000)
+              // Hide times
+              .queue(function () {
+                var callback = awaitAnimations(1, next);
+                $times.fadeOut(1000, callback);
+              }).delay(200)
+              // Show scores
+              .queue(function () {
+                var callback = awaitAnimations(1, next);
+                $scores.fadeIn(1000, callback);
+              }).delay(2000)
+              // Scroll to next screen
+              .queue(function () {
+                currPivot = (currPivot + 1) % $blankPivots.length;
+                var $pivot = $blankPivots.eq(currPivot);
+                var callback = awaitAnimations(1, next);
+                $resultsView.animate({
+                  "scrollTop": $pivot.offset().top
+                         - $resultsView.offset().top
+                         + $resultsView.scrollTop()
+                }, 3000, callback);
+              })
+              .queue(function () {
+                next();
+                rotateResults();
+              });
           }
+
           function rotateAds() {
+            // Show ads
+            // Rotate to next
           }
           rotateResults();
           rotateAds();
         });
-        // var 
-        //   settings = $.extend(defaults, options);
-        //   lastPivotIndex = this.length - settings.itemsPerScreen;
-        //   $pivotElements = this.filter(function (i) {
-        //     if (i >= lastPivotIndex) return i === lastPivotIndex;
-        //     else return i % settings.itemsPerScreen === 0;
-        //   });
-        //   $pivotElements = $pivotElements.prev();
-        //   console.log(this.first().parent());
-        //   var $view = this.first().parent();
-        //   var i = 0;
-        //   function scrollIt() {
-        //     i = (i + 1) % $pivotElements.length;
-        //     console.log($pivotElements.eq(i));
-        //     $view
-        //       .delay(4000)
-        //       .scrollTo($pivotElements.eq(i), function () {
-        //         scrollIt();
-        //       })
-        //   }
-        //   scrollIt();
-        //   $('.sb-result', this).autoRotateChildren();
       },
 
       destroy: function () {

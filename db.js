@@ -45,7 +45,7 @@ var
   timeSchema.virtual('text').get(function () {
     var
       paddedSeconds = this.seconds < 10 ? '0' : '' + this.seconds;
-    return this.disqualified ? 'Diskad' : this.minutes + ' : ' + paddedSeconds;
+    return this.disqualified ? 'DISKAD' : this.minutes + ' : ' + paddedSeconds;
   });
 var 
   Time = db.model('Time', timeSchema);
