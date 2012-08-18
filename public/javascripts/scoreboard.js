@@ -12,45 +12,6 @@
     return animationCallback;
   };
 
-  // $.fn.autoRotateChildren = function (options) {
-  //     var defaults = {
-  //       interval: 3000,
-  //       crossfade: 0
-  //     };
-  //     options = $.extend(defaults, options);
-  //     var rotations = [];
-  //     // rotations[i] = jQuery collection of children to show in rotation #i
-  //     for (var i = 0, $children = $(":eq("+i+")", this);
-  //        $children.length > 0;
-  //        $children = $(":eq("+(++i)+")", this)) {
-  //       rotations[i] = $children;
-  //       // All children start out as hidden
-  //       rotations[i].hide();
-  //     }
-  //     var currRotation = 0;
-  //     rotations[currRotation].show();
-  //     setInterval(function () {
-  //       rotations[currRotation].hide();
-  //       currRotation = (currRotation + 1) % rotations.length;
-  //       rotations[currRotation].show();
-  //     }, options.interval);
-  //   };
-
-
-  // $.fn.scrollTo = function (target, callback) {
-  //     var defaults = {
-  //       target: $(),
-  //       scrollTime: 2000
-  //     };
-  //     $.extend(defaults, options);
-  //     console.log('scrolling to' + target.offset().top)
-  //     this.animate({
-  //       "scrollTop": target.offset().top
-  //              - this.offset().top
-  //              + this.scrollTop()
-  //     }, 3000, callback);
-  //   };
-
   var 
     namespace = 'scoreboard',
     defaults = {
@@ -83,7 +44,6 @@
                      i < lastResultPivot && i % itemsPerScreen === 0;
             }),
             $blankPivots = $resultPivots.prev();
-          console.log($resultPivots);
           $(window).bind('resize.' + namespace, function () {
             $headerTexts.css({
               'font-size': $headerTexts.first().height() * 0.4
@@ -96,10 +56,8 @@
               'padding': '0.2em' 
             });
           }).trigger('resize.' + namespace);          
-          console.log($times);
-          console.log($scores);
-          $times.hide();
 
+          $times.hide();
           var next = $.proxy($scoreboard.dequeue, $scoreboard);
           var currPivot = 0;
 
@@ -143,18 +101,17 @@
                 rotateResults();
               });
           }
-
-          function rotateAds() {
-            // Show ads
-            // Rotate to next
-          }
           rotateResults();
-          rotateAds();
         });
       },
 
       destroy: function () {
-        $(window).unbind('resize.' + namespace);
+        return this.each(function () {
+          // Unbind resize listeners
+          $(window).unbind('resize.' + namespace);
+          // Clear the scrolling queue
+          $(this).clearQueue();
+        });
       }
     };
 

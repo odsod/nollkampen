@@ -73,4 +73,9 @@ exports.showScoreboard = function (req, res) {
   });
   io.sockets.emit('scoreboard', data);
   res.redirect('/');
-}
+};
+
+exports.showCountdown = function (req, res) {
+  io.sockets.emit('countdown');
+  res.redirect('/');
+};

@@ -152,6 +152,7 @@ app.post('/screen/scoreboard',
          loadModel(db.Score, 'scores'),
          loadModel(db.Ad, 'ads'),
          sockets.showScoreboard);
+app.post('/screen/countdown', sockets.showCountdown); 
 app.post('/screen/picture', sockets.showPicture);
 app.post('/screen/text', sockets.showText);
 app.post('/screen/clear', sockets.clear);

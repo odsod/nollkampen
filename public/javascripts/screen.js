@@ -1,26 +1,7 @@
 var socket = io.connect('http://localhost');
 
-
 (function ($) {
 
-  // $.fn.scrollScoreboard = function (options) {
-  //   
-  // }
-// 
-// 	$.fn.autoStretchFont = function (options) {
-// 		var defaults = {
-// 			ratio: 0.5
-// 		};
-// 		options = $.extend(defaults, options);
-// 		var $self = this;
-// 		$(window).bind('resize', function () {
-// 			$self.css({
-// 				"font-size": $self.height()*options.ratio+"px"
-// 			});
-// 		})
-// 		$(window).trigger("resize");
-// 	};
-// 
   $(function () {
 
     // Register all templates as partials
@@ -32,12 +13,36 @@ var socket = io.connect('http://localhost');
     });
 
     socket.on('scoreboard', function (data) {
-      console.log(Handlebars.templates.scoreboard(data));
+      // Clear everything
+      $(window).trigger('clear');
+      // Insert html
       $('body')
         .empty()
         .html(Handlebars.templates.scoreboard(data));
+      // Apply plugin
       $('.sb').scoreboard();
+      // Register cleanup
+      $(window).bind('clear.scoreboard', function () {
+        // Remove plugin
+        $('.sb').scoreboard('destroy').remove();
+      });
     });
 
+    socket.on('countdown', function (data) {
+      // Clear any previous countdown
+      $(window)
+        .trigger('clear.countdown');
+      // Insert html
+      $('body')
+        .append(Handlebars.templates.countdown(data));
+      // Apply plugin
+      $('.countdown')
+        .countdown();
+      // Register cleanup
+      $(window)
+        .bind('clear.countdown', function () {
+          $('.cd').countdown('destroy').remove();
+        });
+      });
   });
 }(jQuery));
