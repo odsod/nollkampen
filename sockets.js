@@ -27,17 +27,22 @@ exports.showScoreboard = function (req, res) {
       color: s.color,
       textColor: s.textColor,
       saint: s.saintImageUrl,
-      results: []
+      results: [],
+      total: 0
     }; 
     req.competitions.forEach(function (c) {
-      section.results.push({
-        time: _.find(req.times, function (t) {
+      var
+        time = _.find(req.times, function (t) {
           return t.section == s.id && t.competition == c.id;
         }).text,
-        points: _.find(req.scores, function (sc) {
+        points = _.find(req.scores, function (sc) {
           return sc.section == s.id && sc.competition == c.id;
-        }).points
+        }).points;
+      section.results.push({
+        time: time,
+        points: points
       });
+      section.total += points;
     });
     data.sections.push(section);
   });
@@ -45,6 +50,20 @@ exports.showScoreboard = function (req, res) {
     data.competitions.push({
       name: c.name
     });
+  });
+  data.sections.sort(function (s1, s2) {
+    // Higher score first
+    return s2.total - s1.total; 
+  });
+  // Assign place numbers
+  var currPlace = 1;
+  var currTotal = Number.POSITIVE_INFINITY;
+  data.sections.forEach(function (section) {
+    section.place = currPlace;
+    if (section.total < currTotal) {
+      currPlace += 1;
+      currTotal = section.total;
+    }
   });
   io.sockets.emit('scoreboard', data);
   res.redirect('/');

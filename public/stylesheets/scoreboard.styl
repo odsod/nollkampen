@@ -6,10 +6,11 @@ $contentHeight = 100% - $headerHeight
 $adsWidth = 20%
 $resultsWidth = 100% - $adsWidth
 
-// Ratio: Section || Result || Total
+// Ratio: Section || 3 * Result || Total
 $sectionWidth = 20%
+$placeWidth = 10%
 $resultWidth = 20%
-$totalWidth = 20%
+$totalWidth = 10%
 
 // Ratio: Empty || Result-row
 $resultRowMargin = 3%
@@ -66,6 +67,8 @@ gradient-bg(start, end)
     sb-col($resultsWidth)
     .sb-section-col
         sb-col($sectionWidth)
+    .sb-place-col
+        sb-col($placeWidth)
     .sb-result-col
         sb-col($resultWidth)
     .sb-total-col
