@@ -1,17 +1,5 @@
 {{#each sections}}
-<div class="sb-row sb-empty-row">_</div>
-<div style="background: {{color}}; color: {{textColor}};" class="sb-row sb-section-row sb-cell-wrapper sb-test">
-  <div class="sb-col sb-section-col sb-cell">
-    <img src="{{saint}}">
-  </div>
-  {{#each results}}
-  <div class="sb-col sb-result-col sb-cell sb-result">
-    <span>{{time}}</span><span>{{points}}</span>
-  </div>
-  {{/each}}
-  <div class="sb-col sb-total-col sb-cell">
-    0
-  </div>
-</div>
+<div class="sb-empty-row">_</div>
+{{> scoreboard-result-row}}
 {{/each}}
-<div class="sb-row sb-empty-row">_</div>
+<div class="sb-empty-row">_</div>

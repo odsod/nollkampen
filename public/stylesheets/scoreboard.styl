@@ -1,0 +1,114 @@
+// Configurable attributes
+$headerHeight = 6%
+$adWidth = 20%
+$resultRowsPerScreen = 5
+$emptyRowHeight = 11%
+
+// Derived attributes
+$contentHeight = 100% - $headerHeight
+$resultsWidth = 100% - $adsWidth
+$emptyRowsPerScreen = $resultRowsPerScreen + 1
+$resultRowHeight = ((100% - (6 * $emptyRowHeight)) / $resultRowsPerScreen) + $emptyRowsPerScreen * $emptyRowHeight
+
+// Wraps everything
+.sb
+    width 100%
+    height 100%
+
+// Cols use full height of parent
+sb-col()
+    height 100%
+    float left
+
+// Cols use full width of parent
+sb-row()
+    width 100%
+
+// Gradient mixin, webkit only
+gradient-bg(start, end)
+    background start
+    background-image -webkit-linear-gradient(start, end)
+
+// Header
+.sb-header-row
+    sb-row()
+    height $headerHeight
+    gradient-bg(#0095d7, #00628c)
+    color #eee
+    text-shadow 0 1px 0 #333
+    text-transform uppercase
+
+// Content: Results || Ads
+.sb-content-row
+    sb-row()
+    height $contentHeight
+    gradient-bg(#eee, #ccc)
+
+// Results: Section || Result * 3 || Total
+.sb-results-col
+    sb-col()
+    width $resultsWidth
+    .sb-section-col
+        sb-col()
+        width $sectionWidth
+    .sb-result-col
+        sb-col()
+        width $resultWidth
+    .sb-total-col
+        sb-col()
+        width $totalWidth
+
+// Ads stack vertically and use full width
+.sb-ads-col
+    sb-col()
+    width $adsWidth
+    .sb-ad-col
+        width 100%
+
+// Make containers jQuery-scrollable
+.sb-results-container
+.sb-ads-container
+    overflow hidden
+
+// Center text vertically
+.sb-text-wrapper
+    display table
+    .sb-text
+        display table-cell
+        float none
+        text-align center
+        vertical-align middle
+
+// Position saint images
+.sb-result-row
+    .sb-section-col
+        position relative
+        img
+            height 220%
+            width auto
+            position absolute
+            bottom 0
+            left 0
+
+// Full height header
+.sb-header
+    .sb-result-row
+        height 100%
+
+// Contains the results of a section
+.sb-content
+    .sb-result-row
+        height $resultRowHeight
+        box-shadow 4px 2px 4px #888
+
+// Same width and left margin in header/content
+.sb-result-row
+    sb-row()
+    width $resultRowWidth
+    margin-left $resultRowMargin
+
+// Empty space between results
+.sb-empty-row
+    sb-row()
+    height $emptyRowHeight
+    color #eee
