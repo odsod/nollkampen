@@ -7,13 +7,11 @@
       {{place}}
     </span>
   </div>
-  {{#each results}}
-  <div class="sb-result-col sb-text">
-    <span class="sb-time">{{time}}</span><span class="sb-score">{{points}}</span>
+  <div class="sb-time-col sb-text">
+    {{time}}
   </div>
-  {{/each}}
-  <div class="sb-total-col sb-text">
-    <span class="sb-hilight" style="background: {{textColor}}; color: {{alternateTextColor}};">
+  <div class="sb-score-col sb-text">
+    <span class="sb-hilight" style="background: {{textColor}}; color: {{alternateTextColor}}">
       {{points}}
     </span>
   </div>

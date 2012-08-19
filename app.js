@@ -5,6 +5,7 @@ var
   sockets = require('./sockets').listen(server);
   routes = require('./routes'),
   path = require('path'),
+  _ = require('underscore'),
   db = require('./db'),
   connectHandlebars = require('connect-handlebars'),
   log = require('winston').cli();
@@ -23,6 +24,7 @@ app.configure(function () {
   app.use(require('stylus').middleware(__dirname + '/public'));
   app.use('/templates.js', connectHandlebars(__dirname + '/templates', {
     exts_re: /.hbs$|.handlebars$/,
+    recursive: true,
     encoding: 'utf8'
   }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -60,18 +62,122 @@ app.param('picture', function (req, res, next, id) {
   });
 });
 
+function loadCompetition(req, res, next) {
+  if (req.body.competition) {
+    db.Competition.findById(req.body.competition, function (err, competition) {
+      req.competition = competition;
+      next();
+    });
+  } else {
+    next();
+  }
+}
+
 function loadModel(model, paramName, criteria) {
   return function (req, res, next) {
     model.find(function (err, instances) {
       if (err) {
         log.error(err);
-        // The DangerZone(tm)
         return res.send('Shit happened.');
       }
       req[paramName] = instances;
       next();
     });
   };
+}
+
+function calculateResults(req, res, next) {
+  var 
+    results = {},
+    times = {};
+    points = {};
+  req.competitions.forEach(function (c) {
+    results[c.id] = [];
+    points[c.id] = {};
+    times[c.id] = {};
+  });
+  req.sections.forEach(function (s) {
+    results[s.id] = [];
+    points[s.id] = 0;
+    req.competitions.forEach(function (c) {
+      // Record results for this competition on the section
+      var p = _.find(req.scores, function (sc) {
+          return sc.section == s.id && sc.competition == c.id;
+      }).points;
+      var t = _.find(req.times, function (t) {
+        return t.section == s.id && t.competition == c.id;
+      }).text;
+      results[s.id].push({
+        competition: c.id,
+        points: p,
+        time: t
+      });
+      points[c.id][s.id] = p;
+      times[c.id][s.id] = t;
+      results[c.id].push({
+        section: s.id,
+        initials: s.initials,
+        points: p,
+        time: t
+      });
+      points[s.id] += p;
+    });
+  });
+  var places = {};
+  var tally = [];
+  req.sections.forEach(function (s) {
+    tally.push({
+      section: s.id,
+      initials: s.initials,
+      points: points[s.id]
+    });
+  });
+  tally.sort(function (s1, s2) {
+    return (s2.points - s1.points) || 
+      (s1.initials == 'IT' && -1) || 
+      (s2.initials == 'IT' && 1) || 
+      (s1.initials.toLowerCase() > s2.initials.toLowerCase() && 1) ||
+      (s1.initials.toLowerCase() < s2.initials.toLowerCase() && -1) || 
+      0;
+  });
+  var currPlace = 0;
+  var currTotal = Number.POSITIVE_INFINITY;
+  tally.forEach(function (t) {
+    if (t.points < currTotal) {
+      currPlace += 1;
+    }
+    places[t.section] = currPlace;
+    t.place = currPlace;
+    currTotal = t.points;
+  });
+  // Assign competition places
+  req.competitions.forEach(function (c) {
+    places[c.id] = {};
+    results[c.id].sort(function (s1, s2) {
+      return (s2.points - s1.points) || 
+         (s1.initials == 'IT' && -1) || 
+         (s2.initials == 'IT' && 1) || 
+         (s1.initials.toLowerCase() > s2.initials.toLowerCase() && 1) ||
+         (s1.initials.toLowerCase() < s2.initials.toLowerCase() && -1) || 
+         0;
+    });
+    var currPlace = 0;
+    var currPoints = Number.POSITIVE_INFINITY;
+    results[c.id].forEach(function (result) {
+      if (result.points < currPoints) {
+        currPlace += 1;
+      }
+      places[c.id][result.section] = currPlace; 
+      result.place = currPlace;
+      currPoints = result.points;
+    });
+  });
+  req.results = results;
+  req.points = points;
+  req.places = places;
+  req.tally = tally;
+  req.times = times;
+  next();
 }
 
 app.get('/', routes.index);
@@ -156,6 +262,17 @@ app.post('/screen/countdown', sockets.showCountdown);
 app.post('/screen/picture', sockets.showPicture);
 app.post('/screen/text', sockets.showText);
 app.post('/screen/clear', sockets.clear);
+
+app.post('/screen',
+         loadModel(db.Competition, 'competitions'),
+         loadModel(db.Section, 'sections'),
+         loadModel(db.Time, 'times'),
+         loadModel(db.Score, 'scores'),
+         loadModel(db.Ad, 'ads'),
+         loadModel(db.Picture, 'pictures'),
+         calculateResults,
+         loadCompetition,
+         sockets.handle);
 
 server.listen(app.get('port'), function () {
   log.info("Express server listening on port " + app.get('port'));

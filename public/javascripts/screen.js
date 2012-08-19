@@ -28,6 +28,60 @@ var socket = io.connect('http://localhost');
       });
     });
 
+    socket.on('revealCompetition', function (data) {
+      $(window)
+        .trigger('clear');
+      // Insert html
+      $('body')
+        .append(Handlebars.templates['reveal-competition'](data));
+      // Apply plugin
+      $('.sb')
+        .reveal();
+      // Register cleanup
+      $(window)
+        .bind('clear.reveal', function () {
+          $('.sb')
+            .reveal('destroy')
+            .remove();
+        });
+      });
+    });
+
+    socket.on('revealTotal', function (data) {
+      $(window)
+        .trigger('clear');
+      // Insert html
+      $('body')
+        .append(Handlebars.templates['scoreboard'](data));
+      // Apply plugin
+      $('.sb')
+        .reveal();
+      // Register cleanup
+      $(window)
+        .bind('clear.reveal', function () {
+          $('.sb')
+            .reveal('destroy')
+            .remove();
+        });
+    });
+
+    socket.on('throwdown', function (data) {
+      $(window)
+        .trigger('clear');
+      // Insert html
+      $('body')
+        .append(Handlebars.templates['throwdown'](data));
+      $('.throwdown')
+        .throwdown();
+      // Register cleanup
+      $(window)
+        .bind('clear.throwdown', function () {
+          $('.throwdown')
+            .throwdown('destroy')
+            .remove();
+        });
+    });
+
     socket.on('countdown', function (data) {
       // Clear any previous countdown
       $(window)
@@ -43,6 +97,5 @@ var socket = io.connect('http://localhost');
         .bind('clear.countdown', function () {
           $('.cd').countdown('destroy').remove();
         });
-      });
-  });
+    });
 }(jQuery));
