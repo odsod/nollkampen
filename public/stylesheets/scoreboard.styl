@@ -19,6 +19,10 @@ $timeWidth = $scoreWidth = ((100% - $sectionWidth - $placeWidth) / 2)
 $resultRowMargin = 3%
 $resultRowWidth = 100% - $resultRowMargin
 
+// Ratio: Empty || Ad-row
+$adRowMargin = 3%
+$adRowWidth = 100% - 2 * $adRowMargin
+
 // Ratio: Empty // Result // Empty // Result
 $resultRowsPerScreen = 5
 $emptyRowHeight = 11%
@@ -91,7 +95,12 @@ gradient-bg(start, end)
 .sb-ads-col
     sb-col($adsWidth)
     .sb-ad-row
-        sb-row($adHeight)
+        height 30%
+        margin-top 8%
+        margin-bottom 8%
+        background-repeat no-repeat
+        background-size contain
+        background-position center
 
 // Make containers jQuery-scrollable
 .sb-results-container
@@ -138,13 +147,12 @@ gradient-bg(start, end)
     width $resultRowWidth
     margin-left $resultRowMargin
 
+.sb-ad-row
+    width $adRowWidth
+    margin-left $adRowMargin
+    margin-right $adRowMargin
+
 // Empty space between results
 .sb-empty-row
     sb-row($emptyRowHeight)
     color #eee
-
-
-// REVEAL testing
-.reveal
-    width 100%
-    height 100%
