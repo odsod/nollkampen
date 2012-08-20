@@ -58,35 +58,40 @@
           }).trigger('resize.' + namespace);          
 
           $times.hide();
-          var next = $.proxy($scoreboard.dequeue, $scoreboard);
+
+          function next(msg) {
+            $scoreboard.dequeue(namespace);
+          }
+
           var currPivot = 0;
 
           function rotateResults() {
+            console.log('top of rotate results');
             $scoreboard
               // Showing scores
-              .delay(2000)
+              .delay(2000, namespace)
               // Hide scores
-              .queue(function() {
+              .queue(namespace, function() {
                 var callback = awaitAnimations(1, next);
                 $scores.fadeOut(1000, callback);
-              }).delay(200)
+              }).delay(200, namespace)
               // Show times
-              .queue(function() {
+              .queue(namespace, function() {
                 var callback = awaitAnimations(1, next);
                 $times.fadeIn(1000, callback);
-              }).delay(2000)
+              }).delay(2000, namespace)
               // Hide times
-              .queue(function () {
+              .queue(namespace, function () {
                 var callback = awaitAnimations(1, next);
                 $times.fadeOut(1000, callback);
-              }).delay(200)
+              }).delay(200, namespace)
               // Show scores
-              .queue(function () {
+              .queue(namespace, function () {
                 var callback = awaitAnimations(1, next);
                 $scores.fadeIn(1000, callback);
-              }).delay(2000)
+              }).delay(2000, namespace)
               // Scroll to next screen
-              .queue(function () {
+              .queue(namespace, function () {
                 currPivot = (currPivot + 1) % $blankPivots.length;
                 var $pivot = $blankPivots.eq(currPivot);
                 var callback = awaitAnimations(1, next);
@@ -94,12 +99,17 @@
                   "scrollTop": $pivot.offset().top
                          - $resultsView.offset().top
                          + $resultsView.scrollTop()
+                         + 4
                 }, 3000, callback);
               })
-              .queue(function () {
-                next();
+              .queue(namespace, function () {
+                $scoreboard.dequeue(namespace);
+                console.log('calling rotate results');
                 rotateResults();
               });
+              console.log('bottom of rotate results');
+              console.log($scoreboard.queue(namespace));
+              $scoreboard.dequeue(namespace);
           }
           rotateResults();
         });
@@ -110,7 +120,7 @@
           // Unbind resize listeners
           $(window).unbind('resize.' + namespace);
           // Clear the scrolling queue
-          $(this).clearQueue();
+          // $(this).clearQueue();
         });
       }
     };

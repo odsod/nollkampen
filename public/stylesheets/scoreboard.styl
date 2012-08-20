@@ -31,6 +31,9 @@ $resultRowHeight += 1%
 $adsPerScreen = 3
 $adHeight = (100% / $adsPerScreen)
 
+// Shadow color
+$shadow = 1px 2px 3px rgba(51,51,51,0.30)
+
 // Top-level container
 .sb
     width 100%
@@ -57,8 +60,11 @@ gradient-bg(start, end)
     sb-row($headerHeight)
     gradient-bg(#0095d7, #00628c)
     color #eee
-    text-shadow 0 1px 0 #333
+    text-shadow $shadow
     text-transform uppercase
+    box-shadow $shadow
+    position relative
+    z-index 10
 
 // Content: Results || Ads
 .sb-content
@@ -101,9 +107,9 @@ gradient-bg(start, end)
         text-align center
         vertical-align middle
         .sb-hilight
-            padding 0.2em
-            border-radius 50%
-            box-shadow 1px 1px 0px 0 #333
+            padding 0.5em
+            border-radius 15%
+            box-shadow $shadow
 
 // Position saint images
 .sb-result-row
@@ -114,7 +120,7 @@ gradient-bg(start, end)
             width auto
             position absolute
             bottom 0
-            left -0px
+            left -5px
 
 // Use full height for result row in header
 .sb-header
@@ -125,7 +131,7 @@ gradient-bg(start, end)
 .sb-content
     .sb-result-row
         height $resultRowHeight
-        box-shadow 4px 2px 4px #888
+        box-shadow $shadow
 
 // Create margin for result rows in header/content
 .sb-result-row
