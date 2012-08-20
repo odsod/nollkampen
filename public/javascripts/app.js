@@ -108,3 +108,41 @@ $(document).delegate('#times-form', 'pageinit', function () {
     }
   }).trigger('change');
 });
+
+$(document).delegate('#sequence-form', 'pageinit', function () {
+  $('.form-submit').click(function () {
+    $('#sequence-form form').submit();
+  });
+  $(this).delegate('.remove', 'click', function () {
+    var $field = $(this).parents('li');
+    if ($field.siblings().length > 0) {
+      $field.slideUp(function () {
+        $field.remove(); 
+      });
+    }
+  });
+  $(this).delegate('.add', 'click', function () {
+    var $field = $(this).parents('li');
+    console.log($field);
+    var $clone = $field.clone().hide();
+    $clone.insertAfter($field).slideDown();
+  });
+  $(this).delegate('.move-down', 'click', function () {
+    var $field = $(this).parents('li');
+    var $next = $field.next('li');
+    if ($next.length > 0) {
+      $field.slideUp(function () {
+        $field.remove().insertAfter($next).slideDown();
+      });
+    }
+  });
+  $(this).delegate('.move-up', 'click', function () {
+    var $field = $(this).parents('li');
+    var $prev = $field.prev('li');
+    if ($prev.length > 0) {
+      $field.slideUp(function () {
+        $field.remove().insertBefore($prev).slideDown();
+      });
+    }
+  });
+});

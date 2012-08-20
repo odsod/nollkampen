@@ -432,13 +432,33 @@ exports.updateCompetitionTimes = function (req, res) {
 // Sequences
 ////
 
+exports.listSequences = function (req, res) {
+  res.render('sequences/list', {
+    title: 'Sekvenser',
+    id: 'sequence-list',
+    back: '/',
+    sequences: req.sequences
+  });
+};
+
 exports.newSequence = function (req, res) {
   res.render('sequences/form', {
     title: 'Skapa sekvens',
     id: 'sequence-form',
+    formAction: '/sequences',
     back: '/sequences',
     sequence: {
       actions: []
     }
   });
 };
+
+exports.createSequence = function (req, res) {
+  new db.Sequence({
+    name: req.body.name,
+    actions: req.body.actions
+  }).save(function (err) {
+    if (err) log.error(err.toString());
+  });
+  res.redirect('/sequences');
+}

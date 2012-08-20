@@ -1,0 +1,28 @@
+extends ../layout
+
+mixin actioninput(action)
+  li(data-role='fieldcontain')
+    .ui-body.ui-body-c.form-body
+      textarea(name='actions[]', id='actions', wrap='virtual')= action
+    .ui-body.ui-body-b.form-buttons: div.ui-grid-c
+      .ui-block-a: a.add(data-role='button', data-theme='c', data-icon='plus', data-iconpos='notext') Lägg till
+      .ui-block-b: a.move-down(data-role='button', data-theme='c', data-icon='arrow-d', data-iconpos='notext') Ner
+      .ui-block-c: a.move-up(data-role='button', data-theme='c', data-icon='arrow-u', data-iconpos='notext') Upp
+      .ui-block-d: a.remove(data-role='button', data-theme='c', data-icon='delete', data-iconpos='notext') Ta bort
+
+
+block content
+  form(method='POST', action=formAction, data-ajax='false')
+    ul(data-role='listview')
+      li(data-role='list-divider') Egenskaper
+      li(data-role='fieldcontain')
+        label(for='name') Namn
+        input(type='text', name='name', id='name', value=sequence.name)
+      li(data-role='list-divider') Kommandon
+      each action in sequence.actions
+        mixin actioninput(action)
+      unless sequence.actions.length
+        mixin actioninput()
+          
+block foot
+  include ../includes/form-controls

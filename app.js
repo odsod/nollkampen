@@ -251,6 +251,7 @@ app.post('/times/:competition',
          routes.updateCompetitionTimes);
 
 app.get('/sequences', routes.newSequence);
+app.post('/sequences', routes.createSequence);
 
 // Methods that map to websocket messages
 app.post('/screen/scoreboard', 

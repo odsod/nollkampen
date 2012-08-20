@@ -3,28 +3,13 @@ extends layout
 block content
   ul(data-role='listview')
     li(data-role='list-divider')
-      span Visa på skärm
+      span Skärm
     li: a(href='/sequences')
-      span Sekvens
+      span Visa sekvens
       img.ui-li-icon(src='/images/55-network.png')
-    li
-      span Nedräkning
+    li: a(href='/sequences')
+      span Enstaka kommando
       img.ui-li-icon(src='/images/55-network.png')
-    li
-      span Grenresultat
-      img.ui-li-icon(src='/images/55-network.png')
-    li
-      span Totalresultat
-      img.ui-li-icon(src='/images/55-network.png')
-    li
-      span Helbild
-      img.ui-li-icon(src='/images/42-photos.png')
-    li
-      span Instickstext
-      img.ui-li-icon(src='/images/09-chat-2.png')
-    li
-      span Insticksbild
-      img.ui-li-icon(src='/images/09-chat-2.png')
     li(data-role='list-divider') Mata in resultat
     li: a(href='/times')
       span Tider
