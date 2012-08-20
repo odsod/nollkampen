@@ -31,7 +31,7 @@
             $resultRows = $('.sb-result-row', $resultsView),
             $resultRow = $resultRows.first(),
             $blankRow = $resultRow.prev(),
-            $resultTexts = $('.sb-time-col, .sb-score-col', $resultRows),
+            $resultTexts = $('.sb-result-col, .sb-time-col, .sb-score-col', $resultRows),
             $scores = $('.sb-score', $resultRows),
             $times = $('.sb-time', $resultRows),
             $highlights = $('.sb-hilight', $resultRows),

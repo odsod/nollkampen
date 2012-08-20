@@ -9,10 +9,13 @@ block content
     input(type='text', name='initials', id='initials', value=section.initials)
 
     label(for='color') Sektionsfärg:
-    input.color-picker(type='text', name='color', id='color', value=section.color || '#ffffff')
+    input.color-picker(type='text', name='color', id='color', value=section.color || '#eeeeee')
 
     label(for='textColor') Textfärg:
-    input.color-picker(type='text', name='textColor', id='textColor', value=section.textColor || '#000000')
+    input.color-picker(type='text', name='textColor', id='textColor', value=section.textColor || '#333333')
+
+    label(for='alternateTextColor') Alternativ textfärg:
+    input.color-picker(type='text', name='alternateTextColor', id='alternateTextColor', value=section.alternateTextColor || '#eeeeee')
 
     label Sektionshelgon:
 

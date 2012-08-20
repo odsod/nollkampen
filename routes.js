@@ -11,10 +11,6 @@ function saveImage(image) {
   return url;
 }
 
-function deleteImage(url) {
-  fs.unlinkSync(__dirname + '/public' + url);
-}
-
 exports.index = function (req, res) {
   res.render('index', {
     title: 'Nollkampen',
@@ -73,6 +69,7 @@ exports.createSection = function (req, res) {
     initials: req.body.initials,
     color: req.body.color,
     textColor: req.body.textColor,
+    alternateTextColor: req.body.alternateTextColor,
     saintImageUrl: saintImageUrl
   }).save(function (err, section) {
     if (err) log.error(err.toString());
@@ -95,6 +92,7 @@ exports.updateSection = function (req, res) {
     initials: req.body.initials,
     color: req.body.color,
     textColor: req.body.textColor,
+    alternateTextColor: req.body.alternateTextColor,
     saintImageUrl: newSaintImageUrl
   }, function (err) {
     if (err) log.error(err.toString());
@@ -106,20 +104,6 @@ exports.deleteSection = function (req, res) {
   if (req.section.saintImageUrl) {
     deleteImage(req.section.saintImageUrl);
   }
-  db.Time.find({
-    section: req.section.id
-  }, function (err, times) {
-    times.forEach(function (time) {
-      time.remove();
-    });
-  });
-  db.Score.find({
-    section: req.section.id
-  }, function (err, scores) {
-    scores.forEach(function (score) {
-      score.remove();
-    });
-  });
   req.section.remove();
   res.redirect('/sections');
 };

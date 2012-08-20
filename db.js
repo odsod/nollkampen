@@ -4,13 +4,36 @@ var
   _ = require('underscore'),
   db = mongoose.createConnection('localhost', 'nollkampen');
 
+function moveToUploads(image) {
+  var
+    name = image.path.split('/').pop() + image.name,
+    url = '/uploads/' + name;
+  fs.renameSync(image.path, __dirname + '/public' + url);
+  return url;
+}
+
+////
+// Picture
+////
 var
   pictureSchema = new mongoose.Schema({
-    name: String,
+    caption: String,
     imageUrl: String
-  }),
-  Picture = db.model('Picture', pictureSchema);
+  });
+  pictureSchema.pre('save', function (next, picture) {
+    if (picture.imageUrl) {
+      picture.imageUrl = moveToUploads(picture.imageUrl)
+    }    
+    next();
+  });
+  pictureSchema.pre('remove', function (next, picture) {
+    fs.unlinkSync(__dirname + '/public' + section.saintImageUrl);
+  });
+exports.Picture = db.model('Picture', pictureSchema);
 
+////
+// Score
+////
 var
   scoreSchema = new mongoose.Schema({
     section: mongoose.Schema.ObjectId,
@@ -20,9 +43,11 @@ var
   scoreSchema.post('save', function (next) {
     next();
   });
-var
-  Score = db.model('Score', scoreSchema);
+exports.Score = db.model('Score', scoreSchema);
 
+////
+// Time
+////
 var
   timeSchema = new mongoose.Schema({
     section: mongoose.Schema.ObjectId,
@@ -36,9 +61,11 @@ var
       paddedSeconds = this.seconds < 10 ? '0' : '' + this.seconds;
     return this.disqualified ? 'DISKAD' : this.minutes + ' : ' + paddedSeconds;
   });
-var 
-  Time = db.model('Time', timeSchema);
+exports.Time = db.model('Time', timeSchema);
 
+////
+// Competition
+////
 var
   competitionSchema = new mongoose.Schema({
     name: String
@@ -56,53 +83,22 @@ var
     });
     next();
   });
-var
-  Competition = db.model('Competition', competitionSchema);
+exports.Competition = db.model('Competition', competitionSchema);
 
+////
+// Section
+////
 var
   sectionSchema = new mongoose.Schema({
     name: String,
     initials: String,
     color: String,
     textColor: String,
+    alternateTextColor: String,
     saintImageUrl: String,
   });
-  sectionSchema.statics.findWithResults = function (cb) {
-    var ret = [];
-    this.find(function(err, sections) {
-      Competition.find(function(err, competitions) {
-        Time.find(function (err, times) {
-          Score.find(function (err, scores) {
-            sections.forEach(function (section) {
-              var results = [];
-              var total = 0;
-              competitions.forEach(function (competition) {
-                var 
-                  time = _.filter(times, function (time) {
-                    return time.section == section.id && time.competition == competition.id;
-                  }),
-                  points = _.filter(scores, function (score) {
-                    return score.section == section.id && score.competition == competition.id;
-                  });
-              var
-                  result = {
-                    competition: competition.id,
-                    time: time,
-                    points: points
-                  };
-                results.push(result);
-                total += result.points;
-              });
-              ret.results = results;
-              ret.total = total;
-            });
-            cb(sections);
-          });
-        });
-      });
-    });
-  },
   sectionSchema.pre('remove', function (next, section) {
+    fs.unlinkSync(__dirname + '/public' + section.saintImageUrl);
     Score.find({
       section: section.id
     }, function (err, scores) {
@@ -115,21 +111,14 @@ var
     });
     next();
   });
-var
-  Section = db.model('Section', sectionSchema);
+exports.Section = db.model('Section', sectionSchema);
 
+////
+// Ad
+////
 var
   adSchema = new mongoose.Schema({
     name: String,
     imageUrl: String
-  }),
-  Ad = db.model('Ad', adSchema);
-
-module.exports = {
-  Competition: Competition,
-  Section: Section,
-  Picture: Picture,
-  Ad: Ad,
-  Score: Score,
-  Time: Time
-};
+  });
+exports.Ad = db.model('Ad', adSchema);
