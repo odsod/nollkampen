@@ -65,6 +65,12 @@ var socket = io.connect('http://localhost');
         });
     });
 
+    socket.on('revealNext', function () {
+      // Reveal next
+      $('.sb')
+        .reveal('next');
+    });
+
     socket.on('throwdown', function (data) {
       $(window)
         .trigger('clear');

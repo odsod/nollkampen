@@ -427,3 +427,18 @@ exports.updateCompetitionTimes = function (req, res) {
   });
   res.redirect('/times');
 };
+
+////
+// Sequences
+////
+
+exports.newSequence = function (req, res) {
+  res.render('sequences/form', {
+    title: 'Skapa sekvens',
+    id: 'sequence-form',
+    back: '/sequences',
+    sequence: {
+      actions: []
+    }
+  });
+};

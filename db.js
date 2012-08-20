@@ -13,6 +13,16 @@ function moveToUploads(image) {
 }
 
 ////
+// Sequence
+////
+var
+  sequenceSchema = new mongoose.Schema({
+    name: String,
+    actions: [String]
+  });
+exports.Sequence = db.model('Sequence', sequenceSchema);
+
+////
 // Picture
 ////
 var

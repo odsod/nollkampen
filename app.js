@@ -109,7 +109,7 @@ function calculateResults(req, res, next) {
       }).text;
       results[s.id].push({
         competition: c.id,
-        points: p,
+        points: p || null,
         time: t
       });
       points[c.id][s.id] = p;
@@ -249,6 +249,8 @@ app.get('/times/:competition',
 app.post('/times/:competition', 
          loadModel(db.Section, 'sections'), 
          routes.updateCompetitionTimes);
+
+app.get('/sequences', routes.newSequence);
 
 // Methods that map to websocket messages
 app.post('/screen/scoreboard', 

@@ -49,7 +49,6 @@ var actions = {
       competition: req.competition,
       ads: req.ads
     };
-    log.warn(req.competition.id);
     req.sections.forEach(function (s) {
       data.sections.push({
         name: s.name,
@@ -95,6 +94,10 @@ var actions = {
       return section.place <= 3;
     });
     io.sockets.emit('revealTotal', data);
+  },
+
+  revealNext: function (req) {
+    io.sockets.emit('revealNext');
   },
 
   countdown: function (req) {
