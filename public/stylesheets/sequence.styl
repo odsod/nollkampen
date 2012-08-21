@@ -1,3 +1,10 @@
+gradient-bg(start, end)
+    background start
+    background-image -webkit-linear-gradient(start, end)
+    background-image -moz-linear-gradient(start, end)
+
+$shadow = 1px 2px 3px rgba(51,51,51,0.30)
+
 html
 body
 .sequence
@@ -9,5 +16,13 @@ li
     padding 0
     text-align center
 
+body
+    color #eee
+    gradient-bg(#0095d7, #00628c)
+    text-shadow $shadow
+
 .action
-    font-size 2em
+    font-family monospace
+
+li
+    padding-top 10%

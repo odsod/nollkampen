@@ -13,7 +13,14 @@ $(function () {
     }
   });
   currPos = sequenceSwipe.getPos();
-  $('*').bind('taphold', function () {
-    navigator.mozVibrate(1000);
+  $('body').bind('taphold', function () {
+    if (navigator.mozVibrate) {
+      navigator.mozVibrate(1000);
+    }
+    $.ajax({
+      type: 'POST',
+      url: '/screen',
+      data: $('.action').eq(sequenceSwipe.getPos()).text()
+    });
   });
 });
