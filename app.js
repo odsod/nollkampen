@@ -62,6 +62,13 @@ app.param('picture', function (req, res, next, id) {
   });
 });
 
+app.param('sequence', function (req, res, next, id) {
+  db.Sequence.findById(id, function (err, sequence) {
+    req.sequence = sequence;
+    next();
+  });
+});
+
 function loadCompetition(req, res, next) {
   if (req.body.competition) {
     db.Competition.findById(req.body.competition, function (err, competition) {
@@ -250,8 +257,16 @@ app.post('/times/:competition',
          loadModel(db.Section, 'sections'), 
          routes.updateCompetitionTimes);
 
-app.get('/sequences', routes.newSequence);
+// Sequence CRUD
+app.get('/sequences',
+        loadModel(db.Sequence, 'sequences'),
+        routes.listSequences);
+app.get('/sequences/new',
+        routes.newSequence);
+app.get('/sequences/:sequence', routes.editSequence)
 app.post('/sequences', routes.createSequence);
+app.post('/sequences/:sequence/update', routes.updateSequence);
+app.post('/sequences/:sequence/delete', routes.deleteSequence);
 
 // Methods that map to websocket messages
 app.post('/screen/scoreboard', 

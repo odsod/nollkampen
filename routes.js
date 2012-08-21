@@ -453,6 +453,16 @@ exports.newSequence = function (req, res) {
   });
 };
 
+exports.editSequence = function (req, res) {
+  res.render('sequences/form', {
+    title: 'Skapa sekvens',
+    id: 'sequence-form',
+    formAction: '/sequences/'+req.sequence.id + '/update',
+    back: '/sequences',
+    sequence: req.sequence
+  });
+};
+
 exports.createSequence = function (req, res) {
   new db.Sequence({
     name: req.body.name,
@@ -460,5 +470,20 @@ exports.createSequence = function (req, res) {
   }).save(function (err) {
     if (err) log.error(err.toString());
   });
+  res.redirect('/sequences');
+}
+
+exports.updateSequence = function (req, res) {
+  req.sequence.update({
+    name: req.body.name,
+    actions: req.body.actions
+  }).save(function (err) {
+    if (err) log.error(err.toString());
+  });
+  res.redirect('/sequences');
+}
+
+exports.deleteSequence = function (req, res) {
+  req.sequence.remove();
   res.redirect('/sequences');
 }

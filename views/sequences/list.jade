@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+  ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
+    each sequence in sequences
+      include item
+  each sequence in sequences
+    include delete-dialog
+
+block foot
+  div(data-role='footer', data-position='fixed', data-theme='b')
+    div(data-role='navbar', data-iconpos='right')
+      ul: li: a(href='/sequences/new', data-icon='plus'): h3 Skapa ny sekvens

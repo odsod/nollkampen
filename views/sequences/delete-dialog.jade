@@ -1,0 +1,7 @@
+.ui-corner-all(data-role='popup', id='delete' + sequence.id)
+  .ui-corner-top(data-role='header'): h1 Ta bort sekvens
+  .ui-corner-bottom(data-role='content')
+    h4 Vill du verkligen ta bort #{sequence.name}?
+    p Du kan inte ångra dig i efterhand.
+    form(method='POST', action='/sequences/' + sequence.id + '/delete')
+      include ../includes/form-controls-delete
