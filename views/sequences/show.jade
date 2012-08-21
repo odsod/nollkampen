@@ -1,0 +1,14 @@
+doctype 5
+html
+  head
+    title= sequence.name
+    meta(name='viewport', content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;')
+    link(rel='stylesheet', href='/stylesheets/sequence.css')
+    script(src='/javascripts/vendor/jquery-1.8.0.min.js')
+    script(src='/javascripts/vendor/swipe.min.js')
+    script(src='/javascripts/sequence.js')
+  body
+    .sequence: ul
+        each action in sequence.actions
+          li: div.action= action
+

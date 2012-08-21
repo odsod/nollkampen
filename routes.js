@@ -457,7 +457,7 @@ exports.editSequence = function (req, res) {
   res.render('sequences/form', {
     title: 'Skapa sekvens',
     id: 'sequence-form',
-    formAction: '/sequences/'+req.sequence.id + '/update',
+    formAction: '/sequences/' + req.sequence.id + '/update',
     back: '/sequences',
     sequence: req.sequence
   });
@@ -471,19 +471,37 @@ exports.createSequence = function (req, res) {
     if (err) log.error(err.toString());
   });
   res.redirect('/sequences');
-}
+};
 
 exports.updateSequence = function (req, res) {
   req.sequence.update({
     name: req.body.name,
     actions: req.body.actions
-  }).save(function (err) {
+  }, function (err) {
     if (err) log.error(err.toString());
   });
   res.redirect('/sequences');
-}
+};
 
 exports.deleteSequence = function (req, res) {
   req.sequence.remove();
   res.redirect('/sequences');
-}
+};
+
+exports.listShowableSequences  = function (req, res) {
+  res.render('sequences/show-list', {
+    title: 'Visa sekvens',
+    id: 'sequence-show-list',
+    back: '/',
+    sequences: req.sequences
+  });
+};
+
+exports.showSequence  = function (req, res) {
+  res.render('sequences/show', {
+    id: 'sequence-show',
+    title: 'Visar: ' + req.sequence.name,
+    back: '/sequences/show-list',
+    sequence: req.sequence
+  });
+};

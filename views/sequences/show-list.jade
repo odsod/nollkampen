@@ -1,0 +1,7 @@
+extends ../layout
+
+block content
+  ul(data-role='listview')
+    each sequence in sequences
+      li: a(href='/sequences/show/' + sequence.id, rel='external')
+        h3= sequence.name

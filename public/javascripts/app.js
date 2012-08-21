@@ -146,3 +146,15 @@ $(document).delegate('#sequence-form', 'pageinit', function () {
     }
   });
 });
+
+$(document).delegate('#sequence-show', 'pageinit', function () {
+  var $sequence = $('.sequence-list');
+  var $actions = $('li', $sequence);
+  $actions.hide();
+  $actions.first().show();
+  var sequenceSwipe = new Swipe($sequence[0], {
+    callback: function () {
+      console.log('swipe');
+    }
+  });
+});

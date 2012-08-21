@@ -257,6 +257,12 @@ app.post('/times/:competition',
          loadModel(db.Section, 'sections'), 
          routes.updateCompetitionTimes);
 
+// Sequence showing
+app.get('/sequences/show',
+        loadModel(db.Sequence, 'sequences'),
+        routes.listShowableSequences);
+app.get('/sequences/show/:sequence', routes.showSequence);
+
 // Sequence CRUD
 app.get('/sequences',
         loadModel(db.Sequence, 'sequences'),
