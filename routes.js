@@ -44,6 +44,7 @@ exports.index = function (req, res) {
 ////
 
 exports.listSections = function (req, res) {
+  log.data(req.Section.instances);
   res.render('sections/list', {
     title:    'Sektioner',
     id:       'section-list',
