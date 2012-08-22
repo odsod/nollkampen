@@ -1,21 +1,23 @@
-var
-  db = require('./db'),
-  fs = require('fs'),
-  log = require('winston').cli();
+var db = require('./db')
+  , log = require('./logs').app;
 
-function saveImage(image) {
-  var
-    name = image.path.split('/').pop() + image.name,
-    url = '/uploads/' + name;
-  fs.renameSync(image.path, __dirname + '/public' + url);
-  return url;
+////
+// Error handler
+////
+
+function handleError(err) {
+  if (err) {
+    log.error(err);
+  }
 }
 
-exports.index = function (req, res) {
-  res.render('index', {
-    title: 'Nollkampen',
-    id: 'menu'
-  });
+////
+// Images
+////
+
+exports.sendImage = function (req, res) {
+  res.contentType(req.image.mime);
+  res.send(req.image.data);
 };
 
 ////
@@ -23,7 +25,18 @@ exports.index = function (req, res) {
 ////
 
 exports.screen = function (req, res) {
-  res.render('screen');  
+  res.render('screen');
+};
+
+////
+// Index menu
+////
+
+exports.index = function (req, res) {
+  res.render('index', {
+    title: 'Nollkampen',
+    id:    'menu'
+  });
 };
 
 ////
@@ -32,78 +45,76 @@ exports.screen = function (req, res) {
 
 exports.listSections = function (req, res) {
   res.render('sections/list', {
-    title: 'Sektioner',
-    id: 'section-list',
-    back: '/',
-    sections: req.sections
+    title:    'Sektioner',
+    id:       'section-list',
+    sections: req.Section.instances
   });
 };
 
 exports.newSection = function (req, res) {
   res.render('sections/form', {
-    title: 'Skapa ny sektion',
-    id: 'section-form',
-    formAction: '/sections',
-    back: '/sections',
+    action:  '/sections',
+    title:   'Skapa ny sektion',
+    id:      'section-form',
     section: {}
   });
 };
 
 exports.editSection = function (req, res) {
   res.render('sections/form', {
-    title: 'Modifiera sektion',
-    id: 'section-form',
-    formAction: '/sections/' + req.section.id + '/update',
-    back: '/sections',
+    action:  '/sections/' + req.section.id + '/update',
+    title:   'Modifiera sektion',
+    id:      'section-form',
     section: req.section
   });
 };
 
 exports.createSection = function (req, res) {
-  var saintImageUrl;
-  if (req.files && req.files.saintImage) {
-    saintImageUrl = saveImage(req.files.saintImage);
+  // Create image first
+  var ImageData = db.model('ImageData');
+  var image = new ImageData();
+  if (req.files && req.files.image) {
+    image.file = req.files.image;
   }
-  new db.Section({
-    name: req.body.name,
-    initials: req.body.initials,
-    color: req.body.color,
-    textColor: req.body.textColor,
-    alternateTextColor: req.body.alternateTextColor,
-    saintImageUrl: saintImageUrl
-  }).save(function (err, section) {
-    if (err) log.error(err.toString());
-    res.redirect('/sections');
+  image.save(function (err, image) {
+    if (err) {
+      log.error(err);
+    }
+    log.data(image);
+    db.model('Section').create({
+      name:               req.body.name,
+      initials:           req.body.initials,
+      color:              req.body.color,
+      textColor:          req.body.textColor,
+      alternateTextColor: req.body.alternateTextColor,
+      image:              image && image._id
+    }, function (err) {
+      if (err) {
+        log.error(err);
+      }
+    });
   });
+  res.redirect('/sections');
 };
 
 exports.updateSection = function (req, res) {
-  var newSaintImageUrl;
-  if (req.files && req.files.saintImage) {
-    newSaintImageUrl = saveImage(req.files.saintImage);
-    if (req.section.saintImageUrl) {
-      deleteImage(req.section.saintImageUrl);
-    }
-  } else {
-    newSaintImageUrl = req.section.saintImageUrl;
+  var image = new db.model('ImageData')();
+  if (req.body.files && req.body.files.image) {
+    image.file = req.body.files && req.body.files.image;
   }
-  req.section.update({
-    name: req.body.name,
-    initials: req.body.initials,
-    color: req.body.color,
-    textColor: req.body.textColor,
-    alternateTextColor: req.body.alternateTextColor,
-    saintImageUrl: newSaintImageUrl
-  }, function (err) {
-    if (err) log.error(err.toString());
-    res.redirect('/sections');
+  image.save(function (err, image) {
+    req.section.update({
+      name:               req.body.name
+    , initials:           req.body.initials
+    , color:              req.body.color
+    , textColor:          req.body.textColor
+    , alternateTextColor: req.body.alternateTextColor
+    , image:              (!err && image && image._id) || req.section.image
+    });
   });
 };
 
 exports.deleteSection = function (req, res) {
-  if (req.section.saintImageUrl) {
-    deleteImage(req.section.saintImageUrl);
-  }
   req.section.remove();
   res.redirect('/sections');
 };
@@ -114,57 +125,38 @@ exports.deleteSection = function (req, res) {
 
 exports.listCompetitions = function (req, res) {
   res.render('competitions/list', {
-    title: 'Grenar',
-    id: 'competitions-list',
-    back: '/',
-    competitions: req.competitions
+    title:        'Grenar',
+    id:           'competitions-list',
+    competitions: req.Competition.instances
   });
 };
 
 exports.newCompetition = function (req, res) {
   res.render('competitions/form', {
-    title: 'Skapa ny gren',
-    id: 'competition-form',
-    formAction: '/competitions',
-    back: '/competitions',
+    title:       'Skapa ny gren',
+    id:          'competition-form',
+    action:      '/competitions',
     competition: {}
   });
 };
 
 exports.editCompetition = function (req, res) {
   res.render('competitions/form', {
-    title: 'Modifiera gren',
-    id: 'competition-form',
-    formAction: '/competitions/' + req.competition.id + '/update',
-    back: '/competitions',
+    title:       'Modifiera gren',
+    id:          'competition-form',
+    action:      '/competitions/' + req.competition.id + '/update',
     competition: req.competition
   });
 };
 
 exports.createCompetition = function (req, res) {
-  new db.Competition({
+  db.model('Competition').create({
     name: req.body.name
-  }).save(function (err) {
-    if (err) log.error(err.toString());
-    res.redirect('/competitions');
   });
+  res.redirect('/competitions');
 };
 
 exports.deleteCompetition = function (req, res) {
-  db.Time.find({
-    competition: req.competition.id
-  }, function (err, times) {
-    times.forEach(function (time) {
-      time.remove();
-    });
-  });
-  db.Score.find({
-    competition: req.competition.id
-  }, function (err, scores) {
-    scores.forEach(function (score) {
-      score.remove();
-    });
-  });
   req.competition.remove();
   res.redirect('/competitions');
 };
@@ -172,10 +164,8 @@ exports.deleteCompetition = function (req, res) {
 exports.updateCompetition = function (req, res) {
   req.competition.update({
     name: req.body.name
-  }, function (err) {
-    if (err) log.error(err.toString());
-    res.redirect('/competitions');
   });
+  res.redirect('/competitions');
 };
 
 ////
@@ -185,67 +175,47 @@ exports.updateCompetition = function (req, res) {
 exports.listAds = function (req, res) {
   res.render('ads/list', {
     title: 'Annonser',
-    id: 'ads-list',
-    back: '/',
-    ads: req.ads
+    id:    'ads-list',
+    ads:   req.Ad.instances
   });
 };
 
 exports.newAd = function (req, res) {
   res.render('ads/form', {
-    title: 'Skapa ny annons',
-    id: 'ad-form',
-    formAction: '/ads',
-    back: '/ads',
-    ad: {}
+    title:  'Skapa ny annons',
+    id:     'ad-form',
+    action: '/ads',
+    ad:     {}
   });
 };
 
 exports.editAd = function (req, res) {
   res.render('ads/form', {
-    title: 'Modifiera annons',
-    id: 'ad-form',
-    formAction: '/ads/' + req.ad.id + '/update',
-    back: '/ads',
-    ad: req.ad
+    title:  'Modifiera annons',
+    id:     'ad-form',
+    action: '/ads/' + req.ad.id + '/update',
+    ad:     req.ad
   });
 };
 
 exports.createAd = function (req, res) {
-  var imageUrl;
-  if (req.files && req.files.image) {
-    imageUrl = saveImage(req.files.image);
+  // Create image first
+  var image = new db.model('ImageData')();
+  if (req.body.files && req.body.files.image) {
+    image.file = req.body.files && req.body.files.image;
   }
-  new db.Ad({
-    name: req.body.name,
-    imageUrl: imageUrl
-  }).save(function (err) {
-    res.redirect('/ads');
+  image.save(function (err, image) {
+    db.model('Ad').create({
+      name:  req.body.name,
+      image: image && image._id
+    });
   });
+  res.redirect('/ads');
 };
 
 exports.deleteAd = function (req, res) {
   req.ad.remove();
   res.redirect('/ads');
-};
-
-exports.updateAd = function (req, res) {
-  var newImageUrl;
-  if (req.files && req.files.image) {
-    newImageUrl = saveImage(req.files.image);
-    if (req.ad.imageUrl) {
-      deleteImage(req.ad.imageUrl);
-    }
-  } else {
-    newImageUrl = req.ad.imageUrl;
-  }
-  req.ad.update({
-    name: req.body.name,
-    imageUrl: newImageUrl
-  }, function (err) {
-    if (err) log.error(err);
-    res.redirect('/ads');
-  });
 };
 
 ////
@@ -254,42 +224,35 @@ exports.updateAd = function (req, res) {
 
 exports.listPictures = function (req, res) {
   res.render('pictures/list', {
-    title: 'Bilder',
-    id: 'pictures-list',
-    back: '/',
-    pictures: req.pictures
+    title:    'Bilder',
+    id:       'pictures-list',
+    pictures: req.Picture.instances
   });
 };
 
 exports.newPicture = function (req, res) {
   res.render('pictures/form', {
-    title: 'Ladda upp bilder',
-    id: 'picture-form',
-    formAction: '/pictures',
-    back: '/pictures',
+    title:   'Ladda upp bilder',
+    id:      'picture-form',
+    action:  '/pictures',
     picture: {}
   });
 };
 
 exports.createPicture = function (req, res) {
-  if (req.files && req.files.images) {
-    var numSaved = 0;
-    req.files.images.forEach(function (image) {
-      var imageUrl = saveImage(image);
-      new db.Picture({
-        name: image.name.split('.')[0],
-        imageUrl: imageUrl
-      }).save(function (err) {
-        if (err) log.error(err);
-        numSaved += 1;
-        if (numSaved === req.files.images.length) {
-          res.redirect('/pictures');
-        }
-      });
-    });
-  } else {
-    res.redirect('/pictures');
+  // Create picture
+  var image = new db.model('ImageData')();
+  if (req.body.files && req.body.files.image) {
+    image.file = req.body.files && req.body.files.image;
   }
+  image.save(function (err, image) {
+    db.model('Picture').create({
+      name:  req.body.name,
+      caption:  req.body.caption,
+      image: image && image._id
+    });
+  });
+  res.redirect('/pictures');
 };
 
 exports.deletePicture = function (req, res) {
@@ -313,7 +276,6 @@ exports.showScoreTable = function (req, res) {
   res.render('scores/table', {
     title: 'Poängställning',
     id: 'scores',
-    back: '/',
     competitions: req.competitions,
     sections: req.sections,
     scores: scoreTable
@@ -321,10 +283,12 @@ exports.showScoreTable = function (req, res) {
 };
 
 exports.showCompetitionScores = function (req, res) {
-  db.Score.find({
+  db.model('Score').find({
     competition: req.competition.id
   }, function (err, scores) {
-    if (err) log.debug(err.toString());
+    if (err) {
+      log.debug(err.toString());
+    }
     var sectionScores = {};
     scores.forEach(function (score) {
       sectionScores[score.section] = score.points;
@@ -332,7 +296,6 @@ exports.showCompetitionScores = function (req, res) {
     res.render('scores/form', {
       title: req.competition.name,
       id: 'scores-form',
-      back: '/scores',
       competition: req.competition,
       competitions: req.competitions,
       sections: req.sections,
@@ -343,15 +306,13 @@ exports.showCompetitionScores = function (req, res) {
 
 exports.updateCompetitionScores = function (req, res) {
   req.sections.forEach(function (section) {
-    db.Score.findOneAndUpdate({
+    db.model('Score').findOneAndUpdate({
       section: section.id,
       competition: req.competition.id
     }, {
       points: req.body[section.id]
     }, {
       upsert: true
-    }, function (err) {
-      if (err) log.debug(err.toString());
     });
   });
   res.redirect('/scores');
@@ -368,7 +329,7 @@ exports.showTimeTable = function (req, res) {
   });
   req.times.forEach(function (time) {
     if (time.disqualified) {
-      timeTable[time.competition][time.section] = 'Diskad'; 
+      timeTable[time.competition][time.section] = 'Diskad';
     } else {
       timeTable[time.competition][time.section] =
         time.minutes + 'm ' + time.seconds + 's';
@@ -377,7 +338,6 @@ exports.showTimeTable = function (req, res) {
   res.render('times/table', {
     title: 'Tider',
     id: 'times-table',
-    back: '/',
     competitions: req.competitions,
     sections: req.sections,
     times: timeTable
@@ -385,10 +345,12 @@ exports.showTimeTable = function (req, res) {
 };
 
 exports.showCompetitionTimes = function (req, res) {
-  db.Time.find({
+  db.model('Time').find({
     competition: req.competition.id
   }, function (err, times) {
-    if (err) log.error(err.toString());
+    if (err) {
+      log.error(err.toString());
+    }
     var sectionTimes = {};
     times.forEach(function (time) {
       sectionTimes[time.section] = {
@@ -401,7 +363,6 @@ exports.showCompetitionTimes = function (req, res) {
     res.render('times/form', {
       title: req.competition.name,
       id: 'times-form',
-      back: '/times',
       competition: req.competition,
       competitions: req.competitions,
       sections: req.sections,
@@ -412,7 +373,7 @@ exports.showCompetitionTimes = function (req, res) {
 
 exports.updateCompetitionTimes = function (req, res) {
   req.sections.forEach(function (section) {
-    db.Time.findOneAndUpdate({
+    db.model('Time').findOneAndUpdate({
       section: section.id,
       competition: req.competition.id
     }, {
@@ -421,8 +382,6 @@ exports.updateCompetitionTimes = function (req, res) {
       disqualified: req.body[section.id].disqualified === 'true'
     }, {
       upsert: true
-    }, function (err) {
-      if (err) log.debug(err.toString());
     });
   });
   res.redirect('/times');
@@ -436,18 +395,16 @@ exports.listSequences = function (req, res) {
   res.render('sequences/list', {
     title: 'Sekvenser',
     id: 'sequence-list',
-    back: '/',
-    sequences: req.sequences
+    sequences: req.Sequence.instances
   });
 };
 
 exports.newSequence = function (req, res) {
   res.render('sequences/form', {
-    title: 'Skapa sekvens',
-    id: 'sequence-form',
-    formAction: '/sequences',
-    back: '/sequences',
-    sequence: {
+    title:     'Skapa sekvens',
+    id:        'sequence-form',
+    action:    '/sequences',
+    sequence:  {
       actions: []
     }
   });
@@ -455,30 +412,25 @@ exports.newSequence = function (req, res) {
 
 exports.editSequence = function (req, res) {
   res.render('sequences/form', {
-    title: 'Skapa sekvens',
-    id: 'sequence-form',
-    formAction: '/sequences/' + req.sequence.id + '/update',
-    back: '/sequences',
+    title:    'Skapa sekvens',
+    id:       'sequence-form',
+    action:   '/sequences/' + req.sequence.id + '/update',
     sequence: req.sequence
   });
 };
 
 exports.createSequence = function (req, res) {
-  new db.Sequence({
-    name: req.body.name,
+  db.model('Sequence').create({
+    name:    req.body.name,
     actions: req.body.actions
-  }).save(function (err) {
-    if (err) log.error(err.toString());
   });
   res.redirect('/sequences');
 };
 
 exports.updateSequence = function (req, res) {
   req.sequence.update({
-    name: req.body.name,
+    name:    req.body.name,
     actions: req.body.actions
-  }, function (err) {
-    if (err) log.error(err.toString());
   });
   res.redirect('/sequences');
 };
@@ -490,18 +442,16 @@ exports.deleteSequence = function (req, res) {
 
 exports.listShowableSequences  = function (req, res) {
   res.render('sequences/show-list', {
-    title: 'Visa sekvens',
-    id: 'sequence-show-list',
-    back: '/',
-    sequences: req.sequences
+    title:     'Visa sekvens',
+    id:        'sequence-show-list',
+    sequences: req.Sequence.instances
   });
 };
 
 exports.showSequence  = function (req, res) {
   res.render('sequences/show', {
-    id: 'sequence-show',
-    title: 'Visar: ' + req.sequence.name,
-    back: '/sequences/show-list',
+    id:       'sequence-show',
+    title:    'Visar: ' + req.sequence.name,
     sequence: req.sequence
   });
 };

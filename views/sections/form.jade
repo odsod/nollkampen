@@ -1,7 +1,7 @@
 extends ../layout
 
 block content
-  form(method='POST', action=formAction, enctype='multipart/form-data', data-ajax='false')
+  form(method='POST', action=action, enctype='multipart/form-data', data-ajax='false')
     label(for='name') Namn:
     input(type='text', name='name', id='name', value=section.name)
 
@@ -23,7 +23,7 @@ block content
       input(type='radio', name='uploadSaintImage', id='upload-saint-image-radio', value='true')
       label(for='upload-saint-image-radio') Ladda upp ny bild
 
-    input(type='file', name='saintImage', id='saint-image-file', accept='image/*')
+    input(type='file', name='image', id='saint-image-file', accept='image/*')
 
     if section.saintImageUrl
       input(type='radio', name='uploadSaintImage', id='keep-saint-image-radio', value='false', checked)

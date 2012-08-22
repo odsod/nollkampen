@@ -46,6 +46,7 @@ $(document).delegate('#section-form', 'pageinit', function () {
     .textinput({
       theme: 'c'
     });
+  $('.color-picker').css('text-shadow', 'none');
   // Radio button toggling of file chooser
   $('input[name=uploadSaintImage]')
     .bind('change', function (event, ui) {

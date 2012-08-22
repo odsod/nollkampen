@@ -2,7 +2,7 @@ var
   io = require('socket.io'),
   _ = require('underscore'),
   db = require('./db'),
-  log = require('winston').cli();
+  log = require('./logs').sockets;
 
 function sectionOrder(s1, s2) {
   // Higher score first
@@ -130,6 +130,5 @@ exports.handle = function (req, res) {
 exports.listen = function (app) {
   io = io.listen(app);
   io.set('logger', log);
-  io.set('log level', 0);
   return exports;
 }

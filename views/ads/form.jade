@@ -1,7 +1,7 @@
 extends ../layout
 
 block content
-  form(method='POST', action=formAction, enctype='multipart/form-data', data-ajax='false')
+  form(method='POST', action=action, enctype='multipart/form-data', data-ajax='false')
     label(for='name') Namn:
     input(type='text', name='name', id='name', value=ad.name)
 

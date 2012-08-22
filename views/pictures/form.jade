@@ -1,9 +1,13 @@
 extends ../layout
 
 block content
-  form(method='POST', action=formAction, enctype='multipart/form-data', data-ajax='false')
-    label(for='images') Bild(er):
-    input(type='file', name='images', accept='image/*', multiple)
+  form(method='POST', action=action, enctype='multipart/form-data', data-ajax='false')
+    label(for='caption') Namn:
+    input(type='text', name='name', value=picture.name)
+    label(for='caption') Text:
+    input(type='text', name='caption', value=picture.caption)
+    label(for='image') Bild:
+    input(type='file', name='image', accept='image/*', multiple)
 
 block foot
     include ../includes/form-controls

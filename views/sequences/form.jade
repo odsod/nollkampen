@@ -12,7 +12,7 @@ mixin actioninput(action)
 
 
 block content
-  form(method='POST', action=formAction, data-ajax='false')
+  form(method='POST', action=action, data-ajax='false')
     ul(data-role='listview')
       li(data-role='list-divider') Egenskaper
       li(data-role='fieldcontain')

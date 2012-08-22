@@ -3,7 +3,7 @@ extends ../layout
 block content
   ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
     each ad in ads
-      include item
+      li: h3 ad.name
   each ad in ads
     include delete-dialog
 

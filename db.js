@@ -1,134 +1,203 @@
-var
-  log = require('winston').cli(),
-  mongoose = require('mongoose'),
-  _ = require('underscore'),
-  db = mongoose.createConnection('localhost', 'nollkampen');
+/*jshint laxcomma: true */
 
-function moveToUploads(image) {
-  var
-    name = image.path.split('/').pop() + image.name,
-    url = '/uploads/' + name;
-  fs.renameSync(image.path, __dirname + '/public' + url);
-  return url;
+var fs       = require('fs')
+  , mongoose = require('mongoose')
+  , Schema   = mongoose.Schema
+  , ObjectId = mongoose.Schema.ObjectId
+  , _        = require('underscore')
+  , log      = require('./logs').app
+  , db       = mongoose.createConnection('localhost', 'nollkampen');
+
+////
+// Error handler
+////
+
+function handleError(err) {
+  if (err) {
+    log.error(err);
+  }
+}
+
+////
+// ImageData
+////
+
+var ImageData = new Schema({
+  data:  { type: Buffer, required: true }
+, mime:  { type: String, required: true }
+, owner: ObjectId
+});
+
+ImageData.virtual('file').set(function (file) {
+  this.data = fs.readFileSync(file.path);
+  this.mime = file.mime;
+});
+
+ImageData.virtual('url').get(function () {
+  return '/resources/' + this._id;
+});
+
+function removeOwnedImages(next) {
+  this.model('ImageData')
+    .remove({ owner: this._id })
+    .ne('_id', this.image)
+    .exec(next);
+}
+
+function markImageAsOwned(next) {
+  if (this.image) {
+    this.model('ImageData').findByIdAndUpdate(this.image._id, {
+      owner: this._id
+    }, next);
+  } else {
+    next();
+  }
 }
 
 ////
 // Sequence
 ////
-var
-  sequenceSchema = new mongoose.Schema({
-    name: String,
-    actions: [String]
-  });
-exports.Sequence = db.model('Sequence', sequenceSchema);
+
+var Sequence = new Schema({
+  name:    String
+, actions: [String]
+});
 
 ////
 // Picture
 ////
-var
-  pictureSchema = new mongoose.Schema({
-    caption: String,
-    imageUrl: String
-  });
-  pictureSchema.pre('save', function (next, picture) {
-    if (picture.imageUrl) {
-      picture.imageUrl = moveToUploads(picture.imageUrl)
-    }    
-    next();
-  });
-  pictureSchema.pre('remove', function (next, picture) {
-    fs.unlinkSync(__dirname + '/public' + section.saintImageUrl);
-  });
-exports.Picture = db.model('Picture', pictureSchema);
+
+var Picture = new Schema({
+  name:    String
+, caption: String
+, image:   { type: ObjectId, ref: 'ImageData' }
+});
+
+Picture.pre('save', removeOwnedImages);
+Picture.pre('save', markImageAsOwned);
+Picture.pre('remove', removeOwnedImages);
 
 ////
 // Score
 ////
-var
-  scoreSchema = new mongoose.Schema({
-    section: mongoose.Schema.ObjectId,
-    competition: mongoose.Schema.ObjectId,
-    points: Number
+
+var Score = new Schema({
+  section:     { type: ObjectId, ref: 'Section', index: true }
+, competition: { type: ObjectId, ref: 'Competition', index: true }
+, points:      Number
+});
+
+Score.pre('save', function (next) {
+  this.model('Section').findById(this.section, function (err, section) {
+    section.scores.addToSet(this);
   });
-  scoreSchema.post('save', function (next) {
-    next();
+  this.model('Competition').findById(this.competition, function (err, competition) {
+    competition.scores.addToSet(this);
   });
-exports.Score = db.model('Score', scoreSchema);
+});
 
 ////
 // Time
 ////
-var
-  timeSchema = new mongoose.Schema({
-    section: mongoose.Schema.ObjectId,
-    competition: mongoose.Schema.ObjectId,
-    minutes: Number,
-    seconds: Number,
-    disqualified: Boolean
+
+var Time = new Schema({
+  section:     { type: ObjectId, ref: 'Section', index: true }
+, competition: { type: ObjectId, ref: 'Competition', index: true }
+, minutes:      Number
+, seconds:      Number
+, disqualified: Boolean
+});
+
+Time.pre('save', function (next) {
+  this.model('Section').findById(this.section, function (err, section) {
+    section.times.addToSet(this);
   });
-  timeSchema.virtual('text').get(function () {
-    var
-      paddedSeconds = this.seconds < 10 ? '0' : '' + this.seconds;
-    return this.disqualified ? 'DISKAD' : this.minutes + ' : ' + paddedSeconds;
+  this.model('Competition').findById(this.competition, function (err, competition) {
+    competition.times.addToSet(this);
   });
-exports.Time = db.model('Time', timeSchema);
+});
+
+Time.virtual('text').get(function () {
+  var pad = this.seconds < 10 ? '0' : '';
+  return this.disqualified ? 'DISKAD' :
+         this.minutes + ':' + pad + this.seconds;
+});
 
 ////
 // Competition
 ////
-var
-  competitionSchema = new mongoose.Schema({
-    name: String
-  });
-  competitionSchema.pre('remove', function (next, competition) {
-    Score.find({
-      competition: competition.id
-    }, function (err, scores) {
-      scores.remove();    
-    });
-    Time.find({
-      competition: competition.id 
-    }, function (err, times) {
-      times.remove();
-    });
-    next();
-  });
-exports.Competition = db.model('Competition', competitionSchema);
+
+var Competition = new Schema({
+  name:   { type: String, index: true }
+, scores: [Score]
+, times:  [Time]
+});
+
+Competition.pre('remove', function (next) {
+  this.scores.remove();
+  this.times.remove();
+  next();
+});
 
 ////
 // Section
 ////
-var
-  sectionSchema = new mongoose.Schema({
-    name: String,
-    initials: String,
-    color: String,
-    textColor: String,
-    alternateTextColor: String,
-    saintImageUrl: String,
-  });
-  sectionSchema.pre('remove', function (next, section) {
-    fs.unlinkSync(__dirname + '/public' + section.saintImageUrl);
-    Score.find({
-      section: section.id
-    }, function (err, scores) {
-      scores.remove();    
-    });
-    Time.find({
-      section: section.id 
-    }, function (err, times) {
-      times.remove();
-    });
-    next();
-  });
-exports.Section = db.model('Section', sectionSchema);
+
+var Section = new Schema({
+  name:               String
+, initials:           { type: String, index: true }
+, color:              String
+, textColor:          String
+, alternateTextColor: String
+, image:              { type: ObjectId, ref: 'ImageData' }
+, times:              [Time]
+, scores:             [Score]
+});
+
+Section.pre('save', removeOwnedImages);
+Section.pre('save', markImageAsOwned);
+Section.pre('remove', removeOwnedImages);
+
+Section.pre('remove', function (next) {
+  this.times.remove();
+  this.scores.remove();
+});
 
 ////
 // Ad
 ////
-var
-  adSchema = new mongoose.Schema({
-    name: String,
-    imageUrl: String
-  });
-exports.Ad = db.model('Ad', adSchema);
+
+var Ad = new Schema({
+  name:  { type: String, index: true }
+, image: { type: ObjectId, ref: 'ImageData' }
+});
+
+Ad.pre('save', removeOwnedImages);
+Ad.pre('save', markImageAsOwned);
+Ad.pre('remove', removeOwnedImages);
+
+////
+// Slideshow
+////
+
+var Slideshow = new Schema({
+  name:   { type: String, index: true }
+, images: [ImageData]
+});
+
+Slideshow.pre('remove', function (next) {
+  this.images.remove(next);
+});
+
+// Model EVERYTHING!
+db.model('ImageData', ImageData);
+db.model('Section', Section);
+db.model('Competition', Competition);
+db.model('Time', Time);
+db.model('Score', Score);
+db.model('Ad', Ad);
+db.model('Picture', Picture);
+db.model('Sequence', Sequence);
+db.model('Slideshow', Slideshow);
+
+module.exports = db;
