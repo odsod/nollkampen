@@ -1,5 +1,5 @@
 li: a(href='/sections/' + section.id)
-  h2.section-initials(style='background: ' + section.color + '; color: ' + section.textColor)= section.initials
-  p= section.name
+  h3(style='background: ' + section.color + '; color: ' + section.textColor)= section.initials
+  p.section-initials= section.name
   a(href='#delete' + section.id, data-rel='popup',
     data-position-to='window') Ta bort

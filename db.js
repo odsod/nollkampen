@@ -145,7 +145,7 @@ Competition.pre('remove', function (next) {
 
 var Section = new Schema({
   name:               String
-, initials:           { type: String, index: true }
+, initials:           { type: String, index: { unique: true } }
 , color:              String
 , textColor:          String
 , alternateTextColor: String
@@ -161,6 +161,10 @@ Section.pre('remove', removeOwnedImages);
 Section.pre('remove', function (next) {
   this.times.remove();
   this.scores.remove();
+});
+
+Section.virtual('imageurl').get(function () {
+  return '/resources/' + this.image;
 });
 
 ////

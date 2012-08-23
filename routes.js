@@ -1,4 +1,5 @@
 var db = require('./db')
+  , ImageData = db.model('ImageData')
   , log = require('./logs').app;
 
 ////
@@ -44,7 +45,6 @@ exports.index = function (req, res) {
 ////
 
 exports.listSections = function (req, res) {
-  log.data(req.Section.instances);
   res.render('sections/list', {
     title:    'Sektioner',
     id:       'section-list',
@@ -62,6 +62,7 @@ exports.newSection = function (req, res) {
 };
 
 exports.editSection = function (req, res) {
+  log.debug(req.section.imageurl);
   res.render('sections/form', {
     action:  '/sections/' + req.section.id + '/update',
     title:   'Modifiera sektion',
@@ -72,7 +73,6 @@ exports.editSection = function (req, res) {
 
 exports.createSection = function (req, res) {
   // Create image first
-  var ImageData = db.model('ImageData');
   var image = new ImageData();
   if (req.files && req.files.image) {
     image.file = req.files.image;
@@ -81,14 +81,13 @@ exports.createSection = function (req, res) {
     if (err) {
       log.error(err);
     }
-    log.data(image);
     db.model('Section').create({
-      name:               req.body.name,
-      initials:           req.body.initials,
-      color:              req.body.color,
-      textColor:          req.body.textColor,
-      alternateTextColor: req.body.alternateTextColor,
-      image:              image && image._id
+      name:               req.body.name
+    , initials:           req.body.initials
+    , color:              req.body.color
+    , textColor:          req.body.textColor
+    , alternateTextColor: req.body.alternateTextColor
+    , image:              image && image._id
     }, function (err) {
       if (err) {
         log.error(err);
@@ -99,11 +98,14 @@ exports.createSection = function (req, res) {
 };
 
 exports.updateSection = function (req, res) {
-  var image = new db.model('ImageData')();
-  if (req.body.files && req.body.files.image) {
-    image.file = req.body.files && req.body.files.image;
+  var image = new ImageData();
+  if (req.files && req.files.image) {
+    image.file = req.files.image;
   }
   image.save(function (err, image) {
+    if (err) {
+      log.error(err);
+    }
     req.section.update({
       name:               req.body.name
     , initials:           req.body.initials
@@ -113,6 +115,7 @@ exports.updateSection = function (req, res) {
     , image:              (!err && image && image._id) || req.section.image
     });
   });
+  res.redirect('/sections');
 };
 
 exports.deleteSection = function (req, res) {

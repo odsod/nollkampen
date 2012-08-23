@@ -7,16 +7,16 @@ block content
 
     label Annonsbild:
 
-    if ad.imageUrl
+    if ad.image
       input(type='radio', name='uploadImage', id='upload-image-radio', value='true', checked='checked')
       label(for='upload-image-radio') Ladda upp ny bild
 
     input(type='file', name='image', id='image-file', accept='image/*')
 
-    if ad.imageUrl
+    if ad.image
       input(type='radio', name='uploadImage', id='keep-image-radio', value='false', checked='checked')
       label(for='keep-image-radio') Behåll existerande bild
-      img.image-preview-form(src=ad.imageUrl)
+      img.image-preview-form(src=ad.image.url)
 
 block foot
   include ../includes/form-controls
