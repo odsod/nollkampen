@@ -36,7 +36,7 @@ var metadata = {
     , link:     'initials'
     }
   , templates: {
-      form: 'sections/form'
+      form: 'section-form'
     }
   }
 , 'Competition': {
@@ -49,7 +49,7 @@ var metadata = {
     , link:     'name'
     }
   , templates: {
-      form: 'competitions/form'
+      form: 'competition-form'
     }
   }
 , 'Ad': {
@@ -62,7 +62,7 @@ var metadata = {
     , link:     'name'
     }
   , templates: {
-      form: 'ads/form'
+      form: 'ad-form'
     }
   }
 , 'Picture': {
@@ -75,7 +75,7 @@ var metadata = {
     , link:     'name'
     }
   , templates: {
-      form: 'pictures/form'
+      form: 'picture-form'
     }
   }
 };
