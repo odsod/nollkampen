@@ -197,9 +197,12 @@ exports.upsertAd = function (req, res) {
 
 exports.upsertPicture = function (req, res) {
   var picture = (req.Picture && req.Picture.instance) || new Picture();
-  picture.setImageData(req.files.image, function (picture) {
+  picture.setImageData(req.files.image, function (pictures) {
     picture.name = req.body.name;
-    res.redirect('/ads');
+    picture.save(function (err) {
+      handleError(err);
+      res.redirect('/pictures');
+    });
   });
 };
 

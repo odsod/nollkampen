@@ -196,9 +196,7 @@ app.get('/resources/:ImageData', routes.sendImageData);
 // Sections CRUD
 ////
 
-app.get('/sections'
-      , loadModel('Section')
-      , routes.list('Section'));
+app.get('/sections', loadModel('Section'), routes.list('Section'));
 
 app.get('/sections/new',               routes.new('Section'));
 app.get('/sections/:Section',          routes.edit('Section'));
@@ -210,9 +208,7 @@ app.post('/sections/:Section/update',  routes.upsertSection);
 // Competitions CRUD
 ////
 
-app.get('/competitions'
-      , loadModel('Competition')
-      , routes.list('Competition'));
+app.get('/competitions', loadModel('Competition'), routes.list('Competition'));
 
 app.get('/competitions/new',                   routes.new('Competition'));
 app.get('/competitions/:Competition',          routes.edit('Competition'));
@@ -220,25 +216,29 @@ app.post('/competitions/:Competition/delete',  routes.delete('Competition'));
 app.post('/competitions',                      routes.upsertCompetition);
 app.post('/competitions/:Competition/update',  routes.upsertCompetition);
 
+////
 // Ads CRUD
-app.get('/ads'
-      , loadModel('Ad')
-      , routes.list('Ad'));
+////
+
+app.get('/ads', loadModel('Ad'), routes.list('Ad'));
 
 app.get('/ads/new',          routes.new('Ad'));
 app.get('/ads/:Ad',          routes.edit('Ad'));
+app.post('/ads/:Ad/delete',  routes.delete('Ad'));
 app.post('/ads',             routes.upsertAd);
 app.post('/ads/:Ad/update',  routes.upsertAd);
-app.post('/ads/:Ad/delete',  routes.delete('Ad'));
 
+////
 // Pictures CRUD
-app.get('/pictures'
-      , loadModel('Picture')
-      , routes.listPictures);
-app.get('/pictures/new', routes.newPicture);
-app.get('/pictures/:Picture', routes.editPicture);
-app.post('/pictures', routes.createPicture);
-app.post('/pictures/:Picture/delete', routes.deletePicture);
+////
+
+app.get('/pictures', loadModel('Picture'), routes.list('Picture'));
+
+app.get('/pictures/new',               routes.new('Picture'));
+app.get('/pictures/:Picture',          routes.edit('Picture'));
+app.post('/pictures',                  routes.upsertPicture);
+app.post('/pictures/:Picture/update',  routes.upsertPicture);
+app.post('/pictures/:Picture/delete',  routes.delete('Picture'));
 
 // Scores
 app.get('/scores'
