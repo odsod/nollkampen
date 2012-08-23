@@ -38,8 +38,44 @@ var metadata = {
   , templates: {
       form: 'sections/form'
     }
-  , routes: {
-      new: '/sections/new'
+  }
+, 'Competition': {
+    root: '/competitions'
+  , modelName: 'Gren'
+  , modelNamePlural: 'Grenar'
+  , showables: {
+      title:    'name'
+    , subtitle: 'name'
+    , link:     'name'
+    }
+  , templates: {
+      form: 'competitions/form'
+    }
+  }
+, 'Ad': {
+    root: '/ads'
+  , modelName: 'Annons'
+  , modelNamePlural: 'Annonser'
+  , showables: {
+      title:    'name'
+    , subtitle: 'name'
+    , link:     'name'
+    }
+  , templates: {
+      form: 'ads/form'
+    }
+  }
+, 'Picture': {
+    root: '/pictures'
+  , modelName: 'Bild'
+  , modelNamePlural: 'Bilder'
+  , showables: {
+      title:    'name'
+    , subtitle: 'name'
+    , link:     'name'
+    }
+  , templates: {
+      form: 'pictures/form'
     }
   }
 };
@@ -104,44 +140,17 @@ exports.screen = function (req, res) {
 ////
 
 exports.index = function (req, res) {
-  res.render('index', {
-    title: 'Nollkampen',
-    id:    'menu'
-  });
+  res.render('index');
 };
 
 ////
 // Sections
 ////
 
-exports.listSections = function (req, res) {
-  res.render('sections/list', {
-    title:    'Sektioner',
-    id:       'section-list',
-    sections: req.Section.instances
-  });
-};
-
-exports.newSection = function (req, res) {
-  res.render('sections/form', {
-    action:  '/sections',
-    title:   'Skapa ny sektion',
-    id:      'section-form',
-    section: {}
-  });
-};
-
-exports.editSection = function (req, res) {
-  res.render('sections/form', {
-    action:  '/sections/' + req.Section.instance.initials + '/update',
-    title:   'Modifiera sektion',
-    id:      'section-form',
-    section: req.Section.instance
-  });
-};
-
 exports.upsertSection = function (req, res) {
-  function doSave(section) {
+  var section = (req.Section && req.Section.instance) || new Section();
+  // First insert image into db if it was uploaded
+  section.setImageData(req.files.image, function (section) {
     section.name = req.body.name;
     section.initials = req.body.initials;
     section.color = req.body.color;
@@ -151,48 +160,15 @@ exports.upsertSection = function (req, res) {
       handleError(err);
       res.redirect('/sections');
     });
-  }
-  // First insert image into db if it was uploaded
-  var section = (req.Section && req.Section.instance) || new Section();
-  if (req.files.image.size > 0) {
-    section.setImageData(req.files.image, doSave);
-  } else {
-    doSave(section);
-  }
+  });
 };
 
 ////
 // Competitions
 ////
 
-exports.listCompetitions = function (req, res) {
-  res.render('competitions/list', {
-    title:        'Grenar',
-    id:           'competitions-list',
-    competitions: req.Competition.instances
-  });
-};
-
-exports.newCompetition = function (req, res) {
-  res.render('competitions/form', {
-    title:       'Skapa ny gren',
-    id:          'competition-form',
-    action:      '/competitions',
-    competition: {}
-  });
-};
-
-exports.editCompetition = function (req, res) {
-  res.render('competitions/form', {
-    title:       'Modifiera gren',
-    id:          'competition-form',
-    action:      '/competitions/' + req.Competition.instance._id + '/update',
-    competition: req.Competition.instance
-  });
-};
-
 exports.upsertCompetition = function (req, res) {
-  var competition = req.Competition.instance || new Competition();
+  var competition = (req.Competition && req.Competition.instance) || new Competition();
   competition.name = req.body.name;
   competition.save(function (err) {
     handleError(err);
@@ -200,110 +176,31 @@ exports.upsertCompetition = function (req, res) {
   });
 };
 
-exports.deleteCompetition = function (req, res) {
-  req.Competition.instance.remove(function (err) {
-    handleError(err);
-    res.redirect('/competitions');
-  });
-};
-
-exports.updateCompetition = function (req, res) {
-  req.competition.update({
-    name: req.body.name
-  });
-  res.redirect('/competitions');
-};
-
 ////
 // Ads
 ////
 
-exports.listAds = function (req, res) {
-  res.render('ads/list', {
-    title: 'Annonser',
-    id:    'ads-list',
-    ads:   req.Ad.instances
-  });
-};
-
-exports.newAd = function (req, res) {
-  res.render('ads/form', {
-    title:  'Skapa ny annons',
-    id:     'ad-form',
-    action: '/ads',
-    ad:     {}
-  });
-};
-
-exports.editAd = function (req, res) {
-  res.render('ads/form', {
-    title:  'Modifiera annons',
-    id:     'ad-form',
-    action: '/ads/' + req.ad.id + '/update',
-    ad:     req.ad
-  });
-};
-
-exports.createAd = function (req, res) {
-  // Create image first
-  var image = new db.model('ImageData')();
-  if (req.body.files && req.body.files.image) {
-    image.file = req.body.files && req.body.files.image;
-  }
-  image.save(function (err, image) {
-    db.model('Ad').create({
-      name:  req.body.name,
-      image: image && image._id
+exports.upsertAd = function (req, res) {
+  var ad = (req.Ad && req.Ad.instance) || new Ad();
+  ad.setImageData(req.files.image, function (ad) {
+    ad.name = req.body.name;
+    ad.save(function (err) {
+      handleError(err);
+      res.redirect('/ads');
     });
   });
-  res.redirect('/ads');
-};
-
-exports.deleteAd = function (req, res) {
-  req.ad.remove();
-  res.redirect('/ads');
 };
 
 ////
 // Pictures
 ////
 
-exports.listPictures = function (req, res) {
-  res.render('pictures/list', {
-    title:    'Bilder',
-    id:       'pictures-list',
-    pictures: req.Picture.instances
+exports.upsertPicture = function (req, res) {
+  var picture = (req.Picture && req.Picture.instance) || new Picture();
+  picture.setImageData(req.files.image, function (picture) {
+    picture.name = req.body.name;
+    res.redirect('/ads');
   });
-};
-
-exports.newPicture = function (req, res) {
-  res.render('pictures/form', {
-    title:   'Ladda upp bilder',
-    id:      'picture-form',
-    action:  '/pictures',
-    picture: {}
-  });
-};
-
-exports.createPicture = function (req, res) {
-  // Create picture
-  var image = new db.model('ImageData')();
-  if (req.body.files && req.body.files.image) {
-    image.file = req.body.files && req.body.files.image;
-  }
-  image.save(function (err, image) {
-    db.model('Picture').create({
-      name:  req.body.name,
-      caption:  req.body.caption,
-      image: image && image._id
-    });
-  });
-  res.redirect('/pictures');
-};
-
-exports.deletePicture = function (req, res) {
-  req.picture.remove();
-  res.redirect('/pictures');
 };
 
 ////
@@ -432,52 +329,12 @@ exports.updateCompetitionTimes = function (req, res) {
 // Sequences
 ////
 
-exports.listSequences = function (req, res) {
-  res.render('sequences/list', {
-    title: 'Sekvenser',
-    id: 'sequence-list',
-    sequences: req.Sequence.instances
-  });
-};
-
-exports.newSequence = function (req, res) {
-  res.render('sequences/form', {
-    title:     'Skapa sekvens',
-    id:        'sequence-form',
-    action:    '/sequences',
-    sequence:  {
-      actions: []
-    }
-  });
-};
-
-exports.editSequence = function (req, res) {
-  res.render('sequences/form', {
-    title:    'Skapa sekvens',
-    id:       'sequence-form',
-    action:   '/sequences/' + req.sequence.id + '/update',
-    sequence: req.sequence
-  });
-};
-
-exports.createSequence = function (req, res) {
-  db.model('Sequence').create({
-    name:    req.body.name,
-    actions: req.body.actions
-  });
-  res.redirect('/sequences');
-};
-
-exports.updateSequence = function (req, res) {
-  req.sequence.update({
-    name:    req.body.name,
-    actions: req.body.actions
-  });
-  res.redirect('/sequences');
-};
-
-exports.deleteSequence = function (req, res) {
-  req.sequence.remove();
+exports.upsertSequence = function (req, res) {
+  // TODO
+  // db.model('Sequence').create({
+  //   name:    req.body.name,
+  //   actions: req.body.actions
+  // });
   res.redirect('/sequences');
 };
 

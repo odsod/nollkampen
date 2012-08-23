@@ -212,32 +212,33 @@ app.post('/sections/:Section/update',  routes.upsertSection);
 
 app.get('/competitions'
       , loadModel('Competition')
-      , routes.listCompetitions);
+      , routes.list('Competition'));
 
-app.get('/competitions/new',                   routes.newCompetition);
-app.get('/competitions/:Competition',          routes.editCompetition);
+app.get('/competitions/new',                   routes.new('Competition'));
+app.get('/competitions/:Competition',          routes.edit('Competition'));
+app.post('/competitions/:Competition/delete',  routes.delete('Competition'));
 app.post('/competitions',                      routes.upsertCompetition);
 app.post('/competitions/:Competition/update',  routes.upsertCompetition);
-app.post('/competitions/:Competition/delete',  routes.delete('Competition', '/competitions'));
 
 // Ads CRUD
 app.get('/ads'
       , loadModel('Ad')
-      , routes.listAds);
-app.get('/ads/new', routes.newAd);
-app.get('/ads/:ad', routes.editAd);
-app.post('/ads', routes.createAd);
-app.post('/ads/:ad/delete', routes.deleteAd);
-app.post('/ads/:ad/update', routes.updateAd);
+      , routes.list('Ad'));
+
+app.get('/ads/new',          routes.new('Ad'));
+app.get('/ads/:Ad',          routes.edit('Ad'));
+app.post('/ads',             routes.upsertAd);
+app.post('/ads/:Ad/update',  routes.upsertAd);
+app.post('/ads/:Ad/delete',  routes.delete('Ad'));
 
 // Pictures CRUD
 app.get('/pictures'
       , loadModel('Picture')
       , routes.listPictures);
 app.get('/pictures/new', routes.newPicture);
-app.get('/pictures/:picture', routes.editPicture);
+app.get('/pictures/:Picture', routes.editPicture);
 app.post('/pictures', routes.createPicture);
-app.post('/pictures/:picture/delete', routes.deletePicture);
+app.post('/pictures/:Picture/delete', routes.deletePicture);
 
 // Scores
 app.get('/scores'
@@ -245,11 +246,11 @@ app.get('/scores'
       , loadModel('Section')
       , loadModel('Score')
       , routes.showScoreTable);
-app.get('/scores/:competition'
+app.get('/scores/:Competition'
       , loadModel('Competition')
       , loadModel('Section')
       , routes.showCompetitionScores);
-app.post('/scores/:competition'
+app.post('/scores/:Competition'
        , loadModel('Section')
        , routes.updateCompetitionScores);
 
@@ -259,11 +260,11 @@ app.get('/times'
       , loadModel('Section')
       , loadModel('Time')
       , routes.showTimeTable);
-app.get('/times/:competition'
+app.get('/times/:Competition'
       , loadModel('Competition')
       , loadModel('Section')
       , routes.showCompetitionTimes);
-app.post('/times/:competition'
+app.post('/times/:Competition'
        , loadModel('Section')
        , routes.updateCompetitionTimes);
 
@@ -271,7 +272,7 @@ app.post('/times/:competition'
 app.get('/sequences/show'
       , loadModel('Sequence')
       , routes.listShowableSequences);
-app.get('/sequences/show/:sequence', routes.showSequence);
+app.get('/sequences/show/:Sequence', routes.showSequence);
 
 // Sequence CRUD
 app.get('/sequences'
@@ -279,10 +280,10 @@ app.get('/sequences'
       , routes.listSequences);
 app.get('/sequences/new'
       , routes.newSequence);
-app.get('/sequences/:sequence', routes.editSequence);
+app.get('/sequences/:Sequence', routes.editSequence);
 app.post('/sequences', routes.createSequence);
-app.post('/sequences/:sequence/update', routes.updateSequence);
-app.post('/sequences/:sequence/delete', routes.deleteSequence);
+app.post('/sequences/:Sequence/update', routes.updateSequence);
+app.post('/sequences/:Sequence/delete', routes.deleteSequence);
 
 // Actions posted to /screen are forwarded through socket
 app.post('/screen'

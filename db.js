@@ -19,41 +19,6 @@ function handleError(err) {
 }
 
 ////
-// ImageData
-////
-
-var ImageData = new Schema({
-  data:  { type: Buffer, required: true }
-, mime:  { type: String, required: true }
-, owner: ObjectId
-});
-
-ImageData.virtual('file').set(function (file) {
-  this.data = fs.readFileSync(file.path);
-  this.mime = file.mime;
-});
-
-function removePreviouslyOwnedImages(next) {
-  // Find all images which is currently not used (this.image)
-  this.model('ImageData')
-    .where('owner').equals(this._id)
-    .where('_id').ne(this.image)
-    .remove(next);
-}
-
-function removeAllOwnedImages(next) {
-  this.model('ImageData')
-    .where('owner').equals(this._id)
-    .remove(next);
-}
-
-function markImageAsOwned(next) {
-  this.model('ImageData')
-    .where('_id').equals(this.image)
-    .update({ owner: this._id }, next);
-}
-
-////
 // Sequence
 ////
 
@@ -71,10 +36,6 @@ var Picture = new Schema({
 , caption: String
 , image:   { type: ObjectId, ref: 'ImageData' }
 });
-
-Picture.pre('save', removePreviouslyOwnedImages);
-Picture.pre('save', markImageAsOwned);
-Picture.pre('remove', removeAllOwnedImages);
 
 ////
 // Score
@@ -153,25 +114,43 @@ var Section = new Schema({
 , scores:             [Score]
 });
 
-Section.virtual('link').get(function () {
-  return this.initials;
+////
+// Ad
+////
+
+var Ad = new Schema({
+  name:  { type: String, index: true }
+, image: { type: ObjectId, ref: 'ImageData' }
 });
 
-Section.pre('remove', function (next) {
-  this.model('ImageData')
-    .where('_id').equals(this.image)
-    .remove(next);
+////
+// Slideshow
+////
+
+var Slideshow = new Schema({
+  name:   { type: String, index: true }
+, images: [{ type: ObjectId, ref: 'ImageData' }]
 });
 
-Section.pre('remove', function (next) {
-  this.times.remove(next);
+Slideshow.pre('remove', function (next) {
+  this.images.remove(next);
 });
 
-Section.pre('remove', function (next) {
-  this.scores.remove(next);
+////
+// ImageData
+////
+
+var ImageData = new Schema({
+  data:  { type: Buffer, required: true }
+, mime:  { type: String, required: true }
 });
 
-Section.methods.setImageData = function (file, callback) {
+ImageData.virtual('file').set(function (file) {
+  this.data = fs.readFileSync(file.path);
+  this.mime = file.mime;
+});
+
+function setImageData(file, callback) {
   var self      = this
     , ImageData = db.model('ImageData');
   function doCreate(err) {
@@ -182,44 +161,47 @@ Section.methods.setImageData = function (file, callback) {
       callback(self);
     });
   }
-  if (this.image) {
-    // Remove old image
-    this.model('ImageData')
-      .where('_id').equals(this.image)
-      .remove(doCreate);
+  if (file.size > 0) {
+    if (this.image) {
+      // Remove old image
+      this.model('ImageData')
+        .where('_id').equals(this.image)
+        .remove(doCreate);
+    } else {
+      doCreate(null);
+    }
   } else {
-    doCreate(null);
+    callback(this);
   }
-};
+}
 
-Section.virtual('imageurl').get(function () {
-  return '/resources/' + this.image;
+function removeImage(next) {
+  this.model('ImageData')
+    .where('_id').equals(this.image)
+    .remove(next);
+}
+
+// Apply setImageData to imagemodels
+[Section, Ad, Picture].forEach(function (Model) {
+  Model.methods.setImageData = setImageData;
+  Model.pre('remove', removeImage);
 });
 
 ////
-// Ad
+// Results removal
 ////
 
-var Ad = new Schema({
-  name:  { type: String, index: true }
-, image: { type: ObjectId, ref: 'ImageData' }
-});
+function removeTimes(next) {
+  this.times.remove(next);
+}
 
-Ad.pre('save', removePreviouslyOwnedImages);
-Ad.pre('save', markImageAsOwned);
-Ad.pre('remove', removeAllOwnedImages);
+function removeScores(next) {
+  this.scores.remove(next);
+}
 
-////
-// Slideshow
-////
-
-var Slideshow = new Schema({
-  name:   { type: String, index: true }
-, images: [ImageData]
-});
-
-Slideshow.pre('remove', function (next) {
-  this.images.remove(next);
+[Section, Competition].forEach(function (Model) {
+  Model.pre('remove', removeTimes);
+  Model.pre('remove', removeScores);
 });
 
 ////
@@ -235,7 +217,6 @@ function findBy(attr) {
 
 // Make section findable by initials
 Section.statics.findByInitials = findBy('initials');
-
 // Make other models findable by name
 [Competition, Picture, Ad, Sequence, Slideshow]
 .forEach(function (Model) {

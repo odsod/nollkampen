@@ -1,22 +1,17 @@
 extends ../layout
 
+block title
+  h1 #{title} #{modelName.toLowerCase()}
+
 block content
-  form(method='POST', action=action, enctype='multipart/form-data', data-ajax='false')
+  form(method='POST', action=postTo, enctype='multipart/form-data', data-ajax='false')
+
     label(for='name') Namn:
-    input(type='text', name='name', id='name', value=ad.name)
+    input(type='text', name='name', id='name', value=instance.name)
 
     label Annonsbild:
 
-    if ad.image
-      input(type='radio', name='uploadImage', id='upload-image-radio', value='true', checked='checked')
-      label(for='upload-image-radio') Ladda upp ny bild
+    include ../includes/image-upload-form
 
-    input(type='file', name='image', id='image-file', accept='image/*')
-
-    if ad.image
-      input(type='radio', name='uploadImage', id='keep-image-radio', value='false', checked='checked')
-      label(for='keep-image-radio') Behåll existerande bild
-      img.image-preview-form(src=ad.image.url)
-
-block foot
+block footer
   include ../includes/form-controls

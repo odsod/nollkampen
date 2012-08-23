@@ -1,9 +1,13 @@
 extends ../layout
 
-block content
-  form(method='POST', action=formAction, data-ajax='false')
-    label(for="name") Namn:
-    input(type="text", name="name", value=competition.name)
+block title
+  h1 #{title} #{modelName.toLowerCase()}
 
-block foot
+block content
+  form(method='POST', action=postTo, data-ajax='false')
+
+    label(for="name") Namn:
+    input(type="text", name="name", value=instance.name)
+
+block footer
   include ../includes/form-controls
