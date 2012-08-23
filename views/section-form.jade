@@ -1,4 +1,4 @@
-extends ../layout
+extends layout
 
 block title
   h1 #{title} #{modelName.toLowerCase()}
@@ -23,7 +23,7 @@ block content
 
     label Sektionshelgon:
 
-    include ../includes/image-upload-form
+    include includes/image-upload-form
 
   script
       $(document).bind('pageinit', function () {
@@ -65,4 +65,4 @@ block content
       });
     
 block footer
-  include ../includes/form-controls
+  include includes/form-controls

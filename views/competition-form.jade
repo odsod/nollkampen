@@ -1,4 +1,4 @@
-extends ../layout
+extends layout
 
 block title
   h1 #{title} #{modelName.toLowerCase()}
@@ -10,4 +10,4 @@ block content
     input(type="text", name="name", value=instance.name)
 
 block footer
-  include ../includes/form-controls
+  include includes/form-controls
