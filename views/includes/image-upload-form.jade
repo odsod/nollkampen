@@ -1,0 +1,26 @@
+if instance.image
+  input.enable-toggle(type='radio', name='enableFile', id='enable-file', value='true')
+  label(for='enable-file') Ladda upp ny bild
+
+input.file-chooser(type='file', name='image', id='saint-image-file', accept='image/*')
+
+if instance.image
+  input.enable-toggle(type='radio', name='enableFile', id='disable-file', value='false', checked)
+  label(for='disable-file') Behåll existerande bild
+  img.image-preview(src=instance.imageurl)
+
+script
+  $(document).bind('pageinit', function () {
+    var $fileChooser = $('.file-chooser');
+    var $enableToggle = $('.enable-toggle');
+    var $imagePreview = $('.image-preview');
+    // Enhance file chooser
+    $fileChooser.textinput({ theme: 'c' });
+    // Radio button toggling of file chooser
+    $enableToggle.bind('change', function () {
+        var disabled = $(this).val() === 'false';
+        $fileChooser.attr('disabled', disabled);
+        // Toggle visibility of image preview
+        $imagePreview.css('opacity', disabled ? 1 : 0.2);
+    }).trigger('change');
+  });

@@ -1,7 +1,0 @@
-.ui-corner-all.popup(data-role='popup', id='delete' + section.initials)
-  .ui-corner-top(data-role='header'): h1 Ta bort sektion
-  .ui-corner-bottom(data-role='content')
-    h4 Vill du verkligen ta bort #{section.initials}?
-    p Du kan inte ångra dig i efterhand.
-    form(method='POST', action='/sections/' + section.initials + '/delete')
-      include ../includes/form-controls-delete

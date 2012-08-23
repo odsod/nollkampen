@@ -1,32 +1,26 @@
 extends layout
 
+block title
+  h1 Nollkampen
+
+block nav
+  // No nav at top level
+
+mixin item(ref, text, icon)
+  li: a(href=ref)
+    span= text
+    img.ui-li-icon(src='/images/' + icon + '.png')
+
 block content
   ul(data-role='listview')
-    li(data-role='list-divider')
-      span Skärm
-    li: a(href='/sequences/show')
-      span Visa sekvens
-      img.ui-li-icon(src='/images/175-macbook.png')
+    li(data-role='list-divider') Skärm
+    mixin item('/sequences/show', 'Visa sekvens', '175-macbook')
     li(data-role='list-divider') Mata in resultat
-    li: a(href='/times')
-      span Tider
-      img.ui-li-icon(src='/images/78-stopwatch.png')
-    li: a(href='/scores') 
-      span Poäng
-      img.ui-li-icon(src='/images/187-pencil.png')
+    mixin item('/times', 'Tider', '78-stopwatch')
+    mixin item('/scores', 'Poäng', '187-pencil')
     li(data-role='list-divider') Skapa och ändra
-    li: a(href='/sections') 
-      span Sektioner
-      img.ui-li-icon(src='/images/112-group.png')
-    li: a(href='/competitions') 
-      span Grenar
-      img.ui-li-icon(src='/images/63-runner.png')
-    li: a(href='/ads') 
-      span Annonser
-      img.ui-li-icon(src='/images/124-bullhorn.png')
-    li: a(href='/pictures') 
-      span Bilder
-      img.ui-li-icon(src='/images/42-photos.png')
-    li: a(href='/sequences') 
-      span Sekvenser
-      img.ui-li-icon(src='/images/55-network.png')
+    mixin item('/sections', 'Sektioner', '112-group')
+    mixin item('/competitions', 'Grenar', '63-runner')
+    mixin item('/ads', 'Annonser', '124-bullhorn')
+    mixin item('/pictures', 'Bilder', '42-photos')
+    mixin item('/sequences', 'Sekvenser', '55-network')

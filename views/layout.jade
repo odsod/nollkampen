@@ -1,7 +1,6 @@
 doctype 5
 html
   head
-    title= title
     // Viewport
     meta(name='viewport', content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;')
     // Vendor stylesheets
@@ -9,18 +8,23 @@ html
     link(rel='stylesheet', href='/stylesheets/vendor/jquery.miniColors.css')
     // Vendor scripts
     script(src='/javascripts/vendor/jquery-1.8.0.min.js')
+    script(src='/javascripts/vendor/jquery.miniColors.min.js')
     script(src='/javascripts/mobileinit.js')
     script(src='/javascripts/vendor/jquery.mobile-1.2.0-alpha.1.min.js')
-    script(src='/javascripts/vendor/jquery.miniColors.min.js')
     script(src='/javascripts/vendor/swipe.min.js')
     // App stylesheets
     link(rel='stylesheet', href='/stylesheets/style.css')
     // App scripts
-    script(src='/javascripts/app.js')
+    block scripts
   body
-    div(data-role='page', id=id)
+    div(data-role='page')
       div(data-role='header', data-position='fixed', data-theme='d', data-tap-toggle='false')
-        include includes/head
+        block title
+        block nav
+          a(data-icon="arrow-l", data-iconpos="right", 
+            data-theme="d", data-rel="back") Bakåt
+          a(href="/", data-icon="arrow-d", data-iconpos="right", 
+            data-theme="d") Meny
         block header
       div(data-role='content', id='content')
         block content

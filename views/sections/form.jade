@@ -1,34 +1,70 @@
 extends ../layout
 
+block title
+  h1 #{title} #{modelName.toLowerCase()}
+
 block content
-  form(method='POST', action=action, enctype='multipart/form-data', data-ajax='false')
+  form(method='POST', action=postTo, enctype='multipart/form-data', data-ajax='false')
+
     label(for='name') Namn:
-    input(type='text', name='name', id='name', value=section.name)
+    input(type='text', name='name', id='name', value=instance.name)
 
     label(for='initials') Initialer:
-    input(type='text', name='initials', id='initials', value=section.initials)
+    input(type='text', name='initials', id='initials', value=instance.initials)
 
     label(for='color') Sektionsfärg:
-    input.color-picker(type='text', name='color', id='color', value=section.color || '#eeeeee')
+    input.color-picker(type='text', name='color', id='color', value=instance.color || '#eeeeee')
 
     label(for='textColor') Textfärg:
-    input.color-picker(type='text', name='textColor', id='textColor', value=section.textColor || '#333333')
+    input.color-picker(type='text', name='textColor', id='textColor', value=instance.textColor || '#333333')
 
     label(for='alternateTextColor') Alternativ textfärg:
-    input.color-picker(type='text', name='alternateTextColor', id='alternateTextColor', value=section.alternateTextColor || '#eeeeee')
+    input.color-picker(type='text', name='alternateTextColor', id='alternateTextColor', value=instance.alternateTextColor || '#eeeeee')
 
     label Sektionshelgon:
 
-    if section.image
-      input(type='radio', name='uploadSaintImage', id='upload-saint-image-radio', value='true')
-      label(for='upload-saint-image-radio') Ladda upp ny bild
+    include ../includes/image-upload-form
 
-    input(type='file', name='image', id='saint-image-file', accept='image/*')
+  script
+      $(document).bind('pageinit', function () {
 
-    if section.image
-      input(type='radio', name='uploadSaintImage', id='keep-saint-image-radio', value='false', checked)
-      label(for='keep-saint-image-radio') Behåll existerande bild
-      img.image-preview-form(src=section.imageurl)
+        console.log('hej');
 
+        var $colorPickers = $('.color-picker');
+        console.log($colorPickers);
+        var $sectionColor = $('#color');
+        var $textColor = $('#textColor');
+        var $alternateTextColor = $('#alternateTextColor');
+
+        function changeSectionColor(hex) {
+          $sectionColor.css('background', hex);
+          $textColor.css('background', hex);
+        }
+
+        function changeTextColor(hex) {
+          $sectionColor.css('color', hex);
+          $textColor.css('color', hex);
+          $alternateTextColor.css('background', hex);
+        }
+
+        function changeAlternateTextColor(hex) {
+          $alternateTextColor.css('color', hex);
+        }
+
+        // Enhance color pickers
+        $sectionColor.miniColors({ change: changeSectionColor });
+        $textColor.miniColors({ change: changeTextColor });
+        $alternateTextColor.miniColors({ change: changeAlternateTextColor });
+
+        // Override text-shadow (why wont !important take effect..?)
+        $colorPickers.css('text-shadow', 'none');
+
+        // Initialize them
+        changeSectionColor($sectionColor.val());
+        changeTextColor($textColor.val());
+        changeAlternateTextColor($alternateTextColor.val());
+
+      });
+    
 block footer
   include ../includes/form-controls

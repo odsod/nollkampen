@@ -153,15 +153,44 @@ var Section = new Schema({
 , scores:             [Score]
 });
 
-Section.pre('save', removePreviouslyOwnedImages);
-Section.pre('save', markImageAsOwned);
-Section.pre('remove', removeAllOwnedImages);
+Section.virtual('link').get(function () {
+  return this.initials;
+});
 
 Section.pre('remove', function (next) {
-  this.times.remove();
-  this.scores.remove();
-  next();
+  this.model('ImageData')
+    .where('_id').equals(this.image)
+    .remove(next);
 });
+
+Section.pre('remove', function (next) {
+  this.times.remove(next);
+});
+
+Section.pre('remove', function (next) {
+  this.scores.remove(next);
+});
+
+Section.methods.setImageData = function (file, callback) {
+  var self      = this
+    , ImageData = db.model('ImageData');
+  function doCreate(err) {
+    var image = new ImageData();
+    image.file = file;
+    image.save(function (err, image) {
+      self.image = image._id;
+      callback(self);
+    });
+  }
+  if (this.image) {
+    // Remove old image
+    this.model('ImageData')
+      .where('_id').equals(this.image)
+      .remove(doCreate);
+  } else {
+    doCreate(null);
+  }
+};
 
 Section.virtual('imageurl').get(function () {
   return '/resources/' + this.image;

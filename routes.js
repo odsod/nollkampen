@@ -1,4 +1,13 @@
 var db = require('./db')
+  , _ = require('underscore')
+  , Section = db.model('Section')
+  , Competition = db.model('Competition')
+  , Time = db.model('Time')
+  , Score = db.model('Score')
+  , Ad = db.model('Ad')
+  , Picture = db.model('Picture')
+  , Sequence = db.model('Sequence')
+  , Slideshow = db.model('Slideshow')
   , ImageData = db.model('ImageData')
   , log = require('./logs').app;
 
@@ -13,10 +22,71 @@ function handleError(err) {
 }
 
 ////
+// I dont know what the fuck yet
+////
+
+var metadata = {
+  'Section': {
+    root: '/sections'
+  , modelName: 'Sektion'
+  , modelNamePlural: 'Sektioner'
+  , showables: {
+      title:    'initials'
+    , subtitle: 'name'
+    , link:     'initials'
+    }
+  , templates: {
+      form: 'sections/form'
+    }
+  , routes: {
+      new: '/sections/new'
+    }
+  }
+};
+
+exports.list = function (model) {
+  return function (req, res) {
+    res.render('list', _.extend(metadata[model], {
+      instances: req[model].instances
+    }));
+  };
+};
+
+exports.new = function (model) {
+  return function (req, res) {
+    res.render(metadata[model].templates.form, _.extend(metadata[model], {
+      title: 'Skapa'
+    , postTo: metadata[model].root
+    , instance: {}
+    }));
+  };
+};
+
+exports.edit = function (model) {
+  return function (req, res) {
+    res.render(metadata[model].templates.form, _.extend(metadata[model], {
+      title: 'Editera'
+    , postTo: metadata[model].root + '/' + req[model].instance[metadata[model].showables.link] + '/update'
+    , instance: req[model].instance
+    }));
+  };
+};
+
+exports.delete = function (model) {
+  return function (req, res) {
+    db.model(model)
+      .findByIdAndRemove(req[model].instance._id, function (err) {
+        handleError(err);
+        res.redirect(metadata[model].root);
+      });
+  };
+};
+
+////
 // Images
 ////
 
-exports.sendImage = function (req, res) {
+exports.sendImageData = function (req, res) {
   res.contentType(req.ImageData.instance.mime);
   res.send(req.ImageData.instance.data);
 };
@@ -70,40 +140,11 @@ exports.editSection = function (req, res) {
   });
 };
 
-exports.createSection = function (req, res) {
-  function doCreate(err, image) {
-    handleError(err);
-    db.model('Section').create({
-      name:               req.body.name
-    , initials:           req.body.initials
-    , color:              req.body.color
-    , textColor:          req.body.textColor
-    , alternateTextColor: req.body.alternateTextColor
-    , image:              image
-    }, function (err, section) {
-      handleError(err);
-      res.redirect('/sections');
-    });
-  }
-  // First insert image into db if it was uploaded
-  if (req.files.image.size > 0) {
-    var image = new ImageData();
-    image.file = req.files.image;
-    image.save(doCreate);
-  } else {
-    // Create without image
-    doCreate(null, null);
-  }
-};
-
-exports.updateSection = function (req, res) {
-  function doUpdate(err, image) {
-    handleError(err);
-    var section = req.Section.instance;
+exports.upsertSection = function (req, res) {
+  function doSave(section) {
     section.name = req.body.name;
-    section.image = image._id;
     section.initials = req.body.initials;
-    section.color =  req.body.color;
+    section.color = req.body.color;
     section.textColor = req.body.textColor;
     section.alternateTextColor = req.body.alternateTextColor;
     section.save(function (err) {
@@ -111,26 +152,13 @@ exports.updateSection = function (req, res) {
       res.redirect('/sections');
     });
   }
-  // First check if a new image was uploaded
+  // First insert image into db if it was uploaded
+  var section = (req.Section && req.Section.instance) || new Section();
   if (req.files.image.size > 0) {
-    var image = new ImageData();
-    image.file = req.files.image;
-    image.save(doUpdate);
+    section.setImageData(req.files.image, doSave);
   } else {
-    // Update with old image
-    doUpdate(null, { _id: req.Section.instance.image });
+    doSave(section);
   }
-};
-
-exports.deleteSection = function (req, res) {
-  db.model('Section')
-    .findById(req.Section.instance._id, function (err, section) {
-      handleError(err);
-      section.remove(function (err) {
-        handleError(err);
-        res.redirect('/sections');
-      });
-    });
 };
 
 ////
@@ -158,21 +186,25 @@ exports.editCompetition = function (req, res) {
   res.render('competitions/form', {
     title:       'Modifiera gren',
     id:          'competition-form',
-    action:      '/competitions/' + req.competition.id + '/update',
-    competition: req.competition
+    action:      '/competitions/' + req.Competition.instance._id + '/update',
+    competition: req.Competition.instance
   });
 };
 
-exports.createCompetition = function (req, res) {
-  db.model('Competition').create({
-    name: req.body.name
+exports.upsertCompetition = function (req, res) {
+  var competition = req.Competition.instance || new Competition();
+  competition.name = req.body.name;
+  competition.save(function (err) {
+    handleError(err);
+    res.redirect('/competitions');
   });
-  res.redirect('/competitions');
 };
 
 exports.deleteCompetition = function (req, res) {
-  req.competition.remove();
-  res.redirect('/competitions');
+  req.Competition.instance.remove(function (err) {
+    handleError(err);
+    res.redirect('/competitions');
+  });
 };
 
 exports.updateCompetition = function (req, res) {

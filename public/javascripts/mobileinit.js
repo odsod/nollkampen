@@ -4,5 +4,5 @@ $(document).bind('mobileinit', function () {
   $.mobile.pageLoadErrorMessage = 'Något gick fel...';
   $.mobile.pageLoadErrorMessageTheme = 'd';
   $.mobile.buttonMarkup.hoverDelay = 0;
-  $.mobile.ajaxEnabled = false;
+  // $.mobile.ajaxEnabled = false;
 });

@@ -190,27 +190,35 @@ function calculateResults(req, res, next) {
 
 app.get('/', routes.index);
 app.get('/screen', routes.screen);
-app.get('/resources/:ImageData', routes.sendImage);
+app.get('/resources/:ImageData', routes.sendImageData);
 
+////
 // Sections CRUD
+////
+
 app.get('/sections'
       , loadModel('Section')
-      , routes.listSections);
-app.get('/sections/new', routes.newSection);
-app.get('/sections/:Section', routes.editSection);
-app.post('/sections', routes.createSection);
-app.post('/sections/:Section/delete', routes.deleteSection);
-app.post('/sections/:Section/update', routes.updateSection);
+      , routes.list('Section'));
 
+app.get('/sections/new',               routes.new('Section'));
+app.get('/sections/:Section',          routes.edit('Section'));
+app.post('/sections/:Section/delete',  routes.delete('Section'));
+app.post('/sections',                  routes.upsertSection);
+app.post('/sections/:Section/update',  routes.upsertSection);
+
+////
 // Competitions CRUD
+////
+
 app.get('/competitions'
       , loadModel('Competition')
       , routes.listCompetitions);
-app.get('/competitions/new', routes.newCompetition);
-app.get('/competitions/:competition', routes.editCompetition);
-app.post('/competitions', routes.createCompetition);
-app.post('/competitions/:competition/update', routes.updateCompetition);
-app.post('/competitions/:competition/delete', routes.deleteCompetition);
+
+app.get('/competitions/new',                   routes.newCompetition);
+app.get('/competitions/:Competition',          routes.editCompetition);
+app.post('/competitions',                      routes.upsertCompetition);
+app.post('/competitions/:Competition/update',  routes.upsertCompetition);
+app.post('/competitions/:Competition/delete',  routes.delete('Competition', '/competitions'));
 
 // Ads CRUD
 app.get('/ads'
