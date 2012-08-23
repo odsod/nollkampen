@@ -78,6 +78,19 @@ var metadata = {
       form: 'picture-form'
     }
   }
+, 'Sequence': {
+    root: '/sequences'
+  , modelName: 'Sekvens'
+  , modelNamePlural: 'Sekvenser'
+  , showables: {
+      title:    'name'
+    , subtitle: 'name'
+    , link:     'name'
+    }
+  , templates: {
+      form: 'sequence-form'
+    }
+  }
 };
 
 exports.list = function (model) {
@@ -89,11 +102,12 @@ exports.list = function (model) {
 };
 
 exports.new = function (model) {
+  var Model = db.model(model);
   return function (req, res) {
     res.render(metadata[model].templates.form, _.extend(metadata[model], {
       title: 'Skapa'
     , postTo: metadata[model].root
-    , instance: {}
+    , instance: new Model()
     }));
   };
 };
@@ -207,45 +221,57 @@ exports.upsertPicture = function (req, res) {
 };
 
 ////
+// Sequences
+////
+
+exports.upsertSequence = function (req, res) {
+  var sequence = (req.Sequence && req.Sequence.instance) || new Sequence();
+  sequence.name = req.body.name;
+  sequence.actions = req.body.actions;
+  sequence.save(function (err) {
+    handleError(err);
+    res.redirect('/sequences');
+  });
+};
+
+////
 // Scores
 ////
 
 exports.showScoreTable = function (req, res) {
   var scoreTable = {};
-  req.competitions.forEach(function (competition) {
-    scoreTable[competition.id] = {};
+  req.Competition.instances.forEach(function (competition) {
+    scoreTable[competition._id] = {};
   });
-  req.scores.forEach(function (score) {
+  req.Score.instances.forEach(function (score) {
     scoreTable[score.competition][score.section] = score.points;
     scoreTable[score.section] = scoreTable[score.section] + score.points || score.points;
   });
   res.render('scores/table', {
     title: 'Poängställning',
     id: 'scores',
-    competitions: req.competitions,
-    sections: req.sections,
+    competitions: req.Competition.instances,
+    sections: req.Section.instances,
     scores: scoreTable
   });
 };
 
 exports.showCompetitionScores = function (req, res) {
-  db.model('Score').find({
-    competition: req.competition.id
-  }, function (err, scores) {
-    handleError(err);
-    var sectionScores = {};
-    scores.forEach(function (score) {
-      sectionScores[score.section] = score.points;
+  Score
+    .where('competition').equals(req.Competition.instance._id)
+    .exec(function (err, scores) {
+      handleError(err);
+      var sectionScores = {};
+      scores.forEach(function (score) {
+        sectionScores[score.section] = score.points;
+      });
+      res.render('scores/form', {
+        competition: req.Competition.instance,
+        competitions: req.Competition.instances,
+        sections: req.Section.instances,
+        scores: sectionScores
+      });
     });
-    res.render('scores/form', {
-      title: req.competition.name,
-      id: 'scores-form',
-      competition: req.competition,
-      competitions: req.competitions,
-      sections: req.sections,
-      scores: sectionScores
-    });
-  });
 };
 
 exports.updateCompetitionScores = function (req, res) {
@@ -326,19 +352,6 @@ exports.updateCompetitionTimes = function (req, res) {
     });
   });
   res.redirect('/times');
-};
-
-////
-// Sequences
-////
-
-exports.upsertSequence = function (req, res) {
-  // TODO
-  // db.model('Sequence').create({
-  //   name:    req.body.name,
-  //   actions: req.body.actions
-  // });
-  res.redirect('/sequences');
 };
 
 exports.listShowableSequences  = function (req, res) {

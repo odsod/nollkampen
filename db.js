@@ -41,6 +41,12 @@ var Picture = new Schema({
 // Score
 ////
 
+var ScoreSheet = new Schema({
+  competition: { type: ObjectId, ref: 'Competition', index: true }
+, scores: [{ section: ObjectId, points: Number }]
+});
+
+
 var Score = new Schema({
   section:     { type: ObjectId, ref: 'Section', index: true }
 , competition: { type: ObjectId, ref: 'Competition', index: true }

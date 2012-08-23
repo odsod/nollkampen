@@ -192,53 +192,20 @@ app.get('/', routes.index);
 app.get('/screen', routes.screen);
 app.get('/resources/:ImageData', routes.sendImageData);
 
-////
-// Sections CRUD
-////
+function resource(root, modelName) {
+  app.get(root, loadModel(modelName),    routes.list(modelName));
+  app.get(root + '/new',                 routes.new(modelName));
+  app.get('/sections/:Section',          routes.edit(modelName));
+  app.post('/sections/:Section/delete',  routes.delete(modelName));
+  app.post('/sections',                  routes['upsert' + modelName]);
+  app.post('/sections/:Section/update',  routes['upsert' + modelName]);
+}
 
-app.get('/sections', loadModel('Section'), routes.list('Section'));
-
-app.get('/sections/new',               routes.new('Section'));
-app.get('/sections/:Section',          routes.edit('Section'));
-app.post('/sections/:Section/delete',  routes.delete('Section'));
-app.post('/sections',                  routes.upsertSection);
-app.post('/sections/:Section/update',  routes.upsertSection);
-
-////
-// Competitions CRUD
-////
-
-app.get('/competitions', loadModel('Competition'), routes.list('Competition'));
-
-app.get('/competitions/new',                   routes.new('Competition'));
-app.get('/competitions/:Competition',          routes.edit('Competition'));
-app.post('/competitions/:Competition/delete',  routes.delete('Competition'));
-app.post('/competitions',                      routes.upsertCompetition);
-app.post('/competitions/:Competition/update',  routes.upsertCompetition);
-
-////
-// Ads CRUD
-////
-
-app.get('/ads', loadModel('Ad'), routes.list('Ad'));
-
-app.get('/ads/new',          routes.new('Ad'));
-app.get('/ads/:Ad',          routes.edit('Ad'));
-app.post('/ads/:Ad/delete',  routes.delete('Ad'));
-app.post('/ads',             routes.upsertAd);
-app.post('/ads/:Ad/update',  routes.upsertAd);
-
-////
-// Pictures CRUD
-////
-
-app.get('/pictures', loadModel('Picture'), routes.list('Picture'));
-
-app.get('/pictures/new',               routes.new('Picture'));
-app.get('/pictures/:Picture',          routes.edit('Picture'));
-app.post('/pictures',                  routes.upsertPicture);
-app.post('/pictures/:Picture/update',  routes.upsertPicture);
-app.post('/pictures/:Picture/delete',  routes.delete('Picture'));
+resource('/sections', 'Section');
+resource('/competitions', 'Competition');
+resource('/ads', 'Ad');
+resource('/pictures', 'Picture');
+resource('/sequences', 'Sequence');
 
 // Scores
 app.get('/scores'
@@ -273,17 +240,6 @@ app.get('/sequences/show'
       , loadModel('Sequence')
       , routes.listShowableSequences);
 app.get('/sequences/show/:Sequence', routes.showSequence);
-
-// Sequence CRUD
-app.get('/sequences'
-      , loadModel('Sequence')
-      , routes.listSequences);
-app.get('/sequences/new'
-      , routes.newSequence);
-app.get('/sequences/:Sequence', routes.editSequence);
-app.post('/sequences', routes.createSequence);
-app.post('/sequences/:Sequence/update', routes.updateSequence);
-app.post('/sequences/:Sequence/delete', routes.deleteSequence);
 
 // Actions posted to /screen are forwarded through socket
 app.post('/screen'

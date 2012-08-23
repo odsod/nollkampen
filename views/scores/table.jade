@@ -1,6 +1,9 @@
 extends ../layout
 
-block head-nav
+block title
+  h1 Poängställning
+
+block header
   table.results-table.results-table-header.ui-body-a.ui-content
     thead
       th Sektion
@@ -17,11 +20,11 @@ block content
             td= scores[competition.id][section.id] || ' '
           td= scores[section.id] || '0'
 
-block foot
+block footer
   div(data-role='footer', data-position='fixed')
     div(data-role='navbar'): ul
       each competition in competitions
-        li: a(href='/scores/' + competition.id, data-theme='b'): h3
+        li: a(href='/scores/' + competition.name, data-theme='b'): h3
           small Mata in poäng för
           br
           = competition.name
