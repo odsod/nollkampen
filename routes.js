@@ -99,21 +99,17 @@ exports.createSection = function (req, res) {
 exports.updateSection = function (req, res) {
   function doUpdate(err, image) {
     handleError(err);
-    db.model('Section')
-      .findById(req.Section.instance._id, function (err, section) {
-        handleError(err);
-        section.name = req.body.name;
-        section.image = image._id;
-        section.save(function (err) {
-          handleError(err);
-          res.redirect('/sections');
-        });
-      // , initials:           req.body.initials
-      // , color:              req.body.color
-      // , textColor:          req.body.textColor
-      // , alternateTextColor: req.body.alternateTextColor
-      // , image:              image._id
-      });
+    var section = req.Section.instance;
+    section.name = req.body.name;
+    section.image = image._id;
+    section.initials = req.body.initials;
+    section.color =  req.body.color;
+    section.textColor = req.body.textColor;
+    section.alternateTextColor = req.body.alternateTextColor;
+    section.save(function (err) {
+      handleError(err);
+      res.redirect('/sections');
+    });
   }
   // First check if a new image was uploaded
   if (req.files.image.size > 0) {
