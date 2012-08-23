@@ -190,7 +190,7 @@ function calculateResults(req, res, next) {
 
 app.get('/', routes.index);
 app.get('/screen', routes.screen);
-app.get('/resources/:image', routes.sendImage);
+app.get('/resources/:ImageData', routes.sendImage);
 
 // Sections CRUD
 app.get('/sections'

@@ -17,8 +17,8 @@ function handleError(err) {
 ////
 
 exports.sendImage = function (req, res) {
-  res.contentType(req.image.mime);
-  res.send(req.image.data);
+  res.contentType(req.ImageData.instance.mime);
+  res.send(req.ImageData.instance.data);
 };
 
 ////
@@ -99,37 +99,42 @@ exports.createSection = function (req, res) {
 exports.updateSection = function (req, res) {
   function doUpdate(err, image) {
     handleError(err);
-    log.debug('Section id ' + req.Section.instance._id);
     db.model('Section')
-      .findByIdAndUpdate(req.Section.instance._id, {
-        name:               req.body.name
-      , initials:           req.body.initials
-      , color:              req.body.color
-      , textColor:          req.body.textColor
-      , alternateTextColor: req.body.alternateTextColor
-      , image:              image
-      }, function (err, section) {
+      .findById(req.Section.instance._id, function (err, section) {
         handleError(err);
-        res.redirect('/sections');
+        section.name = req.body.name;
+        section.image = image._id;
+        section.save(function (err) {
+          handleError(err);
+          res.redirect('/sections');
+        });
+      // , initials:           req.body.initials
+      // , color:              req.body.color
+      // , textColor:          req.body.textColor
+      // , alternateTextColor: req.body.alternateTextColor
+      // , image:              image._id
       });
   }
   // First check if a new image was uploaded
   if (req.files.image.size > 0) {
-    log.debug('Gonna use img');
     var image = new ImageData();
     image.file = req.files.image;
     image.save(doUpdate);
   } else {
-    log.debug('Noooo use img');
     // Update with old image
-    doUpdate(null, req.Section.instance.image);
+    doUpdate(null, { _id: req.Section.instance.image });
   }
 };
 
 exports.deleteSection = function (req, res) {
   db.model('Section')
-    .findByIdAndRemove(req.Section.instance._id, handleError);
-  res.redirect('/sections');
+    .findById(req.Section.instance._id, function (err, section) {
+      handleError(err);
+      section.remove(function (err) {
+        handleError(err);
+        res.redirect('/sections');
+      });
+    });
 };
 
 ////

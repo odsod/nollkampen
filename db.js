@@ -33,28 +33,24 @@ ImageData.virtual('file').set(function (file) {
   this.mime = file.mime;
 });
 
-ImageData.virtual('url').get(function () {
-  return '/resources/' + this._id;
-});
-
-function removeOwnedImages(next) {
+function removePreviouslyOwnedImages(next) {
   // Find all images which is currently not used (this.image)
   this.model('ImageData')
-    .remove({ owner: this._id })
-    .ne('_id', this.image)
-    .exec(function (err) {
-      next();
-    });
+    .where('owner').equals(this._id)
+    .where('_id').ne(this.image)
+    .remove(next);
+}
+
+function removeAllOwnedImages(next) {
+  this.model('ImageData')
+    .where('owner').equals(this._id)
+    .remove(next);
 }
 
 function markImageAsOwned(next) {
-  if (this.image) {
-    this.model('ImageData').findByIdAndUpdate(this.image._id, {
-      owner: this._id
-    }, next);
-  } else {
-    next();
-  }
+  this.model('ImageData')
+    .where('_id').equals(this.image)
+    .update({ owner: this._id }, next);
 }
 
 ////
@@ -76,9 +72,9 @@ var Picture = new Schema({
 , image:   { type: ObjectId, ref: 'ImageData' }
 });
 
-Picture.pre('save', removeOwnedImages);
+Picture.pre('save', removePreviouslyOwnedImages);
 Picture.pre('save', markImageAsOwned);
-Picture.pre('remove', removeOwnedImages);
+Picture.pre('remove', removeAllOwnedImages);
 
 ////
 // Score
@@ -157,13 +153,14 @@ var Section = new Schema({
 , scores:             [Score]
 });
 
-Section.pre('save', removeOwnedImages);
+Section.pre('save', removePreviouslyOwnedImages);
 Section.pre('save', markImageAsOwned);
-Section.pre('remove', removeOwnedImages);
+Section.pre('remove', removeAllOwnedImages);
 
 Section.pre('remove', function (next) {
   this.times.remove();
   this.scores.remove();
+  next();
 });
 
 Section.virtual('imageurl').get(function () {
@@ -179,9 +176,9 @@ var Ad = new Schema({
 , image: { type: ObjectId, ref: 'ImageData' }
 });
 
-Ad.pre('save', removeOwnedImages);
+Ad.pre('save', removePreviouslyOwnedImages);
 Ad.pre('save', markImageAsOwned);
-Ad.pre('remove', removeOwnedImages);
+Ad.pre('remove', removeAllOwnedImages);
 
 ////
 // Slideshow
