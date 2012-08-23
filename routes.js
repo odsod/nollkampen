@@ -3,6 +3,7 @@ var db = require('./db')
   , Section = db.model('Section')
   , Competition = db.model('Competition')
   , Time = db.model('Time')
+  , ScoreSheet = db.model('ScoreSheet')
   , Score = db.model('Score')
   , Ad = db.model('Ad')
   , Picture = db.model('Picture')
@@ -238,54 +239,24 @@ exports.upsertSequence = function (req, res) {
 // Scores
 ////
 
-exports.showScoreTable = function (req, res) {
-  var scoreTable = {};
-  req.Competition.instances.forEach(function (competition) {
-    scoreTable[competition._id] = {};
-  });
-  req.Score.instances.forEach(function (score) {
-    scoreTable[score.competition][score.section] = score.points;
-    scoreTable[score.section] = scoreTable[score.section] + score.points || score.points;
-  });
-  res.render('scores/table', {
-    title: 'Poängställning',
-    id: 'scores',
-    competitions: req.Competition.instances,
-    sections: req.Section.instances,
-    scores: scoreTable
-  });
-};
-
-exports.showCompetitionScores = function (req, res) {
-  Score
-    .where('competition').equals(req.Competition.instance._id)
-    .exec(function (err, scores) {
-      handleError(err);
-      var sectionScores = {};
-      scores.forEach(function (score) {
-        sectionScores[score.section] = score.points;
-      });
-      res.render('scores/form', {
-        competition: req.Competition.instance,
-        competitions: req.Competition.instances,
-        sections: req.Section.instances,
-        scores: sectionScores
-      });
-    });
-};
-
-exports.updateCompetitionScores = function (req, res) {
-  req.sections.forEach(function (section) {
-    db.model('Score').findOneAndUpdate({
-      section: section.id,
-      competition: req.competition.id
-    }, {
-      points: req.body[section.id]
-    }, {
-      upsert: true
+exports.upsertScoreSheet = function (req, res) {
+  var scores = [];
+  _.each(req.body.scores, function (section, points) {
+    scores.push({
+      section: section,
+      points: points
     });
   });
-  res.redirect('/scores');
+  ScoreSheet.findOneAndUpdate({
+    competition: req.Competition.instance.name
+  }, {
+    scores: scores
+  }, {
+    upsert: true
+  }, function (err) {
+    handleError(err);
+    res.redirect('/scores');
+  });
 };
 
 ////

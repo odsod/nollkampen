@@ -9,7 +9,7 @@ block content
       each section in sections
         li(data-role='fieldcontain')
           label(for=section._id): h3= section.initials
-          input(type='range', name=section._id, id=section._id, data-highlight='true',
+          input(type='range', name='scores.'+section._id, id=section._id, data-highlight='true',
                 value=scores[section._id] || 0, min='0', max='20')
 
 block footer

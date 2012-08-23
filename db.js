@@ -43,9 +43,17 @@ var Picture = new Schema({
 
 var ScoreSheet = new Schema({
   competition: { type: ObjectId, ref: 'Competition', index: true }
-, scores: [{ section: ObjectId, points: Number }]
+, scores: [new Schema({
+    section: { type: ObjectId, ref: 'Section'}
+  , points: Number
+  , place: Number
+  })]
 });
 
+var TimeSheet = new Schema({
+  competition: { type: ObjectId, ref: 'Competition', index: true }
+, times: [{ section: ObjectId, time: String }]
+});
 
 var Score = new Schema({
   section:     { type: ObjectId, ref: 'Section', index: true }
@@ -95,14 +103,7 @@ Time.virtual('text').get(function () {
 
 var Competition = new Schema({
   name:   { type: String, index: true }
-, scores: [Score]
-, times:  [Time]
-});
-
-Competition.pre('remove', function (next) {
-  this.scores.remove();
-  this.times.remove();
-  next();
+, results: [{ section: ObjectId, time: String, points: Number, place: Number }]
 });
 
 ////
@@ -118,6 +119,9 @@ var Section = new Schema({
 , image:              { type: ObjectId, ref: 'ImageData' }
 , times:              [Time]
 , scores:             [Score]
+, results:            [{ competition: ObjectId, time: String, points: Number }]
+, total:              Number
+, place:              Number
 });
 
 ////
@@ -213,6 +217,7 @@ function removeScores(next) {
 ////
 // Named queries
 ////
+
 function findBy(attr) {
   return function (value, callback) {
     var criteria = {};
@@ -223,6 +228,13 @@ function findBy(attr) {
 
 // Make section findable by initials
 Section.statics.findByInitials = findBy('initials');
+// Make score sheets findable by competition name (and populate sections)
+ScoreSheet.statics.findByCompetition = function (value, callback) {
+  this
+    .findOne({ competition: value })
+    .populate('scores.section')
+    .run(callback);
+};
 // Make other models findable by name
 [Competition, Picture, Ad, Sequence, Slideshow]
 .forEach(function (Model) {
@@ -239,5 +251,6 @@ db.model('Ad', Ad);
 db.model('Picture', Picture);
 db.model('Sequence', Sequence);
 db.model('Slideshow', Slideshow);
+db.model('ScoreSheet', ScoreSheet);
 
 module.exports = db;

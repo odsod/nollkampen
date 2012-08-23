@@ -59,6 +59,7 @@ app.param('Picture',     'findByName');
 app.param('Sequence',    'findByName');
 app.param('Slideshow',   'findByName');
 app.param('ImageData',   'findById');
+app.param('ScoreSheet',  'findByCompetition');
 
 function loadInstanceFromBody(modelName) {
   return function (req, res, next) {
@@ -194,11 +195,12 @@ app.get('/resources/:ImageData', routes.sendImageData);
 
 function resource(root, modelName) {
   app.get(root, loadModel(modelName),    routes.list(modelName));
-  app.get(root + '/new',                 routes.new(modelName));
-  app.get('/sections/:Section',          routes.edit(modelName));
-  app.post('/sections/:Section/delete',  routes.delete(modelName));
-  app.post('/sections',                  routes['upsert' + modelName]);
-  app.post('/sections/:Section/update',  routes['upsert' + modelName]);
+
+  app.get(root + '/new',                         routes.new(modelName));
+  app.get(root + '/:' + modelName,               routes.edit(modelName));
+  app.post(root + '/:' + modelName + '/delete',  routes.delete(modelName));
+  app.post(root,                                 routes['upsert' + modelName]);
+  app.post(root + '/:' + modelName + '/update',  routes['upsert' + modelName]);
 }
 
 resource('/sections', 'Section');
@@ -206,20 +208,7 @@ resource('/competitions', 'Competition');
 resource('/ads', 'Ad');
 resource('/pictures', 'Picture');
 resource('/sequences', 'Sequence');
-
-// Scores
-app.get('/scores'
-      , loadModel('Competition')
-      , loadModel('Section')
-      , loadModel('Score')
-      , routes.showScoreTable);
-app.get('/scores/:Competition'
-      , loadModel('Competition')
-      , loadModel('Section')
-      , routes.showCompetitionScores);
-app.post('/scores/:Competition'
-       , loadModel('Section')
-       , routes.updateCompetitionScores);
+resource('/scores', 'ScoreSheet');
 
 // Times
 app.get('/times'
