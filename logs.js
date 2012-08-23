@@ -42,15 +42,15 @@ var expressLog = new Logger({
   ]
 });
 
-winston.handleExceptions(
-  new Console({
-    level: 'debug',
-    colorize: true,
-    timestamp: function () {
-      return 'App';
-    }
-  })
-);
+// winston.handleExceptions(
+//   new Console({
+//     level: 'debug',
+//     colorize: true,
+//     timestamp: function () {
+//       return 'App';
+//     }
+//   })
+// );
 
 var expressStream = {
   write: function (str) {

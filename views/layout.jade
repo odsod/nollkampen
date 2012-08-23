@@ -21,7 +21,8 @@ html
     div(data-role='page', id=id)
       div(data-role='header', data-position='fixed', data-theme='d', data-tap-toggle='false')
         include includes/head
-        block head-nav
+        block header
       div(data-role='content', id='content')
         block content
-      block foot
+      div(data-role='footer', data-position='fixed', data-theme='b', data-tap-toggle='false')
+        block footer

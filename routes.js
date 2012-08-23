@@ -8,7 +8,7 @@ var db = require('./db')
 
 function handleError(err) {
   if (err) {
-    log.error(err);
+    log.error(err.stack);
   }
 }
 
@@ -62,64 +62,73 @@ exports.newSection = function (req, res) {
 };
 
 exports.editSection = function (req, res) {
-  log.debug(req.section.imageurl);
   res.render('sections/form', {
-    action:  '/sections/' + req.section.id + '/update',
+    action:  '/sections/' + req.Section.instance.initials + '/update',
     title:   'Modifiera sektion',
     id:      'section-form',
-    section: req.section
+    section: req.Section.instance
   });
 };
 
 exports.createSection = function (req, res) {
-  // Create image first
-  var image = new ImageData();
-  if (req.files && req.files.image) {
-    image.file = req.files.image;
-  }
-  image.save(function (err, image) {
-    if (err) {
-      log.error(err);
-    }
+  function doCreate(err, image) {
+    handleError(err);
     db.model('Section').create({
       name:               req.body.name
     , initials:           req.body.initials
     , color:              req.body.color
     , textColor:          req.body.textColor
     , alternateTextColor: req.body.alternateTextColor
-    , image:              image && image._id
-    }, function (err) {
-      if (err) {
-        log.error(err);
-      }
+    , image:              image
+    }, function (err, section) {
+      handleError(err);
+      res.redirect('/sections');
     });
-  });
-  res.redirect('/sections');
+  }
+  // First insert image into db if it was uploaded
+  if (req.files.image.size > 0) {
+    var image = new ImageData();
+    image.file = req.files.image;
+    image.save(doCreate);
+  } else {
+    // Create without image
+    doCreate(null, null);
+  }
 };
 
 exports.updateSection = function (req, res) {
-  var image = new ImageData();
-  if (req.files && req.files.image) {
-    image.file = req.files.image;
+  function doUpdate(err, image) {
+    handleError(err);
+    log.debug('Section id ' + req.Section.instance._id);
+    db.model('Section')
+      .findByIdAndUpdate(req.Section.instance._id, {
+        name:               req.body.name
+      , initials:           req.body.initials
+      , color:              req.body.color
+      , textColor:          req.body.textColor
+      , alternateTextColor: req.body.alternateTextColor
+      , image:              image
+      }, function (err, section) {
+        handleError(err);
+        res.redirect('/sections');
+      });
   }
-  image.save(function (err, image) {
-    if (err) {
-      log.error(err);
-    }
-    req.section.update({
-      name:               req.body.name
-    , initials:           req.body.initials
-    , color:              req.body.color
-    , textColor:          req.body.textColor
-    , alternateTextColor: req.body.alternateTextColor
-    , image:              (!err && image && image._id) || req.section.image
-    });
-  });
-  res.redirect('/sections');
+  // First check if a new image was uploaded
+  if (req.files.image.size > 0) {
+    log.debug('Gonna use img');
+    var image = new ImageData();
+    image.file = req.files.image;
+    image.save(doUpdate);
+  } else {
+    log.debug('Noooo use img');
+    // Update with old image
+    doUpdate(null, req.Section.instance.image);
+  }
 };
 
 exports.deleteSection = function (req, res) {
-  req.section.remove();
+  db.model('Section')
+    .findByIdAndRemove(req.Section.instance._id, handleError);
   res.redirect('/sections');
 };
 
@@ -290,9 +299,7 @@ exports.showCompetitionScores = function (req, res) {
   db.model('Score').find({
     competition: req.competition.id
   }, function (err, scores) {
-    if (err) {
-      log.debug(err.toString());
-    }
+    handleError(err);
     var sectionScores = {};
     scores.forEach(function (score) {
       sectionScores[score.section] = score.points;
@@ -352,9 +359,7 @@ exports.showCompetitionTimes = function (req, res) {
   db.model('Time').find({
     competition: req.competition.id
   }, function (err, times) {
-    if (err) {
-      log.error(err.toString());
-    }
+    handleError(err);
     var sectionTimes = {};
     times.forEach(function (time) {
       sectionTimes[time.section] = {
@@ -363,7 +368,6 @@ exports.showCompetitionTimes = function (req, res) {
         disqualified: time.disqualified
       };
     });
-    log.debug(JSON.stringify(sectionTimes, '', '  '));
     res.render('times/form', {
       title: req.competition.name,
       id: 'times-form',

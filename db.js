@@ -38,10 +38,13 @@ ImageData.virtual('url').get(function () {
 });
 
 function removeOwnedImages(next) {
+  // Find all images which is currently not used (this.image)
   this.model('ImageData')
     .remove({ owner: this._id })
     .ne('_id', this.image)
-    .exec(next);
+    .exec(function (err) {
+      next();
+    });
 }
 
 function markImageAsOwned(next) {
@@ -191,6 +194,26 @@ var Slideshow = new Schema({
 
 Slideshow.pre('remove', function (next) {
   this.images.remove(next);
+});
+
+////
+// Named queries
+////
+function findBy(attr) {
+  return function (value, callback) {
+    var criteria = {};
+    criteria[attr] = value;
+    this.findOne(criteria, callback);
+  };
+}
+
+// Make section findable by initials
+Section.statics.findByInitials = findBy('initials');
+
+// Make other models findable by name
+[Competition, Picture, Ad, Sequence, Slideshow]
+.forEach(function (Model) {
+  Model.statics.findByName = findBy('name');
 });
 
 // Model EVERYTHING!

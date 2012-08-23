@@ -42,22 +42,23 @@ app.configure('development', function () {
   app.use(express.errorHandler());
 });
 
-app.param(function (name, modelName) {
+app.param(function (modelName, findMethod) {
   return function (req, res, next, val) {
-    db.model(modelName).findById(val, function (err, instance) {
-      req[name] = instance;
+    db.model(modelName)[findMethod](val, function (err, instance) {
+      req[modelName] = req[modelName] || {};
+      req[modelName].instance = instance;
       next();
     });
   };
 });
 
-app.param('section', 'Section');
-app.param('competition', 'Competition');
-app.param('ad', 'Ad');
-app.param('picture', 'Picture');
-app.param('sequence', 'Sequence');
-app.param('slideshow', 'Slideshow');
-app.param('image', 'ImageData');
+app.param('Section',     'findByInitials');
+app.param('Competition', 'findByName');
+app.param('Ad',          'findByName');
+app.param('Picture',     'findByName');
+app.param('Sequence',    'findByName');
+app.param('Slideshow',   'findByName');
+app.param('ImageData',   'findById');
 
 function loadInstanceFromBody(modelName) {
   return function (req, res, next) {
@@ -196,10 +197,10 @@ app.get('/sections'
       , loadModel('Section')
       , routes.listSections);
 app.get('/sections/new', routes.newSection);
-app.get('/sections/:section', routes.editSection);
+app.get('/sections/:Section', routes.editSection);
 app.post('/sections', routes.createSection);
-app.post('/sections/:section/delete', routes.deleteSection);
-app.post('/sections/:section/update', routes.updateSection);
+app.post('/sections/:Section/delete', routes.deleteSection);
+app.post('/sections/:Section/update', routes.updateSection);
 
 // Competitions CRUD
 app.get('/competitions'
