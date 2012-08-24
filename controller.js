@@ -64,7 +64,7 @@ Controller.prototype.create = Controller.prototype.upsert;
 Controller.prototype.update = Controller.prototype.upsert;
 
 Controller.prototype.loadInstance = function (req, res, next) {
-  this.model.findByAlias(req.params.id, function (err, instance) {
+  this.model.findByAlias(req.param, function (err, instance) {
     req.instance = instance;
     next();
   });

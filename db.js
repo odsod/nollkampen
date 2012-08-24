@@ -36,9 +36,7 @@ function hasImage(schema, options) {
 
   // Set a single image
   schema.virtual('image').set(function (image) {
-    log.debug('setimage');
-    log.data(image);
-    if (image.size > 0) {
+    if (image && image.size > 0) {
       this.imageData = [{
         data: fs.readFileSync(image.path)
       , mime: image.mime
@@ -93,7 +91,7 @@ var Picture = new Schema({
 });
 
 Picture.plugin(hasImage, {
-  urlRoot: '/resources'
+  urlRoot: '/img'
 , model: 'Picture'
 });
 
@@ -210,7 +208,7 @@ var Section = new Schema({
 });
 
 Section.plugin(hasImage, {
-  urlRoot: '/resources'
+  urlRoot: '/img'
 , model: 'Section'
 });
 
@@ -229,7 +227,7 @@ Ad.virtual('alias').get(function () {
 });
 
 Ad.plugin(hasImage, {
-  urlRoot: '/resources'
+  urlRoot: '/img'
 , model: 'Ad'
 });
 
@@ -244,7 +242,7 @@ var Slideshow = new Schema({
 });
 
 Slideshow.plugin(hasImage, {
-  urlRoot: '/resources'
+  urlRoot: '/img'
 , model: 'Slideshow'
 });
 

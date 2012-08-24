@@ -46,12 +46,24 @@ app.get('/', function (req, res) {
 });
 
 ////
-// Parse :id into req.params
+// Parse :param into req.params
 ////
 
-app.param('id', function (req, res, next, id) {
-  req.params.id = id;
+app.param(':param', function (req, res, next, param) {
+  req.param = param;
   next();
+});
+
+app.get('/img/:param', function (req, res) {
+  db[req.query.model]
+    .findById(req.param)
+    .select('imageData')
+    .slice('imageData', req.query.i, 1)
+    .exec(function (err, instance) {
+      var image = instance.imageData.pop();
+      res.contentType(image.mime);
+      res.send(image.data);
+    });
 });
 
 ////
@@ -81,7 +93,7 @@ function resource(root, controller) {
   // Edit
   ////
   app.get(
-    root + '/:id'
+    root + '/:param'
     , controller.loadInstance.bind(controller)
     , controller.edit.bind(controller)
   );
@@ -98,7 +110,7 @@ function resource(root, controller) {
   // Update
   ////
   app.put(
-    root + '/:id'
+    root + '/:param'
   , controller.loadInstance.bind(controller)
   , controller.update.bind(controller)
   );
@@ -107,7 +119,7 @@ function resource(root, controller) {
   // Delete
   ////
   app.delete(
-    root + '/:id'
+    root + '/:param'
   , controller.loadInstance.bind(controller)
   , controller.destroy.bind(controller)
   );
@@ -118,8 +130,6 @@ function resource(root, controller) {
 ////
 
 function saveImageHook(req, instance) {
-  log.debug('saveimagehook');
-  log.data(req.files);
   instance.image = req.files.image;
 }
 
