@@ -79,7 +79,11 @@ var Sequence = new Schema({
 , actions: [String]
 });
 
-Sequence.statics.findByName = findBy('name');
+Sequence.virtual('alias').get(function () {
+  return this.name;
+});
+
+Sequence.statics.findByAlias = findBy('name');
 
 ////
 // Picture

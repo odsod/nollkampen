@@ -180,6 +180,16 @@ resource('/pictures', new Controller({
   }
 }));
 
+resource('/sequences', new Controller({
+  model:           'Sequence'
+, root:            '/sequences'
+, form:            'sequence-form'
+, locale:          {
+    modelSingular: 'Sekvens'
+  , modelPlural:   'Sekvenser'
+  }
+}));
+
 server.listen(app.get('port'), function () {
   logs.express.info('Express server listening on port ' + app.get('port'));
 });

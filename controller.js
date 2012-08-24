@@ -48,6 +48,7 @@ Controller.prototype.destroy = function (req, res) {
 Controller.prototype.upsert = function (req, res) {
   var self = this;
   var instance = req.instance || new this.model();
+  log.data(req.body);
   _.each(req.body.attrs, function (value, key) {
     instance[key] = value;
   });
