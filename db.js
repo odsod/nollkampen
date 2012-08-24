@@ -90,12 +90,16 @@ var Picture = new Schema({
 , caption: String
 });
 
+Picture.virtual('alias').get(function () {
+  return this.name;
+});
+
+Picture.statics.findByAlias = findBy('name');
+
 Picture.plugin(hasImage, {
   urlRoot: '/img'
 , model: 'Picture'
 });
-
-Picture.statics.findByName = findBy('name');
 
 ////
 // Result & ResultSheet

@@ -1,17 +1,11 @@
-extends layout
+extends form
 
-block title
-  h1 #{title} #{modelName.toLowerCase()}
+block controls
+  label(for='name') Namn:
+  input(type='text', name='attrs[name]', id='name', value=instance.name)
 
-block content
-  form(method='POST', action=postTo, enctype='multipart/form-data', data-ajax='false')
+  label(for='caption') Bildtext:
+  input(type='text', name='attrs[caption]', id='caption', value=instance.caption)
 
-    label(for='name') Namn:
-    input(type='text', name='name', id='name', value=instance.name)
-
-    label Bild:
-
-    include includes/image-upload-form
-
-block footer
-  include includes/form-controls
+  label Bild:
+  include includes/image-upload-form

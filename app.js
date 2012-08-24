@@ -158,6 +158,17 @@ resource('/ads', new Controller({
   }
 }));
 
+resource('/pictures', new Controller({
+  model:           'Picture'
+, root:            '/pictures'
+, form:            'picture-form'
+, upsertHook:      saveImageHook
+, locale:          {
+    modelSingular: 'Bild'
+  , modelPlural:   'Bilder'
+  }
+}));
+
 server.listen(app.get('port'), function () {
   logs.express.info('Express server listening on port ' + app.get('port'));
 });
