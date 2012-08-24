@@ -1,0 +1,13 @@
+extends layout
+
+block title
+  h1= title
+
+block content
+  form(method='post', action=action, enctype='multipart/form-data', data-ajax='false')
+    input(type='hidden', name='_method', value=method)
+
+    block controls
+
+block footer
+  include includes/form-controls

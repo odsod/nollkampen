@@ -1,0 +1,8 @@
+extends form
+
+block controls
+  label(for='name') Namn:
+  input(type='text', name='attrs[name]', id='name', value=instance.name)
+
+  label Bild:
+  include includes/image-upload-form

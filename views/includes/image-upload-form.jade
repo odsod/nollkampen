@@ -7,7 +7,7 @@ input.file-chooser(type='file', name='image', id='saint-image-file', accept='ima
 if instance.image
   input.enable-toggle(type='radio', name='enableFile', id='disable-file', value='false', checked)
   label(for='disable-file') Behåll existerande bild
-  img.image-preview(src='/resources/' + instance.image)
+  img.image-preview(src=instance.image)
 
 script
   $(document).bind('pageinit', function () {

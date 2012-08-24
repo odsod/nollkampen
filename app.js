@@ -21,7 +21,7 @@ app.configure(function () {
   // Connect express logger to Winston
   app.use(express.logger({ stream: logs.expressStream }));
   app.use(express.bodyParser({
-    uploadDir: __dirname + '/public/uploads'
+    // uploadDir: __dirname + '/public/uploads'
   }));
   app.use(express.methodOverride());
   app.use(app.router);
@@ -45,62 +45,106 @@ app.get('/', function (req, res) {
   res.render('index');
 });
 
+////
+// Parse :id into req.params
+////
+
 app.param('id', function (req, res, next, id) {
   req.params.id = id;
   next();
 });
 
+////
+// Restful resource macro
+////
+
 function resource(root, controller) {
 
-  // Index action
+  ////
+  // Index
+  ////
   app.get(
     root
   , controller.loadCollection.bind(controller)
   , controller.index.bind(controller)
   );
 
-  // New action
+  ////
+  // New
+  ////
   app.get(
     root + '/new'
     , controller.new.bind(controller)
   );
 
-  // Edit action
+  ////
+  // Edit
+  ////
   app.get(
     root + '/:id'
     , controller.loadInstance.bind(controller)
     , controller.edit.bind(controller)
   );
 
-  // Create action
+  ////
+  // Create
+  ////
   app.post(
     root
   , controller.create.bind(controller)
   );
 
+  ////
   // Update
+  ////
   app.put(
     root + '/:id'
   , controller.loadInstance.bind(controller)
   , controller.update.bind(controller)
   );
 
+  ////
   // Delete
+  ////
   app.delete(
     root + '/:id'
   , controller.loadInstance.bind(controller)
   , controller.destroy.bind(controller)
   );
-
 }
 
+////
+// Upsert hook for saving images
+////
+
+function saveImageHook(req, instance) {
+  log.debug('saveimagehook');
+  log.data(req.files);
+  instance.image = req.files.image;
+}
+
+////
+// Restful route declarations
+////
+
 resource('/competitions', new Controller({
-  model: 'Competition'
-, root: '/competitions'
-, form: 'competition-form'
-, locale: {
+  model:           'Competition'
+, root:            '/competitions'
+, form:            'competition-form'
+, locale:          {
     modelSingular: 'Gren'
-  , modelPlural: 'Grenar'
+  , modelPlural:   'Grenar'
+  }
+}));
+
+resource('/ads', new Controller({
+  model:           'Ad'
+, root:            '/ads'
+, form:            'image-form'
+, upsertHook:      saveImageHook
+, locale:          {
+    modelSingular: 'Annons'
+  , modelPlural:   'Annonser'
   }
 }));
 

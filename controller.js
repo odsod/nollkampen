@@ -51,6 +51,9 @@ Controller.prototype.upsert = function (req, res) {
   _.each(req.body.attrs, function (value, key) {
     instance[key] = value;
   });
+  if (this.options.upsertHook) {
+    this.options.upsertHook(req, instance);
+  }
   instance.save(function (err) {
     res.redirect(self.options.root);
   });

@@ -36,6 +36,8 @@ function hasImage(schema, options) {
 
   // Set a single image
   schema.virtual('image').set(function (image) {
+    log.debug('setimage');
+    log.data(image);
     if (image.size > 0) {
       this.imageData = [{
         data: fs.readFileSync(image.path)
@@ -222,12 +224,16 @@ var Ad = new Schema({
   name:  { type: String, index: true }
 });
 
+Ad.virtual('alias').get(function () {
+  return this.name;
+});
+
 Ad.plugin(hasImage, {
   urlRoot: '/resources'
 , model: 'Ad'
 });
 
-Ad.statics.findByName = findBy('name');
+Ad.statics.findByAlias = findBy('name');
 
 ////
 // Slideshow
