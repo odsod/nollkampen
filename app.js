@@ -2,11 +2,11 @@
 
 var express           = require('express')
   , app               = express()
+  , Controller        = require('./controller')
   , server            = require('http').createServer(app)
   , sockets           = require('./sockets').listen(server)
-  , routes            = require('./routes')
+  // , routes            = require('./routes')
   , path              = require('path')
-  , _                 = require('underscore')
   , db                = require('./db')
   , connectHandlebars = require('connect-handlebars')
   , logs              = require('./logs')
@@ -37,210 +37,72 @@ app.configure(function () {
   app.use(express.static(path.join(__dirname, 'public')));
 });
 
-// Config: Development
 app.configure('development', function () {
   app.use(express.errorHandler());
 });
 
-app.param(function (modelName, findMethod) {
-  return function (req, res, next, val) {
-    db.model(modelName)[findMethod](val, function (err, instance) {
-      req[modelName] = req[modelName] || {};
-      req[modelName].instance = instance;
-      next();
-    });
-  };
+app.get('/', function (req, res) {
+  res.render('index');
 });
 
-app.param('Section',     'findByInitials');
-app.param('Competition', 'findByName');
-app.param('Ad',          'findByName');
-app.param('Picture',     'findByName');
-app.param('Sequence',    'findByName');
-app.param('Slideshow',   'findByName');
-app.param('ImageData',   'findById');
-app.param('ScoreSheet',  'findByCompetition');
-
-function loadInstanceFromBody(modelName) {
-  return function (req, res, next) {
-    if (req.body[modelName]) {
-      db.model(modelName).findById(req.body[modelName].instance, function (err, instance) {
-        if (err) {
-          log.error(err);
-          return res.send('Something went wrong..');
-        } else {
-          req[modelName] = req[modelName] || {};
-          req[modelName].instance = instance;
-          next();
-        }
-      });
-    } else {
-      next();
-    }
-  };
-}
-
-function loadModel(modelName) {
-  return function (req, res, next) {
-    db.model(modelName).find(function (err, instances) {
-      if (err) {
-        log.error(err);
-        return res.send('Something went wrong..');
-      } else {
-        req[modelName] = req[modelName] || {};
-        req[modelName].instances = instances;
-        next();
-      }
-    });
-  };
-}
-
-function calculateResults(req, res, next) {
-  var
-    results = {},
-    times = {},
-    points = {};
-  req.competitions.forEach(function (c) {
-    results[c.id] = [];
-    points[c.id] = {};
-    times[c.id] = {};
-  });
-  req.sections.forEach(function (s) {
-    results[s.id] = [];
-    points[s.id] = 0;
-    req.competitions.forEach(function (c) {
-      // Record results for this competition on the section
-      var p = _.find(req.scores, function (sc) {
-          return sc.section === s.id && sc.competition === c.id;
-        }).points;
-      var t = _.find(req.times, function (t) {
-        return t.section === s.id && t.competition === c.id;
-      }).text;
-      results[s.id].push({
-        competition: c.id,
-        points: p || null,
-        time: t
-      });
-      points[c.id][s.id] = p;
-      times[c.id][s.id] = t;
-      results[c.id].push({
-        section: s.id,
-        initials: s.initials,
-        points: p,
-        time: t
-      });
-      points[s.id] += p;
-    });
-  });
-  var places = {};
-  var tally = [];
-  req.sections.forEach(function (s) {
-    tally.push({
-      section: s.id,
-      initials: s.initials,
-      points: points[s.id]
-    });
-  });
-  tally.sort(function (s1, s2) {
-    return (s2.points - s1.points) ||
-      (s1.initials === 'IT' && -1) ||
-      (s2.initials === 'IT' && 1) ||
-      (s1.initials.toLowerCase() > s2.initials.toLowerCase() && 1) ||
-      (s1.initials.toLowerCase() < s2.initials.toLowerCase() && -1) ||
-      0;
-  });
-  var currPlace = 0;
-  var currTotal = Number.POSITIVE_INFINITY;
-  tally.forEach(function (t) {
-    if (t.points < currTotal) {
-      currPlace += 1;
-    }
-    places[t.section] = currPlace;
-    t.place = currPlace;
-    currTotal = t.points;
-  });
-  // Assign competition places
-  req.competitions.forEach(function (c) {
-    places[c.id] = {};
-    results[c.id].sort(function (s1, s2) {
-      return (s2.points - s1.points) ||
-         (s1.initials === 'IT' && -1) ||
-         (s2.initials === 'IT' && 1) ||
-         (s1.initials.toLowerCase() > s2.initials.toLowerCase() && 1) ||
-         (s1.initials.toLowerCase() < s2.initials.toLowerCase() && -1) ||
-         0;
-    });
-    var currPlace = 0;
-    var currPoints = Number.POSITIVE_INFINITY;
-    results[c.id].forEach(function (result) {
-      if (result.points < currPoints) {
-        currPlace += 1;
-      }
-      places[c.id][result.section] = currPlace;
-      result.place = currPlace;
-      currPoints = result.points;
-    });
-  });
-  req.results = results;
-  req.points = points;
-  req.places = places;
-  req.tally = tally;
-  req.times = times;
+app.param('id', function (req, res, next, id) {
+  req.params.id = id;
   next();
+});
+
+function resource(root, controller) {
+
+  // Index action
+  app.get(
+    root
+  , controller.loadCollection.bind(controller)
+  , controller.index.bind(controller)
+  );
+
+  // New action
+  app.get(
+    root + '/new'
+    , controller.new.bind(controller)
+  );
+
+  // Edit action
+  app.get(
+    root + '/:id'
+    , controller.loadInstance.bind(controller)
+    , controller.edit.bind(controller)
+  );
+
+  // Create action
+  app.post(
+    root
+  , controller.create.bind(controller)
+  );
+
+  // Update
+  app.put(
+    root + '/:id'
+  , controller.loadInstance.bind(controller)
+  , controller.update.bind(controller)
+  );
+
+  // Delete
+  app.delete(
+    root + '/:id'
+  , controller.loadInstance.bind(controller)
+  , controller.destroy.bind(controller)
+  );
+
 }
 
-app.get('/', routes.index);
-app.get('/screen', routes.screen);
-app.get('/resources/:ImageData', routes.sendImageData);
-
-function resource(root, modelName) {
-  app.get(root, loadModel(modelName),    routes.list(modelName));
-
-  app.get(root + '/new',                         routes.new(modelName));
-  app.get(root + '/:' + modelName,               routes.edit(modelName));
-  app.post(root + '/:' + modelName + '/delete',  routes.delete(modelName));
-  app.post(root,                                 routes['upsert' + modelName]);
-  app.post(root + '/:' + modelName + '/update',  routes['upsert' + modelName]);
-}
-
-resource('/sections', 'Section');
-resource('/competitions', 'Competition');
-resource('/ads', 'Ad');
-resource('/pictures', 'Picture');
-resource('/sequences', 'Sequence');
-resource('/scores', 'ScoreSheet');
-
-// Times
-app.get('/times'
-      , loadModel('Competition')
-      , loadModel('Section')
-      , loadModel('Time')
-      , routes.showTimeTable);
-app.get('/times/:Competition'
-      , loadModel('Competition')
-      , loadModel('Section')
-      , routes.showCompetitionTimes);
-app.post('/times/:Competition'
-       , loadModel('Section')
-       , routes.updateCompetitionTimes);
-
-// Sequence showing
-app.get('/sequences/show'
-      , loadModel('Sequence')
-      , routes.listShowableSequences);
-app.get('/sequences/show/:Sequence', routes.showSequence);
-
-// Actions posted to /screen are forwarded through socket
-app.post('/screen'
-       , loadModel('Competition')
-       , loadModel('Section')
-       , loadModel('Time')
-       , loadModel('Score')
-       , loadModel('Ad')
-       , loadModel('Picture')
-       , loadInstanceFromBody('Competition')
-       , calculateResults
-       , sockets.handle);
+resource('/competitions', new Controller({
+  model: 'Competition'
+, root: '/competitions'
+, form: 'competition-form'
+, locale: {
+    modelSingular: 'Gren'
+  , modelPlural: 'Grenar'
+  }
+}));
 
 server.listen(app.get('port'), function () {
   logs.express.info('Express server listening on port ' + app.get('port'));

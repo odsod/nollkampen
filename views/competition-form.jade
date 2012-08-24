@@ -1,13 +1,14 @@
 extends layout
 
 block title
-  h1 #{title} #{modelName.toLowerCase()}
+  h1= title
 
 block content
-  form(method='POST', action=postTo, data-ajax='false')
+  form(method='post', action=action, data-ajax='false')
+    input(type='hidden', name='_method', value=method)
 
     label(for="name") Namn:
-    input(type="text", name="name", value=instance.name)
+    input(type="text", name="attrs[name]", value=instance.name)
 
 block footer
   include includes/form-controls

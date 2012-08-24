@@ -1,7 +1,7 @@
 div(data-role='footer', data-position='fixed', data-theme='d')
   div(data-role='navbar'): ul
     li: a(data-rel='back', data-theme='d'): h3 Avbryt
-    li: a.form-submit(data-theme='b'): h3 Spara
+    li: a.form-submit(data-theme='b'): h3 Spara #{modelName}
 
 script
   $(document).bind('pageinit', function () {

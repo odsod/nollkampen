@@ -1,26 +1,26 @@
 extends layout
 
 block title
-  h1= modelNamePlural
+  h1= title
 
 block content
   ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
-    each instance, i in instances
-      li: a(href=root + '/' + instance[showables.link])
-        h3= instance[showables.title]
-        p= instance[showables.title]
+    each instance, i in collection
+      li: a(href=root + '/' + instance.alias)
+        h3= instance.alias
         a(href='#delete' + i, data-rel='popup',
-          data-position-to='window') Ta bort
-  each instance, i in instances
+          data-position-to='window') Ta bort #{modelName}
+  each instance, i in collection
     .ui-corner-all.popup(data-role='popup', id='delete' + i)
-      .ui-corner-top(data-role='header'): h1 Ta bort #{modelName.toLowerCase()}
+      .ui-corner-top(data-role='header'): h1 Ta bort #{modelName}
       .ui-corner-bottom(data-role='content')
-        p Är du säker på att du vill ta bort #{instance[showables.title]}?
-        form(method='POST', action=root + '/' + instance[showables.link] + '/delete')
+        p Är du säker på att du vill ta bort #{instance.alias}?
+        form(method='post', action=root + '/' + instance.alias)
+          input(type='hidden', name='_method', value='delete')
           .ui-body: fieldset.ui-grid-a
             .ui-block-a: a(data-role='button', data-rel='back', data-theme='d') Avbryt
             .ui-block-b: button(type='submit', name='submit', value='submit-value', data-theme='a') Ta bort
 
 block footer
     div(data-role='navbar', data-iconpos='right')
-      ul: li: a(href=root + '/new', data-icon='plus'): h3 Skapa ny #{modelName.toLowerCase()}
+      ul: li: a(href=root + '/new', data-icon='plus'): h3 Skapa ny #{modelName}
