@@ -1,68 +1,60 @@
-extends layout
+extends form
 
-block title
-  h1 #{title} #{modelName.toLowerCase()}
+block controls
+  label(for='name') Namn:
+  input(type='text', name='attrs[name]', id='name', value=instance.name)
 
-block content
-  form(method='POST', action=postTo, enctype='multipart/form-data', data-ajax='false')
+  label(for='initials') Initialer:
+  input(type='text', name='attrs[initials]', id='initials', value=instance.initials)
 
-    label(for='name') Namn:
-    input(type='text', name='name', id='name', value=instance.name)
+  label(for='color') Sektionsfärg:
+  input.color-picker(type='text', name='attrs[color]', id='color', value=instance.color || '#eeeeee')
 
-    label(for='initials') Initialer:
-    input(type='text', name='initials', id='initials', value=instance.initials)
+  label(for='textColor') Textfärg:
+  input.color-picker(type='text', name='attrs[textColor]', id='textColor', value=instance.textColor || '#333333')
 
-    label(for='color') Sektionsfärg:
-    input.color-picker(type='text', name='color', id='color', value=instance.color || '#eeeeee')
+  label(for='alternateTextColor') Alternativ textfärg:
+  input.color-picker(type='text', name='attrs[alternateTextColor]', id='alternateTextColor', value=instance.alternateTextColor || '#eeeeee')
 
-    label(for='textColor') Textfärg:
-    input.color-picker(type='text', name='textColor', id='textColor', value=instance.textColor || '#333333')
+  label Sektionshelgon:
 
-    label(for='alternateTextColor') Alternativ textfärg:
-    input.color-picker(type='text', name='alternateTextColor', id='alternateTextColor', value=instance.alternateTextColor || '#eeeeee')
-
-    label Sektionshelgon:
-
-    include includes/image-upload-form
+  include includes/image-upload-form
 
   script
-      $(document).bind('pageinit', function () {
+    $(document).bind('pageinit', function () {
 
-        var $colorPickers = $('.color-picker');
+      var $colorPickers = $('.color-picker');
 
-        var $sectionColor = $('#color');
-        var $textColor = $('#textColor');
-        var $alternateTextColor = $('#alternateTextColor');
+      var $sectionColor = $('#color');
+      var $textColor = $('#textColor');
+      var $alternateTextColor = $('#alternateTextColor');
 
-        function changeSectionColor(hex) {
-          $sectionColor.css('background', hex);
-          $textColor.css('background', hex);
-        }
+      function changeSectionColor(hex) {
+        $sectionColor.css('background', hex);
+        $textColor.css('background', hex);
+      }
 
-        function changeTextColor(hex) {
-          $sectionColor.css('color', hex);
-          $textColor.css('color', hex);
-          $alternateTextColor.css('background', hex);
-        }
+      function changeTextColor(hex) {
+        $sectionColor.css('color', hex);
+        $textColor.css('color', hex);
+        $alternateTextColor.css('background', hex);
+      }
 
-        function changeAlternateTextColor(hex) {
-          $alternateTextColor.css('color', hex);
-        }
+      function changeAlternateTextColor(hex) {
+        $alternateTextColor.css('color', hex);
+      }
 
-        // Enhance color pickers
-        $sectionColor.miniColors({ change: changeSectionColor });
-        $textColor.miniColors({ change: changeTextColor });
-        $alternateTextColor.miniColors({ change: changeAlternateTextColor });
+      // Enhance color pickers
+      $sectionColor.miniColors({ change: changeSectionColor });
+      $textColor.miniColors({ change: changeTextColor });
+      $alternateTextColor.miniColors({ change: changeAlternateTextColor });
 
-        // Override text-shadow (why wont !important take effect..?)
-        $colorPickers.css('text-shadow', 'none');
+      // Override text-shadow (why wont !important take effect..?)
+      $colorPickers.css('text-shadow', 'none');
 
-        // Initialize them
-        changeSectionColor($sectionColor.val());
-        changeTextColor($textColor.val());
-        changeAlternateTextColor($alternateTextColor.val());
+      // Initialize them
+      changeSectionColor($sectionColor.val());
+      changeTextColor($textColor.val());
+      changeAlternateTextColor($alternateTextColor.val());
 
-      });
-    
-block footer
-  include includes/form-controls
+    });

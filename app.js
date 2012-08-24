@@ -137,6 +137,17 @@ function saveImageHook(req, instance) {
 // Restful route declarations
 ////
 
+resource('/sections', new Controller({
+  model:           'Section'
+, root:            '/sections'
+, form:            'section-form'
+, upsertHook:      saveImageHook
+, locale:          {
+    modelSingular: 'Sektion'
+  , modelPlural:   'Sektioner'
+  }
+}));
+
 resource('/competitions', new Controller({
   model:           'Competition'
 , root:            '/competitions'

@@ -216,7 +216,11 @@ Section.plugin(hasImage, {
 , model: 'Section'
 });
 
-Section.statics.findByInitials = findBy('initials');
+Section.virtual('alias').get(function () {
+  return this.initials;
+});
+
+Section.statics.findByAlias = findBy('initials');
 
 ////
 // Ad
