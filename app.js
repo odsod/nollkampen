@@ -5,9 +5,10 @@ var express           = require('express')
   , Controller        = require('./controller')
   , server            = require('http').createServer(app)
   , sockets           = require('./sockets').listen(server)
-  // , routes            = require('./routes')
+  , _                 = require('underscore')
   , path              = require('path')
   , db                = require('./db')
+  , mongoose          = require('mongoose')
   , connectHandlebars = require('connect-handlebars')
   , logs              = require('./logs')
   , log               = logs.app;
@@ -189,6 +190,75 @@ resource('/sequences', new Controller({
   , modelPlural:   'Sekvenser'
   }
 }));
+
+////
+// Results
+////
+
+function loadCollection(model) {
+  return function (req, res, next) {
+    db[model].find(function (err, collection) {
+      req[model] = { instances: collection };
+      next();
+    });
+  };
+}
+
+function loadInstance(model, param) {
+  return function (req, res, next) {
+    db[model].findByAlias(req[param], function (err, instance) {
+      req[model] = { instance: instance };
+      next();
+    });
+  };
+}
+
+app.get('/results/:param'
+      , loadInstance('Competition', 'param')
+      , loadCollection('Section')
+      , loadCollection('Result')
+      , function (req, res) {
+  res.render('result-form', {
+    action: '/results/' + req.param
+  , method: 'put'
+  , title: 'Resultat för ' + req.Competition.instance.alias.toLowerCase()
+  , sections: req.Section.instances
+  , results: _.groupBy(req.Result.instances, 'section')
+  , modelName: 'resultat'
+  });
+});
+
+app.get('/results'
+      , loadCollection('Section')
+      , loadCollection('Competition')
+      , loadCollection('Result')
+      , function (req, res) {
+  res.render('result-table', {
+    sections: req.Section.instances
+  , competitons: req.Competition.instances
+  , results: req.Result.instances
+  });
+});
+
+app.put('/results/:param'
+       , loadInstance('Competition', 'param')
+       , function (req, res) {
+  log.data(req.body);
+  log.data(req.Competition.instance);
+  _.each(req.body, function (result, section) {
+    log.warn(section);
+    log.data(result);
+    new db.Result({
+      section: section
+    , competition: req.Competition.instance.id
+    , minutes: result.minutes || 0
+    , seconds: result.seconds || 0
+    , points: result.points || 0
+    , disqualified: result.disqualified === 'true'
+    }).save();
+  });
+  res.redirect('/');
+});
 
 server.listen(app.get('port'), function () {
   logs.express.info('Express server listening on port ' + app.get('port'));

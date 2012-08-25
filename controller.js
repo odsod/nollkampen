@@ -3,12 +3,13 @@ var _ = require('underscore')
   , log = require('./logs').app;
 
 var Controller = module.exports = function Controller(options) {
-  this.model = db[options.model];
+  _.extend(this, options);
   this.options = options;
+  this.model = db[options.model];
 };
 
 Controller.prototype.index = function (req, res) {
-  res.render('list', {
+  res.render(this.options.index || 'list', {
     title: this.options.locale.modelPlural
   , modelName: this.options.locale.modelSingular.toLowerCase()
   , root: this.options.root
@@ -48,7 +49,6 @@ Controller.prototype.destroy = function (req, res) {
 Controller.prototype.upsert = function (req, res) {
   var self = this;
   var instance = req.instance || new this.model();
-  log.data(req.body);
   _.each(req.body.attrs, function (value, key) {
     instance[key] = value;
   });

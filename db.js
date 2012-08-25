@@ -106,67 +106,40 @@ Picture.plugin(hasImage, {
 });
 
 ////
-// Result & ResultSheet
+// Result
 ////
 
 var Result = new Schema({
-  section:      { type: ObjectId, ref: 'Section' }
-, competition:  { type: ObjectId, ref: 'Competition' }
+  section:      { type: ObjectId, ref: 'Section', index: true }
+, competition:  { type: ObjectId, ref: 'Competition', index: true }
 , minutes:      Number
 , seconds:      Number
-, disqualified: Boolean
 , points:       Number
-, place:        Number
+, disqualified: Boolean
 });
 
-var ResultSheet = new Schema({
-  competition:    { type: ObjectId, ref: 'Competition', index: true }
-, results: [Result]
-});
-
-ResultSheet.pre('save', function (next) {
-  this.results.sort(function (r1, r2) {
-    return r2.points - r1.points;
-  });
-  var currPlace = 0
-    , currPoints = Number.POSITIVE_INFINITY;
-  this.results.forEach(function (result) {
-    if (result.poins < currPoints) {
-      currPlace += 1;
-      currPoints = result.points;
-    }
-    result.place = currPlace;
-  });
+Result.pre('save', function (next) {
+  log.debug('LLOLOLOL');
   next();
 });
 
-ResultSheet.statics.compile = function (callback) {
+Result.statics.compileTotal = function (callback) {
   this
     .find()
     .populate('competition')
-    .populate('results.section')
-    .exec(function (err, ret) {
-      var sheets = ret.toObject()
-        , results = _.flatten(_.pluck(sheets, 'results'), true)
-        , sectionResults = _.groupBy(results, function (result) {
-          return result.section.initials;
-        })
-        , sectionTotals = _.map(sectionResults, function (results) {
-            return {
-              results : results
-            , total: _.reduce(results, function (memo, result) {
-                return memo + result.points;
-              }, 0)
-            };
-          });
-      callback(sheets);
+    .populate('section')
+    .exec(function (err, rs) {
+      var results = _.map(rs, function (r) {
+        return r.toObject({ getters: true });
+      })
+      , competitionResults = _.groupBy(results, function (r) {
+        return r.competition.alias;
+      })
+      , sectionResults = _.groupBy(results, function (r) {
+        return r.section.alias;
+      });
+      callback();
     });
-};
-
-ResultSheet.statics.findByCompetitionName = function (name, callback) {
-  this.model('Competition').findByName(name, function (err, competition) {
-    this.findOne({ competition: competition._id }, callback);
-  });
 };
 
 ////
@@ -183,21 +156,9 @@ Competition.virtual('alias').get(function () {
 
 Competition.statics.findByAlias = findBy('name');
 
-// Make sure a result sheet exists for every competition
-Competition.pre('save', function (next) {
-  this.model('ResultSheet')
-    .findOneAndUpdate({
-      competition: this._id
-    }, {
-      // Just make sure it exists
-    }, {
-      upsert: true
-    }, next);
-});
-
-// Remove result sheet upon competition removal
+// Clean results on removal
 Competition.pre('remove', function (next) {
-  this.model('ResultSheet')
+  this.model('Result')
     .remove({ competition: this._id }, next);
 });
 
@@ -213,6 +174,12 @@ var Section = new Schema({
 , color:              String
 , textColor:          String
 , alternateTextColor: String
+});
+
+// Remove section results
+Section.pre('remove', function (next) {
+  this.model('Result')
+    .remove({ section: this._id }, next);
 });
 
 Section.plugin(hasImage, {
@@ -265,11 +232,11 @@ Slideshow.statics.findByName = findBy('name');
 ////
 
 module.exports = {
-  Section:     db.model('Section', Section)
+  Section:     db.model('Section',     Section)
 , Competition: db.model('Competition', Competition)
-, ResultSheet: db.model('ResultSheet', ResultSheet)
-, Ad:          db.model('Ad', Ad)
-, Picture:     db.model('Picture', Picture)
-, Sequence:    db.model('Sequence', Sequence)
-, Slideshow:   db.model('Slideshow', Slideshow)
+, Result:      db.model('Result',      Result)
+, Ad:          db.model('Ad',          Ad)
+, Picture:     db.model('Picture',     Picture)
+, Sequence:    db.model('Sequence',    Sequence)
+, Slideshow:   db.model('Slideshow',   Slideshow)
 };

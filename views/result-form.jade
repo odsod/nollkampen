@@ -1,0 +1,40 @@
+extends form
+
+mixin range(value, min, max, _id, attr, text)
+  li(data-role='fieldcontain')
+    label(for=_id+'['+attr+']')= text
+    input(type='range', name=_id+'['+attr+']', id=_id+'['+attr+']', data-highlight='true',
+      value=value, min=min, max=max, data-section=_id)
+
+block controls
+  ul(data-role='listview')
+    each section in sections
+      li(data-role='list-divider')
+        span.section-initials(style='background:'+section.color+';color:'+section.textColor)
+          = section.initials
+      mixin range(results[section._id] && results[section._id].minutes || 0, 0, 9,  section.id, 'minutes', 'Minuter')
+      mixin range(results[section._id] && results[section._id].seconds || 0, 0, 59, section.id, 'seconds', 'Sekunder')
+      mixin range(results[section._id] && results[section._id].points  || 0, 0, 20, section.id, 'points',  'Poäng')
+      li(data-role='fieldcontain')
+        label(for=section._id+'[disqualified]') Diskad
+        select.disqualified-slider(name=section._id+'[disqualified]', id=section._id+'[disqualified]', 
+               data-role='slider', data-theme='c', data-track-theme='d', data-section=section._id)
+          option(value='false') Nej
+          if results[section._id] && results[section._id].disqualified
+            option(value='true', selected) Ja
+          else
+            option(value='true') Ja
+  script
+    $('.disqualified-slider').change(function () {
+      var $this = $(this)
+        , section = $this.data('section')
+        , $inputs = $('input[data-section='+section+']');
+      $inputs
+        .slider($this.val() === 'true' ? 'disable' : 'enable')
+        .slider('refresh');
+      if ($this.val() === 'true') {
+        $inputs
+          .val(0)
+          .slider('refresh');
+      }
+    }).trigger('change');
