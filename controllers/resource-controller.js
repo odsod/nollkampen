@@ -1,22 +1,21 @@
-var _ = require('underscore')
-  , db = require('../db')
+var _   = require('underscore')
+  , db  = require('../db')
   , log = require('../logs').app;
 
-var Controller = module.exports = function Controller(options) {
-  _.extend(this, options);
-  this.options = options;
-  this.model = db[options.model];
-};
+var ResourceController = module.exports = function ResourceController(options) {};
 
-Controller.resource = function (app, root, controller) {
-  
+ResourceController.resource = function (app, root, options) {
+
+  options.model = db[options.model];
+  options.options = options;
+
   ////
   // Index
   ////
   app.get(
     root
-  , controller.loadCollection.bind(controller)
-  , controller.index.bind(controller)
+  , ResourceController.loadCollection.bind(options)
+  , ResourceController.index.bind(options)
   );
 
   ////
@@ -24,7 +23,7 @@ Controller.resource = function (app, root, controller) {
   ////
   app.get(
     root + '/new'
-    , controller.new.bind(controller)
+    , ResourceController.new.bind(options)
   );
 
   ////
@@ -32,8 +31,8 @@ Controller.resource = function (app, root, controller) {
   ////
   app.get(
     root + '/:param'
-    , controller.loadInstance.bind(controller)
-    , controller.edit.bind(controller)
+    , ResourceController.loadInstance.bind(options)
+    , ResourceController.edit.bind(options)
   );
 
   ////
@@ -41,7 +40,7 @@ Controller.resource = function (app, root, controller) {
   ////
   app.post(
     root
-  , controller.create.bind(controller)
+  , ResourceController.create.bind(options)
   );
 
   ////
@@ -49,8 +48,8 @@ Controller.resource = function (app, root, controller) {
   ////
   app.put(
     root + '/:param'
-  , controller.loadInstance.bind(controller)
-  , controller.update.bind(controller)
+  , ResourceController.loadInstance.bind(options)
+  , ResourceController.update.bind(options)
   );
 
   ////
@@ -58,13 +57,13 @@ Controller.resource = function (app, root, controller) {
   ////
   app.delete(
     root + '/:param'
-  , controller.loadInstance.bind(controller)
-  , controller.destroy.bind(controller)
+  , ResourceController.loadInstance.bind(options)
+  , ResourceController.destroy.bind(options)
   );
 
 };
 
-Controller.prototype.index = function (req, res) {
+ResourceController.index = function (req, res) {
   res.render(this.options.index || 'list', {
     title: this.options.locale.modelPlural
   , modelName: this.options.locale.modelSingular.toLowerCase()
@@ -75,7 +74,7 @@ Controller.prototype.index = function (req, res) {
   });
 };
 
-Controller.prototype.new = function (req, res) {
+ResourceController.new = function (req, res) {
   res.render(this.options.form, {
     title: 'Skapa ' + this.options.locale.modelSingular.toLowerCase()
   , modelName: this.options.locale.modelSingular.toLowerCase()
@@ -85,7 +84,7 @@ Controller.prototype.new = function (req, res) {
   });
 };
 
-Controller.prototype.edit = function (req, res) {
+ResourceController.edit = function (req, res) {
   res.render(this.options.form, {
     title: 'Editera ' + this.options.locale.modelSingular.toLowerCase()
   , modelName: this.options.locale.modelSingular.toLowerCase()
@@ -95,14 +94,14 @@ Controller.prototype.edit = function (req, res) {
   });
 };
 
-Controller.prototype.destroy = function (req, res) {
+ResourceController.destroy = function (req, res) {
   var self = this;
   req.instance.remove(function (err) {
     res.redirect(self.options.root);
   });
 };
 
-Controller.prototype.upsert = function (req, res) {
+ResourceController.upsert = function (req, res) {
   var self = this;
   var instance = req.instance || new this.model();
   _.each(req.body.attrs, function (value, key) {
@@ -116,18 +115,18 @@ Controller.prototype.upsert = function (req, res) {
   });
 };
 
-Controller.prototype.create = Controller.prototype.upsert;
+ResourceController.create = ResourceController.prototype.upsert;
 
-Controller.prototype.update = Controller.prototype.upsert;
+ResourceController.update = ResourceController.prototype.upsert;
 
-Controller.prototype.loadInstance = function (req, res, next) {
+ResourceController.loadInstance = function (req, res, next) {
   this.model.findByAlias(req.param, function (err, instance) {
     req.instance = instance;
     next();
   });
 };
 
-Controller.prototype.loadCollection = function (req, res, next) {
+ResourceController.loadCollection = function (req, res, next) {
   this.model.find(function (err, collection) {
     req.collection = collection;
     next();
