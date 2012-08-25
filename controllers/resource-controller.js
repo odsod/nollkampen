@@ -1,11 +1,67 @@
 var _ = require('underscore')
-  , db = require('./db')
-  , log = require('./logs').app;
+  , db = require('../db')
+  , log = require('../logs').app;
 
 var Controller = module.exports = function Controller(options) {
   _.extend(this, options);
   this.options = options;
   this.model = db[options.model];
+};
+
+Controller.resource = function (app, root, controller) {
+  
+  ////
+  // Index
+  ////
+  app.get(
+    root
+  , controller.loadCollection.bind(controller)
+  , controller.index.bind(controller)
+  );
+
+  ////
+  // New
+  ////
+  app.get(
+    root + '/new'
+    , controller.new.bind(controller)
+  );
+
+  ////
+  // Edit
+  ////
+  app.get(
+    root + '/:param'
+    , controller.loadInstance.bind(controller)
+    , controller.edit.bind(controller)
+  );
+
+  ////
+  // Create
+  ////
+  app.post(
+    root
+  , controller.create.bind(controller)
+  );
+
+  ////
+  // Update
+  ////
+  app.put(
+    root + '/:param'
+  , controller.loadInstance.bind(controller)
+  , controller.update.bind(controller)
+  );
+
+  ////
+  // Delete
+  ////
+  app.delete(
+    root + '/:param'
+  , controller.loadInstance.bind(controller)
+  , controller.destroy.bind(controller)
+  );
+
 };
 
 Controller.prototype.index = function (req, res) {

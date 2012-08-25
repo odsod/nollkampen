@@ -1,17 +1,17 @@
 /*jshint camelcase:false */
 
-var express           = require('express')
-  , app               = express()
-  , Controller        = require('./controller')
-  , server            = require('http').createServer(app)
-  , sockets           = require('./sockets').listen(server)
-  , _                 = require('underscore')
-  , path              = require('path')
-  , db                = require('./db')
-  , mongoose          = require('mongoose')
-  , connectHandlebars = require('connect-handlebars')
-  , logs              = require('./logs')
-  , log               = logs.app;
+var express            = require('express')
+  , app                = express()
+  , ResourceController = require('./controllers/resource-controller')
+  , server             = require('http').createServer(app)
+  , sockets            = require('./sockets').listen(server)
+  , _                  = require('underscore')
+  , path               = require('path')
+  , db                 = require('./db')
+  , mongoose           = require('mongoose')
+  , connectHandlebars  = require('connect-handlebars')
+  , logs               = require('./logs')
+  , log                = logs.app;
 
 // Config: All
 app.configure(function () {
@@ -68,65 +68,6 @@ app.get('/img/:param', function (req, res) {
 });
 
 ////
-// Restful resource macro
-////
-
-function resource(root, controller) {
-
-  ////
-  // Index
-  ////
-  app.get(
-    root
-  , controller.loadCollection.bind(controller)
-  , controller.index.bind(controller)
-  );
-
-  ////
-  // New
-  ////
-  app.get(
-    root + '/new'
-    , controller.new.bind(controller)
-  );
-
-  ////
-  // Edit
-  ////
-  app.get(
-    root + '/:param'
-    , controller.loadInstance.bind(controller)
-    , controller.edit.bind(controller)
-  );
-
-  ////
-  // Create
-  ////
-  app.post(
-    root
-  , controller.create.bind(controller)
-  );
-
-  ////
-  // Update
-  ////
-  app.put(
-    root + '/:param'
-  , controller.loadInstance.bind(controller)
-  , controller.update.bind(controller)
-  );
-
-  ////
-  // Delete
-  ////
-  app.delete(
-    root + '/:param'
-  , controller.loadInstance.bind(controller)
-  , controller.destroy.bind(controller)
-  );
-}
-
-////
 // Upsert hook for saving images
 ////
 
@@ -138,7 +79,7 @@ function saveImageHook(req, instance) {
 // Restful route declarations
 ////
 
-resource('/sections', new Controller({
+ResourceController.resource(app, '/sections', new ResourceController({
   model:           'Section'
 , root:            '/sections'
 , form:            'section-form'
@@ -149,7 +90,7 @@ resource('/sections', new Controller({
   }
 }));
 
-resource('/competitions', new Controller({
+ResourceController.resource(app, '/competitions', new ResourceController({
   model:           'Competition'
 , root:            '/competitions'
 , form:            'competition-form'
@@ -159,7 +100,7 @@ resource('/competitions', new Controller({
   }
 }));
 
-resource('/ads', new Controller({
+ResourceController.resource(app, '/ads', new ResourceController({
   model:           'Ad'
 , root:            '/ads'
 , form:            'image-form'
@@ -170,7 +111,7 @@ resource('/ads', new Controller({
   }
 }));
 
-resource('/pictures', new Controller({
+ResourceController.resource(app, '/pictures', new ResourceController({
   model:           'Picture'
 , root:            '/pictures'
 , form:            'picture-form'
@@ -181,7 +122,7 @@ resource('/pictures', new Controller({
   }
 }));
 
-resource('/sequences', new Controller({
+ResourceController.resource(app, '/sequences', new ResourceController({
   model:           'Sequence'
 , root:            '/sequences'
 , form:            'sequence-form'

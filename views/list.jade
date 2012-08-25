@@ -6,6 +6,7 @@ block title
 block content
   ul(data-role='listview', data-split-icon='delete', data-split-theme='c')
     each instance, i in collection
+      - if (typeof linkTo !== 'undefined') root = linkTo;
       li: a(href=root + '/' + instance.alias)
         h3= instance.alias
         a(href='#delete' + i, data-rel='popup',
