@@ -1,0 +1,37 @@
+extends layout
+
+block title
+  h1 Resultat
+
+block header
+  table.results-table.results-table-header.ui-body-a.ui-content
+    thead
+      th Sektion
+      each competition in competitions
+        th= competition.alias
+      th Totalt
+
+block content
+  ul(data-role='listview') 
+    each section in results
+      li: table.results-table: tr 
+        td: span.section-initials(style='background: ' + section.color + '; color: ' + section.textColor)
+            =section.initials
+        each competition in section.results
+          td 
+            =competition.score
+            br
+            if competition.time.length > 2
+              span (#{competition.time})
+        td= section.total
+
+block footer
+  div(data-role='footer', data-position='fixed')
+    div(data-role='navbar'): ul
+      each competition in competitions
+        li: a(href='/results/' + competition.alias, data-theme='b'): h3
+          small Mata in resultat för
+          br
+          = competition.name
+  script
+    // This fixes the most peculiar rendering bug in jQM

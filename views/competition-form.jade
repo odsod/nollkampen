@@ -3,3 +3,6 @@ extends form
 block controls
   label(for="name") Namn:
   input(type="text", name="attrs[name]", value=instance.name)
+
+  label(for="order") Turordning:
+  input(type="number", name="attrs[order]", value=instance.order || 1, min=1)

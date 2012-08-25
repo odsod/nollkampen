@@ -213,6 +213,10 @@ function loadInstance(model, param) {
   };
 }
 
+////
+// Results editing
+////
+
 app.get('/results/:param'
       , loadInstance('Competition', 'param')
       , loadCollection('Section')
@@ -228,34 +232,48 @@ app.get('/results/:param'
   });
 });
 
+////
+// Results overview
+////
+
+function loadTotals(req, res, next) {
+  db.Result.compileTotal(function (results) {
+    req.results = results;
+    next();
+  });
+}
+
 app.get('/results'
-      , loadCollection('Section')
+      , loadTotals
       , loadCollection('Competition')
-      , loadCollection('Result')
       , function (req, res) {
   res.render('result-table', {
-    sections: req.Section.instances
-  , competitons: req.Competition.instances
-  , results: req.Result.instances
+    results: req.results
+  , competitions: _.map(req.Competition.instances, function (c) {
+      return c.toObject({ getters: true});
+    })
   });
 });
+
+////
+// Results updating
+////
 
 app.put('/results/:param'
        , loadInstance('Competition', 'param')
        , function (req, res) {
-  log.data(req.body);
-  log.data(req.Competition.instance);
   _.each(req.body, function (result, section) {
-    log.warn(section);
-    log.data(result);
-    new db.Result({
+    db.Result.update({
       section: section
     , competition: req.Competition.instance.id
-    , minutes: result.minutes || 0
+    }, {
+      minutes: result.minutes || 0
     , seconds: result.seconds || 0
     , points: result.points || 0
     , disqualified: result.disqualified === 'true'
-    }).save();
+    }, {
+      upsert: true
+    }, function () {});
   });
   res.redirect('/');
 });

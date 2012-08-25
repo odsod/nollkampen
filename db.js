@@ -118,9 +118,22 @@ var Result = new Schema({
 , disqualified: Boolean
 });
 
-Result.pre('save', function (next) {
-  log.debug('LLOLOLOL');
-  next();
+Result.virtual('time').get(function () {
+  if (_.isNumber(this.minutes) && _.isNumber(this.seconds)) {
+    return this.minutes + ':' + (this.seconds < 9 ? '0' : '') + this.seconds;
+  } else {
+    return ' ';
+  }
+});
+
+Result.virtual('score').get(function () {
+  if (this.disqualified) {
+    return 'DISKAD!';
+  } else if (this.points) {
+    return this.points;
+  } else {
+    return ' ';
+  }
 });
 
 Result.statics.compileTotal = function (callback) {
@@ -128,17 +141,48 @@ Result.statics.compileTotal = function (callback) {
     .find()
     .populate('competition')
     .populate('section')
-    .exec(function (err, rs) {
-      var results = _.map(rs, function (r) {
-        return r.toObject({ getters: true });
-      })
-      , competitionResults = _.groupBy(results, function (r) {
-        return r.competition.alias;
-      })
-      , sectionResults = _.groupBy(results, function (r) {
-        return r.section.alias;
+    .exec(function (err, results) {
+      // Prepare for takeoff...
+      // Convert to regular objects
+      results = _.map(results, function (result) {
+        return result.toObject({ getters: true });
       });
-      callback();
+      // Lift up section id (for grouping)
+      results = _.map(results, function (result) {
+        return _.extend(result, {
+          sectionId: result.section.id
+        });
+      });
+      // Group by section
+      results = _.groupBy(results, 'sectionId');
+      // Calculate total score and scrub results
+      results = _.map(results, function (results, section) {
+        // Extend with section data
+        return _.extend(results[0].section, {
+          // Calculate total score
+          total: _.reduce(results, function (memo, result) {
+            return memo + result.points;
+          }, 0) || 0
+          // Scrub results and sort by competition order
+        , results: _.sortBy(_.map(results, function (result) {
+            return {
+              time: result.time,
+              points: result.points,
+              score: result.score,
+              disqualified: result.disqualified,
+              order: result.competition.order,
+              competition: result.competition.id,
+              competitionName: result.competition.name
+            };
+          }), 'order')
+        });
+      });
+      // Sort by total score (descending)
+      results = _.sortBy(results, function (section) {
+        return - section.total;
+      });
+      log.data(results);
+      callback(results);
     });
 };
 
@@ -148,6 +192,7 @@ Result.statics.compileTotal = function (callback) {
 
 var Competition = new Schema({
   name: { type: String, index: true }
+, order: Number
 });
 
 Competition.virtual('alias').get(function () {
@@ -155,6 +200,25 @@ Competition.virtual('alias').get(function () {
 });
 
 Competition.statics.findByAlias = findBy('name');
+
+// Initialize results
+Competition.pre('save', function (next) {
+  var self = this;
+  this.model('Section').find(function (err, sections) {
+    sections.forEach(function (section) {
+      self.model('Result').update({
+        competition: self._id
+      , section: section._id
+      }, {
+        competition: self._id
+      , section: section._id
+      }, {
+        upsert: true
+      }, function () { log.debug('upsert'); });
+    });
+    next();
+  });
+});
 
 // Clean results on removal
 Competition.pre('remove', function (next) {
@@ -174,6 +238,25 @@ var Section = new Schema({
 , color:              String
 , textColor:          String
 , alternateTextColor: String
+});
+
+// Initialize results
+Section.pre('save', function (next) {
+  var self = this;
+  this.model('Competition').find(function (err, competitions) {
+    competitions.forEach(function (competition) {
+      self.model('Result').update({
+        competition: competition._id
+      , section: self._id
+      }, {
+        competition: competition._id
+      , section: self._id
+      }, {
+        upsert: true
+      }, function () { log.debug('upsert'); });
+    });
+    next();
+  });
 });
 
 // Remove section results
