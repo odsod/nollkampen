@@ -1,18 +1,33 @@
-var 
-  io = require('socket.io'),
-  _ = require('underscore'),
-  db = require('./db'),
-  log = require('./logs').sockets;
+var io = require('socket.io')
+  , _ = require('underscore')
+  , db = require('../models')
+  , log = require('../logs').app;
 
-function sectionOrder(s1, s2) {
-  // Higher score first
-  return (s2.points - s1.points) || 
-         (s1.initials == 'IT' && -1) || 
-         (s2.initials == 'IT' && 1) || 
-         (s1.initials.toLowerCase() > s2.initials.toLowerCase() && 1) ||
-         (s1.initials.toLowerCase() < s2.initials.toLowerCase() && -1) || 
-         0;
-}
+var ScreenController = module.exports = function ScreenController() {};
+
+ScreenController.screen = function (req, res) {
+  res.render('screen');
+};
+
+ScreenController.listSequences = function (req, res) {
+  res.render('list', {
+    title: 'Visa sekvens'
+  , modelName: 'sekvens'
+  , root: '/screen/sequences'
+  , linkTo: '/screen/sequences'
+  , collection: req.Sequence.instances
+  });
+};
+
+ScreenController.showSequence = function (req, res) {
+  res.render('show-sequence', {
+    sequence: req.Sequence.instance
+  });
+};
+
+ScreenController.handleAction = function (req, res) {
+  
+};
 
 var actions = {
 
@@ -39,7 +54,6 @@ var actions = {
         saint: s.saintImageUrl
       });
     });
-    data.sections.sort(sectionOrder);
     io.sockets.emit('scoreboard', data);
   },
 
@@ -62,7 +76,6 @@ var actions = {
         place: req.places[req.competition.id][s.id]
       });
     });
-    data.sections.sort(sectionOrder);
     data.sections = _.filter(data.sections, function (section) {
       return section.place <= 3;
     });
@@ -89,10 +102,6 @@ var actions = {
         place: req.places[s.id]
       });
     });
-    data.sections.sort(sectionOrder);
-    data.sections = _.filter(data.sections, function (section) {
-      return section.place <= 3;
-    });
     io.sockets.emit('revealTotal', data);
   },
 
@@ -103,7 +112,7 @@ var actions = {
   countdown: function (req) {
     io.sockets.emit('countdown', {
       seconds: req.body.seconds
-    });  
+    });
   },
 
   throwdown: function (req) {
@@ -123,12 +132,14 @@ var actions = {
 
 exports.handle = function (req, res) {
   var action = actions[req.body.action];
-  if (action) action(req);
+  if (action) {
+    action(req);
+  }
   res.redirect('/');
-}
+};
 
 exports.listen = function (app) {
   io = io.listen(app);
-  io.set('logger', log);
+  io.set('logger', require('../logs').sockets);
   return exports;
-}
+};

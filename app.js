@@ -4,8 +4,8 @@ var express            = require('express')
   , app                = express()
   , ResourceController = require('./controllers/resource-controller')
   , ResultsController  = require('./controllers/results-controller')
+  , ScreenController   = require('./controllers/screen-controller')
   , server             = require('http').createServer(app)
-  // , sockets            = require('./sockets').listen(server)
   , _                  = require('underscore')
   , path               = require('path')
   , db                 = require('./models')
@@ -46,6 +46,18 @@ app.configure('development', function () {
 app.get('/', function (req, res) {
   res.render('index');
 });
+
+app.get('/screen', ScreenController.screen);
+
+app.get('/screen/sequences'
+      , ResourceController.loadCollection('Sequence')
+      , ScreenController.listSequences);
+
+app.get('/sequences/sequences/:param'
+      , ResourceController.loadInstance('Sequence', 'param')
+      , ScreenController.showSequence);
+
+app.post('/screen', ScreenController.handleAction);
 
 ////
 // Parse :param into req.params
