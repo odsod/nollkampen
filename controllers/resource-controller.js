@@ -16,7 +16,7 @@ ResourceController.resource = function (app, root, options) {
   ////
   app.get(
     root
-  , c.loadCollection.bind(c)
+  , ResourceController.loadCollection(options.model)
   , c.index.bind(c)
   );
 
@@ -70,7 +70,7 @@ ResourceController.prototype.index = function (req, res) {
     title: this.options.locale.modelPlural
   , modelName: this.options.locale.modelSingular.toLowerCase()
   , root: this.options.root
-  , collection: _.map(req.collection, function (instance) {
+  , collection: _.map(req[this.options.model].instances, function (instance) {
       return instance.toObject({ getters: true });
     })
   });
@@ -124,13 +124,6 @@ ResourceController.prototype.update = ResourceController.prototype.upsert;
 ResourceController.prototype.loadInstance = function (req, res, next) {
   this.model.findByAlias(req.param, function (err, instance) {
     req.instance = instance;
-    next();
-  });
-};
-
-ResourceController.prototype.loadCollection = function (req, res, next) {
-  this.model.find(function (err, collection) {
-    req.collection = collection;
     next();
   });
 };

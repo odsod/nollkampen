@@ -13,10 +13,14 @@ mixin item(ref, text, icon)
 
 block content
   ul(data-role='listview')
-    li(data-role='list-divider') Skärm
-    mixin item('/sequences/show', 'Visa sekvens', '175-macbook')
-    li(data-role='list-divider') Mata in
-    mixin item('/results', 'Resultat', '78-stopwatch')
+    li(data-role='list-divider') Scoreboard
+    li: div(data-role='navbar'): ul
+      li: a(style='padding-top:10px', href='/screen/sequences', data-theme='c')
+        img(src='/images/70-tv.png', style='height: 20px')
+        h1 Visa på skärmen
+      li: a(style='padding-top:10px', href='/results', data-theme='c')
+        img(src='/images/187-pencil.png', style='height: 20px')
+        h1 Mata in poäng
     li(data-role='list-divider') Skapa och ändra
     mixin item('/sections', 'Sektioner', '112-group')
     mixin item('/competitions', 'Grenar', '63-runner')

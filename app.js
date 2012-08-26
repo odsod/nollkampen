@@ -9,7 +9,6 @@ var express            = require('express')
   , _                  = require('underscore')
   , path               = require('path')
   , db                 = require('./models')
-  , mongoose           = require('mongoose')
   , connectHandlebars  = require('connect-handlebars')
   , logs               = require('./logs')
   , log                = logs.app;

@@ -1,4 +1,5 @@
-var mongoose = require('mongoose');
+var log = require('../logs').app
+  , mongoose = require('mongoose').connect('localhost', 'nollkampen');
 
 module.exports = {
   Section:     mongoose.model('Section',     require('./section'))
