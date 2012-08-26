@@ -21,7 +21,7 @@ appLog.data = function (data) {
 var socketsLog = new Logger({
   transports: [
     new Console({
-      level: 'warn'
+      level: 'error'
     , colorize: true
     , timestamp: function () {
         return 'Sockets';

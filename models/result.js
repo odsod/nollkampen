@@ -36,6 +36,7 @@ Result.virtual('score').get(function () {
 });
 
 Result.statics.compileTotal = function (callback) {
+  var self = this;
   this
     .find()
     .populate('competition')
@@ -80,7 +81,65 @@ Result.statics.compileTotal = function (callback) {
       results = _.sortBy(results, function (section) {
         return - section.total;
       });
-      log.data(results);
+      // Assign place numbers
+      var currPlace = 0
+        , currTotal = Number.POSITIVE_INFINITY;
+      results.forEach(function (result) {
+        if (result.total < currTotal) {
+          currPlace += 1;
+          currTotal = result.total;
+        }
+        result.place = currPlace;
+      });
+      // Touchdown!
       callback(results);
     });
+};
+
+Result.statics.compileCompetition = function (competition, callback) {
+  var self = this;
+  this.model('Competition').findByAlias(competition, function (err, competition) {
+    self
+      .find({ competition: competition._id })
+      .populate('section')
+      .exec(function (err, results) {
+        // Prepare for takeoff...
+        // Convert to regular objects
+        results = _.map(results, function (result) {
+          return result.toObject({ getters: true });
+        });
+        // Lift up section id (for grouping)
+        results = _.map(results, function (result) {
+          return _.extend(result, {
+            sectionId: result.section.id
+          });
+        });
+        // Group by section
+        results = _.groupBy(results, 'sectionId');
+        // Lift up results and data
+        results = _.map(results, function (results, section) {
+          // Return section extended with result data
+          return _.extend(results[0].section, {
+            time: results[0].time
+          , points: results[0].points
+          });
+        });
+        // Sort by points (descending)
+        results = _.sortBy(results, function (section) {
+          return - section.points;
+        });
+        // Assign place numbers
+        var currPlace = 0
+          , currPoints = Number.POSITIVE_INFINITY;
+        results.forEach(function (result) {
+          if (result.points < currPoints) {
+            currPlace += 1;
+            currPoints = result.points;
+          }
+          result.place = currPlace;
+        });
+        // Touchdown!
+        callback(results);
+      });
+  });
 };

@@ -21,13 +21,9 @@ ScreenController.listSequences = function (req, res) {
 };
 
 ScreenController.showSequence = function (req, res) {
-  res.render('show-sequence', {
+  res.render('sequence-show', {
     sequence: req.Sequence.instance
   });
-};
-
-ScreenController.handleAction = function (req, res) {
-  
 };
 
 var actions = {
@@ -37,73 +33,53 @@ var actions = {
   },
 
   scoreboard: function (req) {
-    var data = {
-      sections: [],
-      competitions: req.competitions,
-      ads: req.ads
-    };
-    req.sections.forEach(function (s) {
-      data.sections.push({
-        name: s.name,
-        initials: s.initials,
-        color: s.color,
-        textColor: s.textColor,
-        alternateTextColor: s.alternateTextColor,
-        results: req.results[s.id],
-        points: req.points[s.id],
-        place: req.places[s.id],
-        saint: s.saintImageUrl
+    db.Result.compileTotal(function (results) {
+      db.Competition.find(function (err, competitions) {
+        db.Ad.find(function (err, ads) {
+          log.data(results);
+          io.sockets.emit('scoreboard', {
+            results: results
+          , competitions: _.sortBy(_.map(competitions, function (c) {
+              return c.toObject({ getters: true });
+            }), 'order')
+          , ads: _.map(ads, function (a) {
+              return a.toObject({ getters: true });
+            })
+          });
+        });
       });
     });
-    io.sockets.emit('scoreboard', data);
   },
 
   revealCompetition: function (req) {
-    var data = {
-      sections: [],
-      competition: req.competition,
-      ads: req.ads
-    };
-    req.sections.forEach(function (s) {
-      data.sections.push({
-        name: s.name,
-        initials: s.initials,
-        color: s.color,
-        textColor: s.textColor,
-        alternateTextColor: s.alternateTextColor,
-        saint: s.saintImageUrl,
-        time: req.times[req.competition.id][s.id],
-        points: req.points[req.competition.id][s.id],
-        place: req.places[req.competition.id][s.id]
+    db.Result.compileCompetition(req.body.competition, function (results) {
+      db.Ad.find(function (err, ads) {
+        io.sockets.emit('revealCompetition', {
+          results: _.first(results, 3)
+        , ads: _.map(ads, function (a) {
+            return a.toObject({ getters: true });
+          })
+        });
       });
     });
-    data.sections = _.filter(data.sections, function (section) {
-      return section.place <= 3;
-    });
-    io.sockets.emit('revealCompetition', data);
   },
 
   revealTotal: function (req) {
-    var data = {
-      sections: [],
-      competitions: req.competitions,
-      competition: req.competition,
-      ads: req.ads
-    };
-    req.sections.forEach(function (s) {
-      data.sections.push({
-        name: s.name,
-        initials: s.initials,
-        color: s.color,
-        textColor: s.textColor,
-        alternateTextColor: s.alternateTextColor,
-        saint: s.saintImageUrl,
-        results: req.results[s.id],
-        points: req.points[s.id],
-        place: req.places[s.id]
+    db.Result.compileTotal(function (results) {
+      db.Competition.find(function (err, competitions) {
+        db.Ad.find(function (err, ads) {
+          io.sockets.emit('revealTotal', {
+            results: _.first(results, 3)
+          , competitions: _.sortBy(_.map(competitions, function (c) {
+              return c.toObject({ getters: true });
+            }), 'order')
+          , ads: _.map(ads, function (a) {
+              return a.toObject({ getters: true });
+            })
+          });
+        });
       });
     });
-    io.sockets.emit('revealTotal', data);
   },
 
   revealNext: function (req) {
@@ -131,7 +107,7 @@ var actions = {
 
 };
 
-exports.handle = function (req, res) {
+ScreenController.handleAction = function (req, res) {
   var action = actions[req.body.action];
   if (action) {
     action(req);
@@ -139,8 +115,7 @@ exports.handle = function (req, res) {
   res.redirect('/');
 };
 
-exports.listen = function (app) {
+ScreenController.listen = function (app) {
   io = io.listen(app);
   io.set('logger', require('../logs').sockets);
-  return exports;
 };

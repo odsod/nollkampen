@@ -42,30 +42,40 @@ app.configure('development', function () {
   app.use(express.errorHandler());
 });
 
-app.get('/', function (req, res) {
-  res.render('index');
-});
-
-app.get('/screen', ScreenController.screen);
-
-app.get('/screen/sequences'
-      , ResourceController.loadCollection('Sequence')
-      , ScreenController.listSequences);
-
-app.get('/sequences/sequences/:param'
-      , ResourceController.loadInstance('Sequence', 'param')
-      , ScreenController.showSequence);
-
-app.post('/screen', ScreenController.handleAction);
-
 ////
-// Parse :param into req.params
+// Pamameter declarations
 ////
 
 app.param(':param', function (req, res, next, param) {
   req.param = param;
   next();
 });
+
+////
+// Top level routes
+////
+
+app.get('/', function (req, res) {
+  res.render('index');
+});
+
+app.get('/screen', ScreenController.screen);
+
+////
+// Screen routes
+////
+
+ScreenController.listen(server);
+
+app.get('/screen/sequences'
+      , ResourceController.loadCollection('Sequence')
+      , ScreenController.listSequences);
+
+app.get('/screen/sequences/:param'
+      , ResourceController.loadInstance('Sequence', 'param')
+      , ScreenController.showSequence);
+
+app.post('/screen', ScreenController.handleAction);
 
 ////
 // Image server
@@ -80,6 +90,10 @@ app.get('/img', require('./models/has-image').createServer({ route: '/img' }));
 function saveImageHook(req, instance) {
   instance.image = req.files.image;
 }
+
+////
+// Resource routes
+////
 
 ResourceController.resource(app, '/sections', {
   model:           'Section'
@@ -135,7 +149,7 @@ ResourceController.resource(app, '/sequences', {
 });
 
 ////
-// Results
+// Results routes
 ////
 
 app.get('/results/:param'
@@ -152,6 +166,10 @@ app.get('/results'
 app.put('/results/:param'
       , ResourceController.loadInstance('Competition', 'param')
       , ResultsController.update);
+
+////
+// ...and go
+////
 
 server.listen(app.get('port'), function () {
   logs.express.info('Express server listening on port ' + app.get('port'));

@@ -8,11 +8,13 @@ var socket = io.connect('http://localhost');
     Handlebars.partials = Handlebars.templates;
 
     socket.on('clear', function (data) {
+      $(window).trigger('clear');
       $('body')
         .empty();
     });
 
     socket.on('scoreboard', function (data) {
+      console.log(data);
       // Clear everything
       $(window).trigger('clear');
       // Insert html
@@ -44,15 +46,15 @@ var socket = io.connect('http://localhost');
             .reveal('destroy')
             .remove();
         });
-      });
     });
 
     socket.on('revealTotal', function (data) {
+      console.log(data);
       $(window)
         .trigger('clear');
       // Insert html
       $('body')
-        .append(Handlebars.templates['scoreboard'](data));
+        .append(Handlebars.templates.scoreboard(data));
       // Apply plugin
       $('.sb')
         .reveal();
@@ -66,6 +68,7 @@ var socket = io.connect('http://localhost');
     });
 
     socket.on('revealNext', function () {
+      console.log('next');
       // Reveal next
       $('.sb')
         .reveal('next');
@@ -76,7 +79,7 @@ var socket = io.connect('http://localhost');
         .trigger('clear');
       // Insert html
       $('body')
-        .append(Handlebars.templates['throwdown'](data));
+        .append(Handlebars.templates.throwdown(data));
       $('.throwdown')
         .throwdown();
       // Register cleanup
@@ -104,4 +107,6 @@ var socket = io.connect('http://localhost');
           $('.cd').countdown('destroy').remove();
         });
     });
+
+  });
 }(jQuery));
