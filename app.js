@@ -56,17 +56,11 @@ app.param(':param', function (req, res, next, param) {
   next();
 });
 
-app.get('/img/:param', function (req, res) {
-  db[req.query.model]
-    .findById(req.param)
-    .select('imageData')
-    .slice('imageData', req.query.i, 1)
-    .exec(function (err, instance) {
-      var image = instance.imageData.pop();
-      res.contentType(image.mime);
-      res.send(image.data);
-    });
-});
+////
+// Image server
+////
+
+app.get('/img', require('./models/has-image').createServer({ route: '/img' }));
 
 ////
 // Upsert hook for saving images

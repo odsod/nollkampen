@@ -2,20 +2,22 @@ var _   = require('underscore')
   , db  = require('../db')
   , log = require('../logs').app;
 
-var ResourceController = module.exports = function ResourceController(options) {};
+var ResourceController = module.exports = function ResourceController(options) {
+  this.model = db[options.model];
+  this.options = options;
+};
 
 ResourceController.resource = function (app, root, options) {
 
-  options.model = db[options.model];
-  options.options = options;
+  var c = new ResourceController(options);
 
   ////
   // Index
   ////
   app.get(
     root
-  , ResourceController.loadCollection.bind(options)
-  , ResourceController.index.bind(options)
+  , c.loadCollection.bind(c)
+  , c.index.bind(c)
   );
 
   ////
@@ -23,7 +25,7 @@ ResourceController.resource = function (app, root, options) {
   ////
   app.get(
     root + '/new'
-    , ResourceController.new.bind(options)
+  , c.new.bind(c)
   );
 
   ////
@@ -31,8 +33,8 @@ ResourceController.resource = function (app, root, options) {
   ////
   app.get(
     root + '/:param'
-    , ResourceController.loadInstance.bind(options)
-    , ResourceController.edit.bind(options)
+  , c.loadInstance.bind(c)
+  , c.edit.bind(c)
   );
 
   ////
@@ -40,7 +42,7 @@ ResourceController.resource = function (app, root, options) {
   ////
   app.post(
     root
-  , ResourceController.create.bind(options)
+  , c.create.bind(c)
   );
 
   ////
@@ -48,8 +50,8 @@ ResourceController.resource = function (app, root, options) {
   ////
   app.put(
     root + '/:param'
-  , ResourceController.loadInstance.bind(options)
-  , ResourceController.update.bind(options)
+  , c.loadInstance.bind(c)
+  , c.update.bind(c)
   );
 
   ////
@@ -57,13 +59,13 @@ ResourceController.resource = function (app, root, options) {
   ////
   app.delete(
     root + '/:param'
-  , ResourceController.loadInstance.bind(options)
-  , ResourceController.destroy.bind(options)
+  , c.loadInstance.bind(c)
+  , c.destroy.bind(c)
   );
 
 };
 
-ResourceController.index = function (req, res) {
+ResourceController.prototype.index = function (req, res) {
   res.render(this.options.index || 'list', {
     title: this.options.locale.modelPlural
   , modelName: this.options.locale.modelSingular.toLowerCase()
@@ -74,7 +76,7 @@ ResourceController.index = function (req, res) {
   });
 };
 
-ResourceController.new = function (req, res) {
+ResourceController.prototype.new = function (req, res) {
   res.render(this.options.form, {
     title: 'Skapa ' + this.options.locale.modelSingular.toLowerCase()
   , modelName: this.options.locale.modelSingular.toLowerCase()
@@ -84,7 +86,7 @@ ResourceController.new = function (req, res) {
   });
 };
 
-ResourceController.edit = function (req, res) {
+ResourceController.prototype.edit = function (req, res) {
   res.render(this.options.form, {
     title: 'Editera ' + this.options.locale.modelSingular.toLowerCase()
   , modelName: this.options.locale.modelSingular.toLowerCase()
@@ -94,14 +96,14 @@ ResourceController.edit = function (req, res) {
   });
 };
 
-ResourceController.destroy = function (req, res) {
+ResourceController.prototype.destroy = function (req, res) {
   var self = this;
   req.instance.remove(function (err) {
     res.redirect(self.options.root);
   });
 };
 
-ResourceController.upsert = function (req, res) {
+ResourceController.prototype.upsert = function (req, res) {
   var self = this;
   var instance = req.instance || new this.model();
   _.each(req.body.attrs, function (value, key) {
@@ -115,20 +117,38 @@ ResourceController.upsert = function (req, res) {
   });
 };
 
-ResourceController.create = ResourceController.prototype.upsert;
+ResourceController.prototype.create = ResourceController.prototype.upsert;
 
-ResourceController.update = ResourceController.prototype.upsert;
+ResourceController.prototype.update = ResourceController.prototype.upsert;
 
-ResourceController.loadInstance = function (req, res, next) {
+ResourceController.prototype.loadInstance = function (req, res, next) {
   this.model.findByAlias(req.param, function (err, instance) {
     req.instance = instance;
     next();
   });
 };
 
-ResourceController.loadCollection = function (req, res, next) {
+ResourceController.prototype.loadCollection = function (req, res, next) {
   this.model.find(function (err, collection) {
     req.collection = collection;
     next();
   });
+};
+
+ResourceController.loadInstance = function (modelName, param) {
+  return function (req, res, next) {
+    db[modelName].findByAlias(req.param, function (err, instance) {
+      req[modelName] = { instance: instance };
+      next();
+    });
+  };
+};
+
+ResourceController.loadCollection = function (modelName) {
+  return function (req, res, next) {
+    db[modelName].find(function (err, instances) {
+      req[modelName] = { instances: instances };
+      next();
+    });
+  };
 };

@@ -1,5 +1,6 @@
 var _ = require('underscore')
-  , db = require('../db');
+  , db = require('../db')
+  , log = require('../logs').app;
 
 var ResultsController = module.exports = function ResultsController() {};
 

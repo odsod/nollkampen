@@ -6,7 +6,7 @@ var fs       = require('fs')
   , ObjectId = mongoose.Schema.ObjectId
   , _        = require('underscore')
   , log      = require('./logs').app
-  , db       = mongoose.createConnection('localhost', 'nollkampen');
+  , db       = mongoose.connect('localhost', 'nollkampen');
 
 ////
 // Named queries
@@ -18,56 +18,6 @@ function findBy(attr) {
     criteria[attr] = value;
     this.findOne(criteria, callback);
   };
-}
-
-////
-// hasImage plugin
-////
-
-function hasImage(schema, options) {
-
-  // Add data and mime subdocs
-  schema.add({
-    imageData: [{
-      data: { type: Buffer, select: false }
-    , mime: String
-    }]
-  });
-
-  // Set a single image
-  schema.virtual('image').set(function (image) {
-    if (image && image.size > 0) {
-      this.imageData = [{
-        data: fs.readFileSync(image.path)
-      , mime: image.mime
-      }];
-    }
-  });
-
-  // Set multiple images
-  schema.virtual('images').set(function (images) {
-    this.imageData = [];
-    images.forEach(function (image) {
-      if (image.size > 0) {
-        this.imageData.push({
-          data: fs.readFileSync(image.path)
-        , mime: image.mime
-        });
-      }
-    });
-  });
-
-  // Get url for a single image
-  schema.virtual('image').get(function () {
-    return options.urlRoot + '/' + this._id + '?model=' + options.model + '&i=0';
-  });
-
-  // Get urls for multiple images
-  schema.virtual('images').get(function () {
-    return _.map(_.range(this.imageData.length), function (i) {
-      return options.urlRoot + '/' + this._id + '?model=' + options.model + '&i=' + i;
-    });
-  });
 }
 
 ////
@@ -100,10 +50,7 @@ Picture.virtual('alias').get(function () {
 
 Picture.statics.findByAlias = findBy('name');
 
-Picture.plugin(hasImage, {
-  urlRoot: '/img'
-, model: 'Picture'
-});
+Picture.plugin(require('./has-image').plugin);
 
 ////
 // Result
@@ -265,10 +212,7 @@ Section.pre('remove', function (next) {
     .remove({ section: this._id }, next);
 });
 
-Section.plugin(hasImage, {
-  urlRoot: '/img'
-, model: 'Section'
-});
+Section.plugin(require('./has-image').plugin);
 
 Section.virtual('alias').get(function () {
   return this.initials;
@@ -288,10 +232,7 @@ Ad.virtual('alias').get(function () {
   return this.name;
 });
 
-Ad.plugin(hasImage, {
-  urlRoot: '/img'
-, model: 'Ad'
-});
+Ad.plugin(require('./has-image').plugin);
 
 Ad.statics.findByAlias = findBy('name');
 
@@ -303,10 +244,7 @@ var Slideshow = new Schema({
   name:   { type: String, index: true }
 });
 
-Slideshow.plugin(hasImage, {
-  urlRoot: '/img'
-, model: 'Slideshow'
-});
+Slideshow.plugin(require('./has-image').plugin);
 
 Slideshow.statics.findByName = findBy('name');
 
