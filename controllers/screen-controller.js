@@ -12,6 +12,7 @@ ScreenController.screen = function (req, res) {
 ScreenController.listSequences = function (req, res) {
   res.render('list', {
     title: 'Visa sekvens'
+  , noCrud: true
   , modelName: 'sekvens'
   , root: '/screen/sequences'
   , linkTo: '/screen/sequences'

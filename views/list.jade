@@ -9,19 +9,23 @@ block content
       - if (typeof linkTo !== 'undefined') root = linkTo;
       li: a(href=root + '/' + instance.alias)
         h3= instance.alias
-        a(href='#delete' + i, data-rel='popup',
-          data-position-to='window') Ta bort #{modelName}
-  each instance, i in collection
-    .ui-corner-all.popup(data-role='popup', id='delete' + i)
-      .ui-corner-top(data-role='header'): h1 Ta bort #{modelName}
-      .ui-corner-bottom(data-role='content')
-        p Är du säker på att du vill ta bort #{instance.alias}?
-        form(method='post', action=root + '/' + instance.alias)
-          input(type='hidden', name='_method', value='delete')
-          .ui-body: fieldset.ui-grid-a
-            .ui-block-a: a(data-role='button', data-rel='back', data-theme='d') Avbryt
-            .ui-block-b: button(type='submit', name='submit', value='submit-value', data-theme='a') Ta bort
+        - if (!(typeof noCrud !== 'undefined' && noCrud === true))
+          a(href='#delete' + i, data-rel='popup',
+            data-position-to='window') Ta bort #{modelName}
+  // Delete dialogs
+  - if (!(typeof noCrud !== 'undefined' && noCrud === true))
+    each instance, i in collection
+      .ui-corner-all.popup(data-role='popup', id='delete' + i)
+        .ui-corner-top(data-role='header'): h1 Ta bort #{modelName}
+        .ui-corner-bottom(data-role='content')
+          p Är du säker på att du vill ta bort #{instance.alias}?
+          form(method='post', action=root + '/' + instance.alias)
+            input(type='hidden', name='_method', value='delete')
+            .ui-body: fieldset.ui-grid-a
+              .ui-block-a: a(data-role='button', data-rel='back', data-theme='d') Avbryt
+              .ui-block-b: button(type='submit', name='submit', value='submit-value', data-theme='a') Ta bort
 
 block footer
+  - if (!(typeof noCrud !== 'undefined' && noCrud === true))
     div(data-role='navbar', data-iconpos='right')
       ul: li: a(href=root + '/new', data-icon='plus'): h3 Skapa ny #{modelName}
