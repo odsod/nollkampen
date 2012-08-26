@@ -1,12 +1,11 @@
-var mongoose = require('mongoose')
-  , db = mongoose.createConnection('localhost', 'nollkampen');
+var mongoose = require('mongoose');
 
 module.exports = {
-  Section:     db.model('Section',     require('./section'))
-, Competition: db.model('Competition', require('./competition'))
-, Result:      db.model('Result',      require('./result'))
-, Ad:          db.model('Ad',          require('./ad'))
-, Picture:     db.model('Picture',     require('./picture'))
-, Sequence:    db.model('Sequence',    require('./sequence'))
-, Slideshow:   db.model('Slideshow',   require('./slideshow'))
+  Section:     mongoose.model('Section',     require('./section'))
+, Competition: mongoose.model('Competition', require('./competition'))
+, Result:      mongoose.model('Result',      require('./result'))
+, Ad:          mongoose.model('Ad',          require('./ad'))
+, Picture:     mongoose.model('Picture',     require('./picture'))
+, Sequence:    mongoose.model('Sequence',    require('./sequence'))
+, Slideshow:   mongoose.model('Slideshow',   require('./slideshow'))
 };

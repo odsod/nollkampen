@@ -1,5 +1,5 @@
 var _   = require('underscore')
-  , db  = require('../db')
+  , db  = require('../models')
   , log = require('../logs').app;
 
 var ResourceController = module.exports = function ResourceController(options) {
