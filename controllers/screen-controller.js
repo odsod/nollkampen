@@ -93,6 +93,12 @@ var actions = {
     });
   },
 
+  megaCountdown: function (req) {
+    io.sockets.emit('megaCountdown', {
+      seconds: req.body.seconds
+    });
+  },
+
   throwdown: function (req) {
     var data = {
       pictures: []

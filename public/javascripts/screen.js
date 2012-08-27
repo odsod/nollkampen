@@ -115,4 +115,10 @@ var socket = io.connect('http://localhost');
     addContent($count, 'countdown', false);
   });
 
+  socket.on('megaCountdown', function (data) {
+    $(window).trigger('clear.megaCountdown');
+    var $count = $(Handlebars.templates['mega-countdown'](data));
+    addContent($count, 'megaCountdown', false);
+  });
+
 }(jQuery));
