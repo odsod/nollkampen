@@ -36,7 +36,6 @@ var actions = {
     db.Result.compileTotal(function (results) {
       db.Competition.find(function (err, competitions) {
         db.Ad.find(function (err, ads) {
-          log.data(results);
           io.sockets.emit('scoreboard', {
             results: results
           , competitions: _.sortBy(_.map(competitions, function (c) {
