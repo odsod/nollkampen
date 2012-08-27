@@ -68,7 +68,7 @@ var actions = {
       db.Competition.find(function (err, competitions) {
         db.Ad.find(function (err, ads) {
           io.sockets.emit('revealTotal', {
-            results: _.first(results, 3)
+            results: results
           , competitions: _.sortBy(_.map(competitions, function (c) {
               return c.toObject({ getters: true });
             }), 'order')

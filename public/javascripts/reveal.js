@@ -40,13 +40,13 @@
             $threes = $('.sb-place-col > span:contains(3)', $resultRows).parent().parent();
           $(window).bind('resize.' + namespace, function () {
             $headerTexts.css({
-              'font-size': $headerTexts.first().height() * 0.4
+              'font-size': $headerTexts.first().height() * 0.5
             });
             $resultTexts.css({
-              'font-size': $resultRows.first().height() * 0.45
+              'font-size': $resultRows.first().height() * 0.70
             });
             $highlights.css({
-              'font-size': $resultRows.first().height() * 0.40,
+              'font-size': $resultRows.first().height() * 0.70,
               'padding': '0.2em' 
             });
           }).trigger('resize.' + namespace);
@@ -66,6 +66,8 @@
               'position': 'relative',
               'top': '-500px'
             });
+          // Hide all others
+          $threes.last().nextAll().hide();
           $(this).data(namespace, {
             next: [$ones, $twos, $threes]
           });

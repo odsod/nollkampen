@@ -71,6 +71,8 @@ var socket = io.connect('http://localhost');
   });
 
   socket.on('revealCompetition', function (data) {
+    console.log('reveal competition');
+    console.log(data);
     var $reveal = $(Handlebars.templates['reveal-competition'](data));
     swapContent($reveal, 'reveal');
   });

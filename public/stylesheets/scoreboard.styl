@@ -1,5 +1,5 @@
 // Ratio: Header // Content
-$headerHeight = 6%
+$headerHeight = 7%
 $contentHeight = 100% - $headerHeight
 
 // Ratio: Ads || Results
@@ -36,7 +36,8 @@ $adsPerScreen = 3
 $adHeight = (100% / $adsPerScreen)
 
 // Shadow color
-$shadow = 1px 2px 3px rgba(51,51,51,0.30)
+$shadow = 1px 2px 3px rgba(51,51,51,0.66)
+$textShadow = 1px 2px 3px rgba(30,30,30, 0.66)
 
 // Top-level container
 .scoreboard
@@ -73,7 +74,8 @@ gradient-bg(start, end)
 // Content: Results || Ads
 .sb-content
     sb-row($contentHeight)
-    gradient-bg(#eee, #ccc)
+    //gradient-bg(#eee, #ccc)
+    gradient-bg(#0095d7, #00628c)
 
 // Results: Section || Result * 3 || Total
 .sb-results-col
@@ -115,9 +117,7 @@ gradient-bg(start, end)
         float none
         text-align center
         vertical-align middle
-        .sb-hilight
-            padding 0.9em
-            border-radius 15%
+        text-shadow $textShadow
 
 // Position saint images
 .sb-result-row

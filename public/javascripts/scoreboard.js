@@ -28,14 +28,13 @@
       // Bind automatical resize listeners
       $(window).bind('resize.' + namespace, function () {
         $headerTexts.css({
-          'font-size': $headerTexts.first().height() * 0.4
+          'font-size': $headerTexts.first().height() * 0.5
         });
         $resultTexts.css({
-          'font-size': $resultRows.first().height() * 0.45
+          'font-size': $resultRows.first().height() * 0.56
         });
         $highlights.css({
-          'font-size': $resultRows.first().height() * 0.40,
-          'padding': '0.2em'
+          'font-size': $resultRows.first().height() * 0.70
         });
       }).trigger('resize.' + namespace);
 
