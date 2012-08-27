@@ -53,7 +53,7 @@ var socket = io.connect('http://localhost');
         nextZ += 1;
         $background.show();
         $(window).bind('clear.' + plugin, function () {
-          $element[plugin]('destroy');
+          $element[plugin]('destroy').remove();
         });
       });
     });
@@ -105,6 +105,7 @@ var socket = io.connect('http://localhost');
   });
 
   socket.on('throwdown', function (data) {
+    $(window).trigger('clear.throwdown');
     var $throw = $(Handlebars.templates.throwdown(data));
     addContent($throw, 'throwdown');
   });

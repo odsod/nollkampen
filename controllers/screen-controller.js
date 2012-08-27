@@ -100,16 +100,13 @@ var actions = {
   },
 
   throwdown: function (req) {
-    var data = {
-      pictures: []
-    };
-    req.pictures.forEach(function (p) {
-      data.pictures.push({
-        caption: 'test',
-        url: p.imageUrl
-      });
+    db.Picture.findByAlias(req.body.picture, function (err, pic) {
+      if (pic) {
+        io.sockets.emit('throwdown', {
+          image: pic.image
+        });
+      }
     });
-    io.sockets.emit('throwdown', data);
   }
 
 };

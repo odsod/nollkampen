@@ -1,27 +1,59 @@
 (function ($) {
 
-  var 
+  var namespace = 'throwdown'
+    , defaults = {
+      test: 5
+    };
 
-    namespace = 'throwdown',
+  function init(options) {
+    return this.each(function () {
+      var settings = $.extend(defaults, options)
+        , $throwdown = $(this)
+        , $pic = $('.td-picture', $throwdown)
+        , $img = $('img', $pic)
+        , $parent = $throwdown.parent()
+        , midX = $parent.width() / 2
+        , midY = $parent.height() / 2
+        , rangeX = $parent.width() * 0.25
+        , rangeY = $parent.height() * 0.05;
+      $pic.hide();
+      $img.load(function () {
+        var w = $pic.width()
+          , h = $pic.height()
+          , x = (rangeX * Math.random()) - (rangeX / 2) + midX - w / 2
+          , y = (rangeY * Math.random()) - (rangeY * 4) + midY - h / 2
+          , rot = (30 * Math.random()) - 15
+          , displaceX = $parent.width() - (Math.random() * $parent.width() / 2);
+        $pic
+          .css({
+            'left': x
+          , 'top': y
+          })
+          .css({
+            'x': '-=' + displaceX
+          , 'y': '+=' + $parent.height()
+          , 'rotate': ((Math.random() * 180) - 90) + 'deg'
+          , 'scale': 1.5
+          , 'box-shadow': '100px 100px 100px rgba(50,50,50, 0.1)'
+          })
+          .show()
+          .transition({
+            'x': '+=' + displaceX
+          , 'y': '-=' + $parent.height()
+          , 'rotate': rot
+          , 'scale': 1
+          , 'box-shadow': '0 2px 15px #333'
+          }, 2000);
+      });
+    });
+  }
 
-    defaults = {
-      complete: function () {}
-    },
-
-    methods = {
-
-      init: function (options) {
-        return this.each(function () {
-          var 
-            settings = $.extend(defaults, options);
-        });
-      },
-
+  var methods = {
+      init: init,
       destroy: function () {
         return this.each(function () {
         });
       }
-
     };
 
   $.fn[namespace] = function (method) {
