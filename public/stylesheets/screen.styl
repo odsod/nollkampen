@@ -1,6 +1,5 @@
 html
 body
-.pane
     width 100%
     height 100%
     margin 0
@@ -10,11 +9,12 @@ body
 
 .pane
     position absolute
+    // Default position to be overridden
     top 0
     left 0
-    z-index 0
-    background yellow
 
-.active
-    z-index 1!important
-    background blue!important
+.background
+    width 100%
+    height 100%
+    z-index 0
+    background #ccc

@@ -41,6 +41,8 @@
                      i < lastResultPivot && i % itemsPerScreen === 0;
             })
             , $blankPivots = $resultPivots.prev();
+
+          // Bind automatical resize listeners
           $(window).bind('resize.' + namespace, function () {
             $headerTexts.css({
               'font-size': $headerTexts.first().height() * 0.4
@@ -54,17 +56,14 @@
             });
           }).trigger('resize.' + namespace);
 
+          // Start by not showing times
           $times.hide();
 
-          function next() {
-            console.log('next');
-            $scoreboard.dequeue();
-          }
-
+          // Start by showing first part of results
           var currPivot = 0;
 
           function rotateResults() {
-            console.log('top of rotate results');
+            // Use the scoreboard animation queue
             $scoreboard
               // Hide scores
               .queue(function () {
@@ -108,15 +107,17 @@
                 }));
               });
           }
+          // Bootstrap the animation loop
           rotateResults();
         });
       },
 
       destroy: function () {
         return this.each(function () {
+          console.log('destroying scoreboard');
           // Unbind all scoreboard listeners
           $(window).unbind('.' + namespace);
-          // Clear the scrolling queue
+          // Clear the animation queue
           $(this).clearQueue();
         });
       }
