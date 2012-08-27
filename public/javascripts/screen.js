@@ -17,8 +17,6 @@ var socket = io.connect('http://localhost');
     $background = $('<div class="background pane">');
     // Insert background pane
     $background.appendTo($body);
-    // Insert dummy plugin for debug
-    $body.append('<div class="dummy plugin"></div>');
     // Init Z-index
     bottomZ = 0;
     nextZ = bottomZ + 1;
@@ -26,17 +24,21 @@ var socket = io.connect('http://localhost');
 
   function clearScreen(callback) {
     var $plugins = $('.plugin');
-    $plugins
-      .stop(true)
-      .fadeOut(2000, _.once(function () {
-        $('window').trigger('clear');
-        $('*').unbind();
-        $plugins.remove();
-        nextZ = bottomZ + 1;
-        if (callback) {
-          callback();
-        }
-      }));
+    if ($plugins.length > 0) {
+      $plugins
+        .stop(true)
+        .fadeOut(2000, _.once(function () {
+          $('window').trigger('clear');
+          $('*').unbind();
+          $plugins.remove();
+          nextZ = bottomZ + 1;
+          if (callback) {
+            callback();
+          }
+        }));
+    } else {
+      callback();
+    }
   }
 
   function swapContent($element, plugin) {
@@ -50,15 +52,33 @@ var socket = io.connect('http://localhost');
         $element.css('z-index', nextZ);
         nextZ += 1;
         $background.show();
-        $(window).bind('clear.scoreboard', function () {
+        $(window).bind('clear.' + plugin, function () {
           $element[plugin]('destroy');
         });
       });
     });
   }
 
-  function addContent($element, plugin) {
-  
+  function addContent($element, plugin, fadeIn) {
+    $element
+      .hide()
+      .css('z-index', nextZ)
+      .appendTo($body);
+    nextZ += 1;
+    if (fadeIn) {
+      $element.fadeIn(2000, function () {
+        $element[plugin]();
+        $(window).bind('clear.' + plugin, function () {
+          $element[plugin]('destroy');
+        });
+      });
+    } else {
+      $element.show();
+      $element[plugin]();
+      $(window).bind('clear.' + plugin, function () {
+        $element[plugin]('destroy').remove();
+      });
+    }
   }
 
   socket.on('clear', function (data) {
@@ -71,8 +91,6 @@ var socket = io.connect('http://localhost');
   });
 
   socket.on('revealCompetition', function (data) {
-    console.log('reveal competition');
-    console.log(data);
     var $reveal = $(Handlebars.templates['reveal-competition'](data));
     swapContent($reveal, 'reveal');
   });
@@ -87,13 +105,14 @@ var socket = io.connect('http://localhost');
   });
 
   socket.on('throwdown', function (data) {
-    var $throw = Handlebars.templates.throwdown(data);
+    var $throw = $(Handlebars.templates.throwdown(data));
     addContent($throw, 'throwdown');
   });
 
   socket.on('countdown', function (data) {
-    var $count = Handlebars.templates.countdown(data);
-    addContent($count, 'countdown');
+    $(window).trigger('clear.countdown');
+    var $count = $(Handlebars.templates.countdown(data));
+    addContent($count, 'countdown', false);
   });
 
 }(jQuery));

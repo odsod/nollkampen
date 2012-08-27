@@ -1,128 +1,114 @@
 (function ($) {
 
-  var 
+  var namespace = 'countdown'
+    , defaults = {
+      message: 'Nollkampen börjar om: '
+    , seconds: 15
+    , formatter: function (count) {
+        if (count > 3600) {
+          return Math.ceil(count / 3600) + ' timmar';
+        } else if (count > 60) {
+          return Math.ceil(count / 60) + ' minuter';
+        } else if (count > 10) {
+          return count + ' sekunder';
+        } else {
+          return count;
+        }
+      }
+    };
 
-    namespace = 'countdown',
+  function init(options) {
+    return this.each(function () {
+      var settings = $.extend(defaults, options)
+        , $countdown = $(this)
+        , $count = $('.cd-count', $countdown)
+        , currCount = settings.seconds
+        , fullscreen = false
+        , firstTick = true;
 
-    defaults = {
-      message: '',
-      seconds: 13,
-      expandEasing: 'easeOutCirc',
-      shrinkEasing: 'easeInExpo',
-      expandDuration: 200,
-      shrinkDuration: 1500,
-      complete: function () {}
-    },
+      console.log('init countdown');
 
-    methods = {
+      $countdown.css('font-size', $countdown.height() / 2);
+      $count.css({
+        'padding-left': 20
+      , 'padding-right': 20
+      });
+      $count.hide();
 
-      init: function (options) {
-        return this.each(function () {
-          var 
-            settings = $.extend(defaults, options),
-            $countdown = $(this),
-            $count = $('.cd-count', $countdown),
-            initialCount = (settings.seconds > 60 ?
-                           Math.ceil(settings.seconds / 60) * 60 :
-                           settings.seconds),
-            currCount = initialCount,
-            isFullscreen = false,
-            next = $.proxy($countdown.dequeue, $countdown);
-
-          $count.css({
-            'font-size': $count.height() * 0.6
+      function goFullScreen() {
+        $countdown
+          // Fade out count
+          .queue(function () {
+            var $this = $(this);
+            // Maintain size after text is gone
+            $countdown.css('width', $countdown.width());
+            // Fade out text
+            $count.fadeOut(300, _.once(function () {
+              // Prepare styles for first animation
+              $count
+                .text('')
+                .css('font-size', 0)
+                .show();
+              $this.dequeue();
+            }));
+          })
+          .animate({
+            'width':         $countdown.parent().width()
+          , 'height':        $countdown.parent().height()
+          }, {
+            duration: 5000
+          })
+          .animate({
+            'opacity': 1
+          , 'border-radius': 0
+          }, {
+            duration: 2000
+          , complete: nextTick
           });
+      }
 
-          function nextCount() {
-            if (currCount < 1) return;
-            // Switch to fullscreen on last 10 seconds
-            if (!isFullscreen && currCount <= 10) {
-              $countdown
-                // Fade small overlay out
-                .fadeOut(1000)
-                .delay(200)
-                // Convert to big overlay
-                .queue(function () {
-                  $count
-                    .text('');
-                  $countdown
-                    .css({
-                      'padding': 0,
-                      'height': '100%',
-                      'width': '100%',
-                      'opacity': 1
-                    })
-                    .dequeue();
-                })
-                // Fade back in
-                .fadeIn(1000);
-              isFullscreen = true;
-            } 
-            if (currCount <= 10) {
-              $countdown
-                // Set the text
-                .queue(function () {
-                  $count
-                    .text(currCount)
-                    .css('font-size', 0)
-                    .show();
-                  $countdown.dequeue();
-                })
-                .delay(200)
-                // Expand the count
-                .queue(function () {
-                  $count
-                    .animate({
-                      'font-size': $count.height() / 2
-                    }, {
-                      duration: 700,
-                      easing: 'easeOutCirc',
-                      complete: function () {
-                        $countdown.dequeue();
-                      }
-                    });
-                })
-                .delay(200)
-                // Fade the count out
-                .queue(function () {
-                  $count.fadeOut(500, function () {
-                    $countdown.dequeue();
-                    currCount -= 1;
-                    nextCount();
-                  }); 
-                });
-            } else if (currCount <= 60) {
-              $count.text('Nollkampen börjar om ' + currCount + ' sekunder...')
-              currCount -= 1; 
-              $countdown
-                .delay(1000)
-                .queue(function () {
-                  $countdown.dequeue();
-                  nextCount();
-                });
-            } else {
-              $count.text('Nollkampen börjar om ' + Math.ceil(currCount / 60) + ' minuter...');
-              currCount -= 60;
-              $countdown
-                .delay(60000)
-                .queue(function () {
-                  $countdown.dequeue();
-                  nextCount();
-                });
-            }
+      function nextTick() {
+        if (currCount < 1) {
+          return;
+        }
+        if (currCount > 10) {
+          $count.text(settings.message + settings.formatter(currCount));
+          currCount -= 1;
+          if (currCount === 10) {
+            setTimeout(goFullScreen, 1000);
+          } else {
+            setTimeout(nextTick, 1000);
           }
-          nextCount();
-        });
-      },
+        } else {
+          // Let the rest be handled by starting a full screen countdown
+          return;
+        }
+      }
 
-      destroy: function () {
+      function bootstrap() {
+        if (currCount <= 10) {
+          goFullScreen();
+        } else {
+          $count.text(settings.message + settings.formatter(currCount));
+          $count.fadeIn(1000, nextTick);
+        }
+      }
+
+      // Bootstrap and go!
+      bootstrap();
+
+    });
+  }
+
+  var methods = {
+      init: init
+    , destroy: function () {
         return this.each(function () {
           $(this)
             .clearQueue()
             .text('');
         });
       }
-
     };
 
   $.fn.countdown = function (method) {

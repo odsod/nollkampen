@@ -54,7 +54,7 @@ var actions = {
     db.Result.compileCompetition(req.body.competition, function (results) {
       db.Ad.find(function (err, ads) {
         io.sockets.emit('revealCompetition', {
-          results: _.first(results, 3)
+          results: results
         , ads: _.map(ads, function (a) {
             return a.toObject({ getters: true });
           })
@@ -86,8 +86,10 @@ var actions = {
   },
 
   countdown: function (req) {
+    log.data(req.body);
     io.sockets.emit('countdown', {
-      seconds: req.body.seconds
+      seconds: req.body.seconds,
+      message: req.body.message
     });
   },
 

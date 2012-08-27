@@ -22,9 +22,9 @@ script
       callback: function () {
         if (sequenceSwipe.getPos() !== currPos) {
           if (navigator.mozVibrate) {
-            navigator.mozVibrate([300, 100, 300]);
+            navigator.mozVibrate([200, 50, 200]);
           } else if (navigator.vibrate) {
-            navigator.vibrate([300, 100, 300]);
+            navigator.vibrate([200, 50, 200]);
           }
         }
         currPos = sequenceSwipe.getPos();
@@ -33,9 +33,9 @@ script
     currPos = sequenceSwipe.getPos();
     $('body').bind('taphold', function () {
       if (navigator.mozVibrate) {
-        navigator.mozVibrate(1000);
+        navigator.mozVibrate(400);
       } else if (navigator.vibrate) {
-        navigator.vibrate(1000);
+        navigator.vibrate(400);
       }
       $.ajax({
         type: 'POST',

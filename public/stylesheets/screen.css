@@ -9,8 +9,6 @@ body {
 }
 .pane {
   position: absolute;
-  top: 0;
-  left: 0;
 }
 .background {
   width: 100%;
