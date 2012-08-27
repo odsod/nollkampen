@@ -28,7 +28,7 @@ var socket = io.connect('http://localhost');
     var $plugins = $('.plugin');
     $plugins
       .stop(true)
-      .fadeOut(_.once(function () {
+      .fadeOut(2000, _.once(function () {
         $('window').trigger('clear');
         $('*').unbind();
         $plugins.remove();
@@ -39,108 +39,59 @@ var socket = io.connect('http://localhost');
       }));
   }
 
+  function swapContent($element, plugin) {
+    // Start by clearing screen
+    clearScreen(function () {
+      $element
+        .css('z-index', bottomZ - 1)
+        .appendTo($body);
+      $element[plugin]();
+      $background.fadeOut(2000, function () {
+        $element.css('z-index', nextZ);
+        nextZ += 1;
+        $background.show();
+        $(window).bind('clear.scoreboard', function () {
+          $element[plugin]('destroy');
+        });
+      });
+    });
+  }
+
+  function addContent($element, plugin) {
+  
+  }
+
   socket.on('clear', function (data) {
     clearScreen();
   });
 
   socket.on('scoreboard', function (data) {
-    console.log('scoreboard');
-    // Start by clearing screen
-    clearScreen(function () {
-      // Render html
-      var $scoreboard = $(Handlebars.templates.scoreboard(data));
-      // Insert behind background and initialize
-      $scoreboard
-        .css('z-index', bottomZ - 1)
-        .appendTo($body)
-        .scoreboard();
-      $background.fadeOut(function () {
-        $scoreboard.css('z-index', nextZ);
-        nextZ += 1;
-        $background.show();
-      });
-      $(window).bind('clear.scoreboard', function () {
-        $scoreboard.scoreboard('destroy');
-      });
-    });
+    var $scoreboard = $(Handlebars.templates.scoreboard(data));
+    swapContent($scoreboard, 'scoreboard');
   });
 
   socket.on('revealCompetition', function (data) {
-    $(window)
-      .trigger('clear');
-    // Insert html
-    $('body')
-      .append(Handlebars.templates['reveal-competition'](data));
-    // Apply plugin
-    $('.sb')
-      .reveal();
-    // Register cleanup
-    $(window)
-      .bind('clear.reveal', function () {
-        $('.sb')
-          .reveal('destroy')
-          .remove();
-      });
+    var $reveal = $(Handlebars.templates['reveal-competition'](data));
+    swapContent($reveal, 'reveal');
   });
 
   socket.on('revealTotal', function (data) {
-    console.log(data);
-    $(window)
-      .trigger('clear');
-    // Insert html
-    $('body')
-      .append(Handlebars.templates.scoreboard(data));
-    // Apply plugin
-    $('.sb')
-      .reveal();
-    // Register cleanup
-    $(window)
-      .bind('clear.reveal', function () {
-        $('.sb')
-          .reveal('destroy')
-          .remove();
-      });
+    var $reveal = $(Handlebars.templates['reveal-total'](data));
+    swapContent($reveal, 'reveal');
   });
 
   socket.on('revealNext', function () {
-    console.log('next');
-    // Reveal next
-    $('.sb')
-      .reveal('next');
+    $('.reveal.plugin').reveal('next');
   });
 
   socket.on('throwdown', function (data) {
-    $(window)
-      .trigger('clear');
-    // Insert html
-    $('body')
-      .append(Handlebars.templates.throwdown(data));
-    $('.throwdown')
-      .throwdown();
-    // Register cleanup
-    $(window)
-      .bind('clear.throwdown', function () {
-        $('.throwdown')
-          .throwdown('destroy')
-          .remove();
-      });
+    var $throw = Handlebars.templates.throwdown(data);
+    addContent($throw, 'throwdown');
   });
 
   socket.on('countdown', function (data) {
-    // Clear any previous countdown
-    $(window)
-      .trigger('clear.countdown');
-    // Insert html
-    $('body')
-      .append(Handlebars.templates.countdown(data));
-    // Apply plugin
-    $('.countdown')
-      .countdown();
-    // Register cleanup
-    $(window)
-      .bind('clear.countdown', function () {
-        $('.cd').countdown('destroy').remove();
-      });
+    var $count = Handlebars.templates.countdown(data);
+    addContent($count, 'countdown');
   });
 
 }(jQuery));
