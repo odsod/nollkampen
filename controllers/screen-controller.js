@@ -122,12 +122,23 @@ ScreenController.handleAction = function (req, res) {
 
 ScreenController.showInstapic = function (req, res) {
   res.render('instapic', {
-    captions: ['test1', 'test2']
+    captions: [' ', 'test1', 'test2']
   });
 };
 
-ScreenController.handleInstapic = function (req, res) {
-  res.end();
+ScreenController.createInstapic = function (req, res) {
+  var pic = new db.Picture({
+    name: 'instapic'
+  , caption: req.body.inputCaption.trim() || req.body.selectCaption.trim()
+  });
+  pic.image = req.files.image;
+  pic.save(function (err, pic) {
+    io.sockets.emit('throwdown', {
+      image: pic.image,
+      caption: pic.caption
+    });
+    res.redirect('/screen/instapic');
+  });
 };
 
 ScreenController.listen = function (app) {

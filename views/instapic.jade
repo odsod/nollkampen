@@ -1,0 +1,20 @@
+doctype 5
+html
+  head
+    title Snabbfoto
+    // Vendor scripts
+    meta(name='viewport', content='user-scalable=0')
+    style
+      body { overflow: hidden; font-family: monospace; color: #eee; background: #0095d7; background-image -moz-linear-gradient(#0095d7, #00628c); text-shadow: 1px 2px 3px rgba(30,30,30, 0.66); }
+      form { width: 100% }
+      input, label, select, button { font-size: 5em; margin-bottom: 0.3em; padding: 0; display: block; width: 100%; }
+  body(style='margin: 0; padding: 10px;')
+    form#instapic(action='/screen/instapic/', enctype='multipart/form-data', method='post')
+      input(type='hidden', name='_method', value='post')
+      label Bildtext
+      input(type='text', name='inputCaption')
+      select(name='selectCaption')
+        each caption in captions
+          option(value=caption)= caption
+      label Bild
+      input(type='file', name='image', id='image', accept='image/*', onChange='document.forms.instapic.submit()')

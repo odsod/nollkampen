@@ -67,6 +67,9 @@ app.get('/screen', ScreenController.screen);
 
 ScreenController.listen(server);
 
+app.get('/screen/instapic', ScreenController.showInstapic);
+app.post('/screen/instapic', ScreenController.createInstapic);
+
 app.get('/screen/sequences'
       , ResourceController.loadCollection('Sequence')
       , ScreenController.listSequences);
