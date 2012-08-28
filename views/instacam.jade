@@ -1,0 +1,15 @@
+doctype 5
+html
+  head
+    title Snabbfoto
+    // Vendor scripts
+    script(src='/javascripts/vendor/jquery.min.js')
+    meta(name='viewport', content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;')
+  body
+    form(action='/screen/instapic/', method='post')
+      input(type='hidden', name='_method', value='post')
+      input(type='file', name='image', id='image', accept='image/*')
+      select(name='caption')
+        each caption in captions
+          option(value=caption)= caption
+      input(type='submit')

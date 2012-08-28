@@ -103,7 +103,8 @@ var actions = {
     db.Picture.findByAlias(req.body.picture, function (err, pic) {
       if (pic) {
         io.sockets.emit('throwdown', {
-          image: pic.image
+          image: pic.image,
+          caption: pic.caption
         });
       }
     });
@@ -117,6 +118,16 @@ ScreenController.handleAction = function (req, res) {
     action(req);
   }
   res.redirect('/');
+};
+
+ScreenController.showInstapic = function (req, res) {
+  res.render('instapic', {
+    captions: ['test1', 'test2']
+  });
+};
+
+ScreenController.handleInstapic = function (req, res) {
+  res.end();
 };
 
 ScreenController.listen = function (app) {

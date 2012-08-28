@@ -11,10 +11,11 @@
         , $throwdown = $(this)
         , $pic = $('.td-picture', $throwdown)
         , $img = $('img', $pic)
+        , $cap = $('p', $pic)
         , $parent = $throwdown.parent()
         , midX = $parent.width() / 2
         , midY = $parent.height() / 2
-        , rangeX = $parent.width() * 0.25
+        , rangeX = $parent.width() * 0.15
         , rangeY = $parent.height() * 0.05;
       $pic.hide();
       $img.load(function () {
@@ -23,7 +24,7 @@
           , x = (rangeX * Math.random()) - (rangeX / 2) + midX - w / 2
           , y = (rangeY * Math.random()) - (rangeY * 4) + midY - h / 2
           , rot = (30 * Math.random()) - 15
-          , displaceX = $parent.width() - (Math.random() * $parent.width() / 2);
+          , displaceX = $parent.width();
         $pic
           .css({
             'left': x
@@ -34,7 +35,7 @@
           , 'y': '+=' + $parent.height()
           , 'rotate': ((Math.random() * 180) - 90) + 'deg'
           , 'scale': 1.5
-          , 'box-shadow': '100px 100px 100px rgba(50,50,50, 0.1)'
+          , 'box-shadow': '300px 300px 300px rgba(50,50,50, 0.1)'
           })
           .show()
           .transition({
@@ -43,7 +44,7 @@
           , 'rotate': rot
           , 'scale': 1
           , 'box-shadow': '0 2px 15px #333'
-          }, 2000);
+          }, 1000, 'snap');
       });
     });
   }
