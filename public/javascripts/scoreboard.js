@@ -40,17 +40,11 @@
         , $blankPivots = $resultPivots.prev();
 
       // Bind automatical resize listeners
-      $(window).bind('resize.' + NAMESPACE, function () {
-        $headerTexts.css({
-          'font-size': $headerTexts.first().height() * settings.fontScales.header
-        });
-        $resultTexts.css({
-          'font-size': $resultRows.first().height() * settings.fontScales.result
-        });
-        $highlights.css({
-          'font-size': $resultRows.first().height() * settings.fontScales.highlight
-        });
-      }).trigger('resize.' + NAMESPACE);
+      window.nollkampenUtils.bindFontFitOnResize([
+        { $el: $headerTexts, scale: settings.fontScales.header }
+      , { $el: $resultTexts, scale: settings.fontScales.result }
+      , { $el: $highlights, scale: settings.fontScales.highlight }
+      ]);
 
       $times.hide();
       var currPivot = 0;

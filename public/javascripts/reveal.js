@@ -38,19 +38,12 @@
         , $twos = $('.sb-place-col > span:contains(2)', $resultRows).parent().parent()
         , $threes = $('.sb-place-col > span:contains(3)', $resultRows).parent().parent();
 
-      $(window).bind('resize.' + NAMESPACE, function () {
-        $headerTexts.css({
-          'font-size': $headerTexts.first().height() * settings.fontScales.header
-        });
-        $resultTexts.css({
-          'font-size': $resultRows.first().height() * settings.fontScales.result
-        });
-        $highlights.css({
-          'font-size': $resultRows.first().height() * settings.fontScales.highlight
-          // TODO: check if this can be moved to stylesheet
-        , 'padding': '0.2em'
-        });
-      }).trigger('resize.' + NAMESPACE);
+      // Fit fonts
+      window.nollkampenUtils.bindFontFitOnResize([
+        { $el: $headerTexts, scale: settings.fontScales.header }
+      , { $el: $resultTexts, scale: settings.fontScales.result }
+      , { $el: $highlights, scale: settings.fontScales.highlight }
+      ]);
 
       // Only show scores, no times
       $('.sb-time', $resultRows).hide();
@@ -59,9 +52,11 @@
       moveOut($ones);
       moveOut($twos);
       moveOut($threes);
-      // Hide all others
+
+      // Hide all results >= position 3
       $threes.last().nextAll().hide();
-      // Save progression in the DOM
+
+      // Save reveal progression in the DOM
       $(this).data(NAMESPACE, {
         next: [$ones, $twos, $threes]
       });

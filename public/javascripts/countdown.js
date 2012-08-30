@@ -27,13 +27,17 @@
         , $count = $('.cd-count', $countdown)
         , currCount = settings.seconds;
 
-      $countdown.css('font-size', $countdown.height() * settings.fontScale);
+      window.nollkampenUtils.bindFontFitOnResize([
+        { $el: $countdown, scale: settings.fontScale }
+      ]);
 
       // TODO: move this to stylesheet
       $count.css({
         'padding-left':  20
       , 'padding-right': 20
       });
+
+      // Start by hiding count
       $count.hide();
 
       function goFullScreen() {
