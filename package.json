@@ -11,9 +11,10 @@
   , "jade": "*"
   , "stylus": "*"
   , "mongoose": "*"
-  , "handlebars": "*"
   , "connect-handlebars": "*"
   , "socket.io": "*"
   , "underscore": "*"
+  , "connect-assetmanager": "*"
+  , "connect-assetmanager-handlers": "*"
   }
 }

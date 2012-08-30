@@ -86,7 +86,6 @@ var actions = {
   },
 
   countdown: function (req) {
-    log.data(req.body);
     io.sockets.emit('countdown', {
       seconds: req.body.seconds,
       message: req.body.message

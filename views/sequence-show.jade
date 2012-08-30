@@ -10,7 +10,7 @@ html
   body
     .sequence: ul
         each action in sequence.actions
-          li: h1.action= action
+          li: div.action: div= action
 script
   $(function () {
     var $sequence = $('.sequence');

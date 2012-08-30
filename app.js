@@ -22,20 +22,39 @@ app.configure(function () {
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
-  // Compile stylus stylesheets
-  app.use(require('stylus').middleware(path.join(__dirname, 'public/stylesheets')));
   // Precompile client-side templates
-  app.use('/templates.js', connectHandlebars(path.join(__dirname, '/templates'), {
+  app.use('/templates.js', connectHandlebars(path.join(__dirname, 'views', 'templates'), {
     exts_re: /\.hbs$|\.handlebars$/
   , recursive: true
   , encoding: 'utf8'
   }));
-  // Serve static files from public
-  app.use(express.static(path.join(__dirname, 'public')));
 });
 
 app.configure('development', function () {
+  // Output errors
   app.use(express.errorHandler());
+  // Force recompilation and do not compress styles
+  app.use(require('stylus').middleware({
+    force: true
+  , compress: false
+  , src:   path.join(__dirname, 'views')
+  , dest:  path.join(__dirname, 'public')
+  }));
+});
+
+app.configure('production', function () {
+  // Compress stylesheets
+  app.use(require('stylus').middleware({
+    force: false
+  , compress: true
+  , src:   path.join(__dirname, 'stylesheets')
+  , dest:  path.join(__dirname, 'public', 'stylesheets')
+  }));
+});
+
+app.configure(function () {
+  // Serve static files from public
+  app.use(express.static(path.join(__dirname, 'public')));
 });
 
 ////
@@ -173,3 +192,5 @@ app.put('/results/:param'
 server.listen(app.get('port'), function () {
   require('./logs').express.info('Express server listening on port ' + app.get('port'));
 });
+
+log.debug('environment -', app.get('env'));
