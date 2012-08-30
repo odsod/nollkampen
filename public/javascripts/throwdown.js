@@ -15,7 +15,7 @@
         , $parent = $throwdown.parent()
         , midX = $parent.width() / 2
         , midY = $parent.height() / 2
-        , rangeX = $parent.width() * 0.15
+        , rangeX = $parent.width() * 0.30
         , rangeY = $parent.height() * 0.01;
       $pic.hide();
       $img.load(function () {
@@ -24,22 +24,22 @@
           , x = (rangeX * Math.random()) - (rangeX / 2) + midX - w / 2
           , y = (rangeY * Math.random()) - (rangeY * 4) + midY - h / 2
           , rot = (20 * Math.random()) - 10
-          , displaceX = $parent.width();
+          , displaceX = (Math.random() * 4 * $parent.width()) - 2 * $parent.width() - x;
         $pic
           .css({
             'left': x
           , 'top': y
           })
           .css({
-            'x': '-=' + displaceX
-          , 'y': '+=' + $parent.height()
+            'x': (displaceX > 0 ? '-=' : '+=') + Math.abs(displaceX)
+          , 'y': '+=' + 1.7 * $parent.height()
           , 'rotate': ((Math.random() * 180) - 90) + 'deg'
           , 'scale': 2.5
           })
           .show()
           .transition({
-            'x': '+=' + displaceX
-          , 'y': '-=' + $parent.height()
+            'x': (displaceX > 0 ? '+=' : '-=') + Math.abs(displaceX)
+          , 'y': '-=' + 1.7 * $parent.height()
           , 'rotate': rot
           , 'scale': 1
           }, 1000, 'snap');
