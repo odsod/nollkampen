@@ -5,20 +5,28 @@ html
     meta(name='viewport', content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;')
     link(rel='stylesheet', href='/stylesheets/sequence.css')
     script(src='/javascripts/vendor/jquery-1.8.0.min.js')
-    script(src='/javascripts/vendor/jquery.mobile.touchevents.js')
     script(src='/javascripts/vendor/swipe.min.js')
+    script(src='/javascripts/vendor/jquery.mobile.touchevents.js')
   body
-    .sequence: ul
+    #sequence
+      ul
         each action in sequence.actions
-          li: div.action: div= action
+          li.action
+            input(type='hidden', value=action)
+
 script
   $(function () {
-    var $sequence = $('.sequence');
-    var $items = $('li');
-    $items.hide();
-    $items.first().css('display', 'block').show();
+
+    // Insert formatted version of POST-params
+    $('.action').each(function () {
+      $(this).append(
+        $(this).children('input').val().replace(/&/g, '<br><br>').replace(/=/g, ':<br>')
+      );
+    });
+
+    // Apply Swipe plugin
     var currPos;
-    var sequenceSwipe = new Swipe($sequence[0], {
+    var sequenceSwipe = new Swipe(document.getElementById('sequence'), {
       callback: function () {
         if (sequenceSwipe.getPos() !== currPos) {
           if (navigator.mozVibrate) {
@@ -30,7 +38,11 @@ script
         currPos = sequenceSwipe.getPos();
       }
     });
+     
+    // Get initial position
     currPos = sequenceSwipe.getPos();
+    
+    // Bind taphold to sending action
     $('body').bind('taphold', function () {
       if (navigator.mozVibrate) {
         navigator.mozVibrate(400);
@@ -40,7 +52,7 @@ script
       $.ajax({
         type: 'POST',
         url: '/screen',
-        data: $('.action').eq(sequenceSwipe.getPos()).text()
+        data: $('.action').eq(sequenceSwipe.getPos()).children('input').val()
       });
     });
   });

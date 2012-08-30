@@ -105,7 +105,7 @@ var socket = io.connect('http://localhost');
   });
 
   socket.on('throwdown', function (data) {
-    $(window).trigger('clear.throwdown');
+    //$(window).trigger('clear.throwdown');
     var $throw = $(Handlebars.templates.throwdown(data));
     addContent($throw, 'throwdown');
   });

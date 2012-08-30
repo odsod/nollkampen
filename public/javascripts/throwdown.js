@@ -16,14 +16,14 @@
         , midX = $parent.width() / 2
         , midY = $parent.height() / 2
         , rangeX = $parent.width() * 0.15
-        , rangeY = $parent.height() * 0.05;
+        , rangeY = $parent.height() * 0.01;
       $pic.hide();
       $img.load(function () {
         var w = $pic.width()
           , h = $pic.height()
           , x = (rangeX * Math.random()) - (rangeX / 2) + midX - w / 2
           , y = (rangeY * Math.random()) - (rangeY * 4) + midY - h / 2
-          , rot = (30 * Math.random()) - 15
+          , rot = (20 * Math.random()) - 10
           , displaceX = $parent.width();
         $pic
           .css({
@@ -34,8 +34,7 @@
             'x': '-=' + displaceX
           , 'y': '+=' + $parent.height()
           , 'rotate': ((Math.random() * 180) - 90) + 'deg'
-          , 'scale': 1.5
-          , 'box-shadow': '300px 300px 300px rgba(50,50,50, 0.1)'
+          , 'scale': 2.5
           })
           .show()
           .transition({
@@ -43,7 +42,6 @@
           , 'y': '-=' + $parent.height()
           , 'rotate': rot
           , 'scale': 1
-          , 'box-shadow': '0 2px 15px #333'
           }, 1000, 'snap');
       });
     });
