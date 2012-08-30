@@ -75,7 +75,7 @@ var socket = io.connect('http://localhost');
     } else {
       $element.show();
       $element[plugin]();
-      $(window).bind('clear.' + plugin, function () {
+      $(window).bind('clear', function () {
         $element[plugin]('destroy').remove();
       });
     }
@@ -105,15 +105,27 @@ var socket = io.connect('http://localhost');
   });
 
   socket.on('throwdown', function (data) {
-    //$(window).trigger('clear.throwdown');
+    $(window).trigger('clear.throwdown');
     var $throw = $(Handlebars.templates.throwdown(data));
     addContent($throw, 'throwdown');
+    // On throwdown clear, keep only the 5 latest throwdowns
+    $(window).unbind('clear.throwdown');
+    $(window).bind('clear.throwdown', function () {
+      var $throwdowns = $('.throwdown');
+      if ($throwdowns.length > 5) {
+        $throwdowns.first().throwdown('destroy').remove();
+      }
+    });
   });
 
   socket.on('countdown', function (data) {
     $(window).trigger('clear.countdown');
     var $count = $(Handlebars.templates.countdown(data));
     addContent($count, 'countdown', false);
+    $(window).unbind('clear.countdown');
+    $(window).bind('clear.countdown', function () {
+      $count.countdown('destroy').remove();
+    });
   });
 
   socket.on('megaCountdown', function (data) {
