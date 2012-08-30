@@ -2,7 +2,6 @@ var socket = io.connect('http://localhost');
 
 (function ($) {
 
-
   var $body;
   var $background;
   var bottomZ;

@@ -34,9 +34,9 @@
         , $scores = $('.sb-score', $resultRows)
         , $times = $('.sb-time', $resultRows)
         , $highlights = $('.sb-hilight', $resultRows)
-        , $ones = $('.sb-place-col > span:contains(1)', $resultRows).parent().parent()
-        , $twos = $('.sb-place-col > span:contains(2)', $resultRows).parent().parent()
-        , $threes = $('.sb-place-col > span:contains(3)', $resultRows).parent().parent();
+        , $ones = $('.sb-place-col:contains(1)', $resultRows).parent()
+        , $twos = $('.sb-place-col:contains(2)', $resultRows).parent()
+        , $threes = $('.sb-place-col:contains(3)', $resultRows).parent();
 
       // Fit fonts
       window.nollkampenUtils.bindFontFitOnResize([
