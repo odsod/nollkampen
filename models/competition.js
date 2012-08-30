@@ -1,13 +1,9 @@
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , log = require('../logs').app;
-
 ////
 // Competition
 ////
 
-var Competition = module.exports = new Schema({
-  name: { type: String, index: true }
+var Competition = module.exports = new (require('mongoose')).Schema({
+  name: { type: String, index: { unique: true } }
 , order: Number
 });
 
@@ -15,7 +11,7 @@ Competition.plugin(require('./find-by-alias'), {
   attr: 'name'
 });
 
-// Initialize results
+// Assure results exist on save
 Competition.pre('save', function (next) {
   var self = this;
   this.model('Section').find(function (err, sections) {
@@ -24,11 +20,12 @@ Competition.pre('save', function (next) {
         competition: self._id
       , section: section._id
       }, {
+        // TODO: make sure this is not necessary and delete
         competition: self._id
       , section: section._id
       }, {
         upsert: true
-      }, function () { log.debug('upsert'); });
+      }, function () { });
     });
     next();
   });
@@ -36,6 +33,5 @@ Competition.pre('save', function (next) {
 
 // Clean results on removal
 Competition.pre('remove', function (next) {
-  this.model('Result')
-    .remove({ competition: this._id }, next);
+  this.model('Result').remove({ competition: this._id }, next);
 });

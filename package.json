@@ -1,20 +1,19 @@
 {
-  "name": "nollkampen",
-  "version": "0.0.1",
-  "readme": "README.md",
-  "private": true,
-  "scripts": {
+  "name": "nollkampen"
+, "version": "0.0.1"
+, "readme": "README.md"
+, "private": true
+, "scripts": {
     "start": "node app"
-  },
-  "dependencies": {
-    "express": "3.0.0rc3",
-    "jade": "*",
-    "stylus": "*",
-    "mongoose": "*",
-    "handlebars": "*",
-    "connect-handlebars": "*",
-    "socket.io": "*",
-    "underscore": "*",
-    "step": "*"
+  }
+, "dependencies": {
+    "express": "3.0.0rc3"
+  , "jade": "*"
+  , "stylus": "*"
+  , "mongoose": "*"
+  , "handlebars": "*"
+  , "connect-handlebars": "*"
+  , "socket.io": "*"
+  , "underscore": "*"
   }
 }

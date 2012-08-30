@@ -142,6 +142,7 @@ ScreenController.createInstapic = function (req, res) {
 };
 
 ScreenController.listen = function (app) {
-  io = io.listen(app);
-  io.set('logger', require('../logs').sockets);
+  io = io.listen(app, {
+    logger: require('../logs').sockets
+  });
 };

@@ -3,8 +3,8 @@ var mongoose = require('mongoose')
   , log = require('../logs').app;
 
 var Section = module.exports = new Schema({
-  name:               String
-, initials:           { type: String, index: { unique: true } }
+  initials:           { type: String, index: { unique: true } }
+, name:               String
 , color:              String
 , textColor:          String
 , alternateTextColor: String
@@ -19,6 +19,7 @@ Section.pre('save', function (next) {
         competition: competition._id
       , section: self._id
       }, {
+        // TODO: find out if this is necessary and remove
         competition: competition._id
       , section: self._id
       }, {
@@ -31,8 +32,7 @@ Section.pre('save', function (next) {
 
 // Remove section results
 Section.pre('remove', function (next) {
-  this.model('Result')
-    .remove({ section: this._id }, next);
+  this.model('Result').remove({ section: this._id }, next);
 });
 
 Section.plugin(require('./has-image').plugin);

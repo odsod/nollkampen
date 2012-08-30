@@ -1,9 +1,11 @@
 (function ($) {
 
-  var namespace = 'countdown'
-    , defaults = {
+  var NAMESPACE = 'countdown'
+    , DEFAULTS = {
       message: 'Nollkampen börjar om: '
     , seconds: 15
+    , fullScreenStopTime: 10
+    , fontScale: 0.5
     , formatter: function (count) {
         if (count > 3600) {
           return Math.ceil(count / 3600) + ' timmar';
@@ -19,18 +21,17 @@
 
   function init(options) {
     return this.each(function () {
-      var settings = $.extend(defaults, options)
+
+      var settings = $.extend(DEFAULTS, options)
         , $countdown = $(this)
         , $count = $('.cd-count', $countdown)
-        , currCount = settings.seconds
-        , fullscreen = false
-        , firstTick = true;
+        , currCount = settings.seconds;
 
-      console.log('init countdown');
+      $countdown.css('font-size', $countdown.height() * settings.fontScale);
 
-      $countdown.css('font-size', $countdown.height() / 2);
+      // TODO: move this to stylesheet
       $count.css({
-        'padding-left': 20
+        'padding-left':  20
       , 'padding-right': 20
       });
       $count.hide();
@@ -53,8 +54,8 @@
             }));
           })
           .animate({
-            'width':         $countdown.parent().width()
-          , 'height':        $countdown.parent().height()
+            'width':  $countdown.parent().width()
+          , 'height': $countdown.parent().height()
           }, {
             duration: 5000
           })
@@ -74,7 +75,7 @@
         if (currCount > 10) {
           $count.text(settings.message + settings.formatter(currCount));
           currCount -= 1;
-          if (currCount === 10) {
+          if (settings.fullScreenStopTime && currCount === settings.fullScreenStopTime) {
             setTimeout(goFullScreen, 1000);
           } else {
             setTimeout(nextTick, 1000);
@@ -96,28 +97,29 @@
 
       // Bootstrap and go!
       bootstrap();
+    });
+  }
 
+  function destroy() {
+    return this.each(function () {
+      $(this)
+        // Break count loop
+        .stop(true);
     });
   }
 
   var methods = {
       init: init
-    , destroy: function () {
-        return this.each(function () {
-          $(this)
-            .clearQueue()
-            .text('');
-        });
-      }
+    , destroy: destroy
     };
 
-  $.fn.countdown = function (method) {
+  $.fn[NAMESPACE] = function (method) {
     if (methods[method]) {
       return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
     } else if (typeof method === 'object' || !method) {
       return methods.init.apply(this, arguments);
     } else {
-      $.error('Method' + method + 'does not exist on jQuery.' + namespace);
+      $.error('Method' + method + 'does not exist on jQuery.' + NAMESPACE);
     }
   };
 

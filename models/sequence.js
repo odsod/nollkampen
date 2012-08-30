@@ -1,12 +1,8 @@
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , log = require('../logs').app;
-
 ////
 // Sequence
 ////
 
-var Sequence = module.exports = new Schema({
+var Sequence = module.exports = new (require('mongoose')).Schema({
   name:    String
 , actions: [String]
 });

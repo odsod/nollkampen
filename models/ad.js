@@ -1,13 +1,9 @@
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , log = require('../logs').app;
-
 ////
 // Ad
 ////
 
-var Ad = module.exports = new Schema({
-  name:  { type: String, index: true }
+var Ad = module.exports = new (require('mongoose')).Schema({
+  name:  { type: String, index: { unique: true } }
 });
 
 Ad.plugin(require('./find-by-alias'), {

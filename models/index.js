@@ -1,5 +1,5 @@
-var log = require('../logs').app
-  , mongoose = require('mongoose').connect('localhost', 'nollkampen');
+// Use default connection
+var mongoose = require('mongoose').connect('localhost', 'nollkampen');
 
 module.exports = {
   Section:     mongoose.model('Section',     require('./section'))
@@ -9,4 +9,6 @@ module.exports = {
 , Picture:     mongoose.model('Picture',     require('./picture'))
 , Sequence:    mongoose.model('Sequence',    require('./sequence'))
 , Slideshow:   mongoose.model('Slideshow',   require('./slideshow'))
+// Put instapics in a separate collection from pictures
+, InstaPic:    mongoose.model('InstaPic',    require('./picture'))
 };

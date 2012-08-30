@@ -7,15 +7,15 @@ var appLog = new Logger({
     new Console({
       level: 'info'
     , colorize: true
-    , timestamp: function () {
-        return 'App';
-      }
     })
   ]
 });
 
-appLog.data = function (data) {
-  JSON.stringify(data, null, '  ').split(/\n/).map(appLog.info);
+appLog.data = function (data, name) {
+  if (name) {
+    appLog.debug(name + ':');
+  }
+  JSON.stringify(data, null, '  ').split(/\n/).map(appLog.debug);
 };
 
 var socketsLog = new Logger({
@@ -24,7 +24,7 @@ var socketsLog = new Logger({
       level: 'error'
     , colorize: true
     , timestamp: function () {
-        return 'Sockets';
+        return 'socket.io';
       }
     })
   ]
@@ -36,21 +36,11 @@ var expressLog = new Logger({
       level: 'warn',
       colorize: true,
       timestamp: function () {
-        return 'Express';
+        return 'express  ';
       }
     })
   ]
 });
-
-// winston.handleExceptions(
-//   new Console({
-//     level: 'debug',
-//     colorize: true,
-//     timestamp: function () {
-//       return 'App';
-//     }
-//   })
-// );
 
 var expressStream = {
   write: function (str) {
@@ -58,16 +48,9 @@ var expressStream = {
   }
 };
 
-function logError(err) {
-  if (err) {
-    winston.loggers.get('app').error(err);
-  }
-}
-
 module.exports = {
   express: expressLog
 , app: appLog
 , sockets: socketsLog
-, logError: logError
 , expressStream: expressStream
 };

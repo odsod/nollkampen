@@ -8,31 +8,27 @@ var express            = require('express')
   , server             = require('http').createServer(app)
   , _                  = require('underscore')
   , path               = require('path')
-  , db                 = require('./models')
   , connectHandlebars  = require('connect-handlebars')
-  , logs               = require('./logs')
-  , log                = logs.app;
+  , log                = require('./logs').app;
 
 // Config: All
 app.configure(function () {
   app.set('port', process.env.PORT || 3000);
-  app.set('views', __dirname + '/views');
+  app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
   app.use(express.favicon());
   // Connect express logger to Winston
-  app.use(express.logger({ stream: logs.expressStream }));
-  app.use(express.bodyParser({
-    // uploadDir: __dirname + '/public/uploads'
-  }));
+  app.use(express.logger({ stream: require('./logs').expressStream }));
+  app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
   // Compile stylus stylesheets
-  app.use(require('stylus').middleware(__dirname + '/public'));
+  app.use(require('stylus').middleware(path.join(__dirname, 'public/stylesheets')));
   // Precompile client-side templates
-  app.use('/templates.js', connectHandlebars(__dirname + '/templates', {
-    exts_re: /\.hbs$|\.handlebars$/,
-    recursive: true,
-    encoding: 'utf8'
+  app.use('/templates.js', connectHandlebars(path.join(__dirname, '/templates'), {
+    exts_re: /\.hbs$|\.handlebars$/
+  , recursive: true
+  , encoding: 'utf8'
   }));
   // Serve static files from public
   app.use(express.static(path.join(__dirname, 'public')));
@@ -175,5 +171,5 @@ app.put('/results/:param'
 ////
 
 server.listen(app.get('port'), function () {
-  logs.express.info('Express server listening on port ' + app.get('port'));
+  require('./logs').express.info('Express server listening on port ' + app.get('port'));
 });

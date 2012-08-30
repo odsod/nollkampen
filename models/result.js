@@ -1,14 +1,11 @@
-var mongoose = require('mongoose')
-  , _        = require('underscore')
-  , Schema   = mongoose.Schema
-  , ObjectId = Schema.ObjectId
-  , log      = require('../logs').app;
+var _        = require('underscore')
+  , ObjectId = require('mongoose').Schema.ObjectId;
 
 ////
 // Result
 ////
 
-var Result = module.exports = new Schema({
+var Result = module.exports = new (require('mongoose')).Schema({
   section:      { type: ObjectId, ref: 'Section', index: true }
 , competition:  { type: ObjectId, ref: 'Competition', index: true }
 , minutes:      Number
@@ -31,6 +28,7 @@ Result.virtual('score').get(function () {
   } else if (this.points) {
     return this.points;
   } else {
+    // Purposefully let 0 fall through to here
     return ' ';
   }
 });

@@ -1,13 +1,9 @@
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , log = require('../logs').app;
-
 ////
 // Picture
 ////
 
-var Picture = module.exports = new Schema({
-  name:    String
+var Picture = module.exports = new (require('mongoose')).Schema({
+  name:    { type: String, index: { unique: true } }
 , caption: String
 });
 
