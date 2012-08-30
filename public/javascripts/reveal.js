@@ -10,6 +10,14 @@
     , easing: 'easeOutCubic'
     };
 
+  function moveOut($elements) {
+    var $lastElement = $elements.last();
+    $elements.css({
+      'position': 'relative',
+      'top': - $lastElement.offset().top - $lastElement.height()
+    });
+  }
+
   function init(options) {
     return this.each(function () {
       var settings = $.extend(DEFAULTS, options)
@@ -44,25 +52,16 @@
         });
       }).trigger('resize.' + NAMESPACE);
 
+      // Only show scores, no times
       $('.sb-time', $resultRows).hide();
-      // TODO: check if jQuery.transit can be used for this
-      $ones
-        .css({
-          'position': 'relative',
-          'top': '-500px'
-        });
-      $twos
-        .css({
-          'position': 'relative',
-          'top': '-500px'
-        });
-      $threes
-        .css({
-          'position': 'relative',
-          'top': '-500px'
-        });
+
+      // Move result rows out of screen
+      moveOut($ones);
+      moveOut($twos);
+      moveOut($threes);
       // Hide all others
       $threes.last().nextAll().hide();
+      // Save progression in the DOM
       $(this).data(NAMESPACE, {
         next: [$ones, $twos, $threes]
       });
