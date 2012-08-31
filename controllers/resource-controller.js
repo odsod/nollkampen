@@ -145,3 +145,15 @@ ResourceController.loadCollection = function (modelName) {
     });
   };
 };
+
+////
+// Upsert hook for saving images
+////
+
+ResourceController.saveImageHook = function (req, instance) {
+  instance.image = req.files.image;
+};
+
+ResourceController.saveImagesHook = function (req, instance) {
+  instance.images = req.files.images;
+};

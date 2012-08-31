@@ -102,14 +102,6 @@ app.post('/screen', ScreenController.handleAction);
 app.get('/img', require('./models/has-image').createServer({ route: '/img' }));
 
 ////
-// Upsert hook for saving images
-////
-
-function saveImageHook(req, instance) {
-  instance.image = req.files.image;
-}
-
-////
 // Resource routes
 ////
 
@@ -117,7 +109,7 @@ ResourceController.resource(app, '/sections', {
   model:           'Section'
 , root:            '/sections'
 , form:            'section-form'
-, upsertHook:      saveImageHook
+, upsertHook:      ResourceController.saveImageHook
 , locale:          {
     modelSingular: 'Sektion'
   , modelPlural:   'Sektioner'
@@ -138,7 +130,7 @@ ResourceController.resource(app, '/ads', {
   model:           'Ad'
 , root:            '/ads'
 , form:            'image-form'
-, upsertHook:      saveImageHook
+, upsertHook:      ResourceController.saveImageHook
 , locale:          {
     modelSingular: 'Annons'
   , modelPlural:   'Annonser'
@@ -149,10 +141,21 @@ ResourceController.resource(app, '/pictures', {
   model:           'Picture'
 , root:            '/pictures'
 , form:            'picture-form'
-, upsertHook:      saveImageHook
+, upsertHook:      ResourceController.saveImageHook
 , locale:          {
     modelSingular: 'Bild'
   , modelPlural:   'Bilder'
+  }
+});
+
+ResourceController.resource(app, '/slideshows', {
+  model:           'Slideshow'
+, root:            '/slideshows'
+, form:            'slideshow-form'
+, upsertHook:      ResourceController.saveImagesHook
+, locale:          {
+    modelSingular: 'Bildspel'
+  , modelPlural:   'Bildspel'
   }
 });
 

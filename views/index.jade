@@ -16,14 +16,18 @@ block content
     li(data-role='list-divider') Scoreboard
     li: div(data-role='navbar'): ul
       li: a(style='padding-top:10px', href='/screen/sequences', data-theme='c')
-        img(src='/images/70-tv.png', style='height: 20px')
-        h1 Visa på skärmen
+        img(src='/images/107-widescreen.png', style='height: 20px')
+        h1 Skärm
+      li: a(style='padding-top:10px', href='/screen/instapic', data-theme='c')
+        img(src='/images/86-camera.png', style='height: 20px')
+        h1 Snabbfoto
       li: a(style='padding-top:10px', href='/results', data-theme='c')
         img(src='/images/187-pencil.png', style='height: 20px')
-        h1 Mata in poäng
+        h1 Resultat
     li(data-role='list-divider') Skapa och ändra
     mixin item('/sections', 'Sektioner', '112-group')
     mixin item('/competitions', 'Grenar', '63-runner')
     mixin item('/ads', 'Annonser', '124-bullhorn')
     mixin item('/pictures', 'Bilder', '42-photos')
+    mixin item('/slideshows', 'Bildspel', '43-film-roll')
     mixin item('/sequences', 'Sekvenser', '55-network')
