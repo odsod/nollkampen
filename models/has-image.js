@@ -58,10 +58,11 @@ function hasImage(schema, options) {
 
   // Set multiple images
   schema.virtual('images').set(function (images) {
+    var self = this;
     this.imageData = [];
     images.forEach(function (image) {
       if (image.size > 0) {
-        this.imageData.push({
+        self.imageData.push({
           data: fs.readFileSync(image.path)
         , mime: image.mime
         });
@@ -76,8 +77,9 @@ function hasImage(schema, options) {
 
   // Get urls for multiple images
   schema.virtual('images').get(function () {
+    var self = this;
     return _.map(_.range(this.imageData.length), function (i) {
-      return route + '?id=' + this._id + '&model=' + this.constructor.modelName + '&i=' + i;
+      return route + '?id=' + self._id + '&model=' + self.constructor.modelName + '&i=' + i;
     });
   });
 }

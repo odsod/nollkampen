@@ -1,0 +1,16 @@
+extends form
+
+block controls
+  label(for='name') Namn:
+  input(type='text', name='attrs[name]', id='name', value=instance.name)
+
+  label Bilder:
+  input.file-chooser(type='file', name='images', id='saint-image-file', accept='image/*', multiple)
+
+  each image in instance.images
+    img(src=image)
+
+  script
+    $(document).bind('pageinit', function () {
+      $('.file-chooser').textinput({ theme: 'c' });
+    });
