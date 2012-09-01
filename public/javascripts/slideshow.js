@@ -8,15 +8,21 @@
 
   function init(options) {
     return this.each(function () {
+      console.log('slideshow plugin');
       var settings       = $.extend(DEFAULTS, options)
         , $slideshow     = $(this)
-        , $images        = $('image', $slideshow)
+        , $images        = $('img', $slideshow)
         , $currImage     = $images.first();
+
+      console.log($slideshow);
+      console.log($images);
+
 
       // Start by hiding all but the first image
       $currImage.nextAll().hide();
 
       function rotateImages() {
+        console.log('rotating');
         // Find the next image
         var $nextImage = $currImage.next();
         if ($nextImage.length === 0) {
@@ -28,6 +34,8 @@
         $nextImage.css({ 'z-index': 0 });
 
         $nextImage.show();
+        $nextImage.css('left', $slideshow.width() / 2 - $nextImage.width() / 2);
+        $currImage.css('left', $slideshow.width() / 2 - $currImage.width() / 2);
         $currImage
           .delay(settings.interval)
           .fadeOut(settings.fadeTime, settings.easing, function () {
@@ -36,8 +44,10 @@
           });
       }
 
-      // Start the animation loop
-      rotateImages();
+      $images.waitForImages(_.once(function () {
+        rotateImages();
+      }));
+
     });
   }
 

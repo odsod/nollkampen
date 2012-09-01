@@ -90,6 +90,7 @@ var socket = io.connect('http://nollkampen');
   });
 
   socket.on('slideshow', function (data) {
+    console.log('slideshow');
     var $slideshow = $(Handlebars.templates.slideshow(data));
     swapContent($slideshow, 'slideshow');
   });

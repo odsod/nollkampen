@@ -1,5 +1,6 @@
 var _        = require('underscore')
   , mongoose = require('mongoose')
+  , log      = require('../logs').app
   , fs       = require('fs');
 
 ////
@@ -19,10 +20,11 @@ function createServer(options) {
     connection = options.connection || mongoose;
   }
   return function (req, res) {
+    log.data(req.query);
     connection.model(req.query.model)
       .findById(req.query.id)
       .select('imageData')
-      .slice('imageData', req.query.i, 1)
+      .slice('imageData', [parseInt(req.query.i, 10), 1])
       .exec(function (err, instance) {
         var image = instance.imageData.pop();
         res.contentType(image.mime);
