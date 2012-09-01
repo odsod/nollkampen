@@ -88,7 +88,6 @@ ResourceController.prototype.new = function (req, res) {
 };
 
 ResourceController.prototype.edit = function (req, res) {
-  log.data(req.instance.toObject({ getters: true }));
   res.render(this.options.form, {
     title: 'Editera ' + this.options.locale.modelSingular.toLowerCase()
   , modelName: this.options.locale.modelSingular.toLowerCase()
@@ -107,7 +106,6 @@ ResourceController.prototype.destroy = function (req, res) {
 
 ResourceController.prototype.upsert = function (req, res) {
   var self = this;
-  log.data(req.files);
   var instance = req.instance || new this.model();
   _.each(req.body.attrs, function (value, key) {
     instance[key] = value;

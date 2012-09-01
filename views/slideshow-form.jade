@@ -8,7 +8,7 @@ block controls
   input.file-chooser(type='file', name='images', id='saint-image-file', accept='image/*', multiple)
 
   each image in instance.images
-    img(src=image)
+    img(src=image.image)
 
   script
     $(document).bind('pageinit', function () {

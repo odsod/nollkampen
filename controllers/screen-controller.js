@@ -109,6 +109,15 @@ var actions = {
     });
   }
 
+, slideshow: function (req) {
+    db.Slideshow.findByAlias(req.body.slideshow, function (err, slideshow) {
+      if (slideshow) {
+        io.sockets.emit('slideshow', {
+          images: slideshow.images
+        });
+      }
+    });
+  }
 };
 
 ScreenController.handleAction = function (req, res) {

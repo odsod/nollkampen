@@ -79,7 +79,9 @@ function hasImage(schema, options) {
   schema.virtual('images').get(function () {
     var self = this;
     return _.map(_.range(this.imageData.length), function (i) {
-      return route + '?id=' + self._id + '&model=' + self.constructor.modelName + '&i=' + i;
+      return {
+        image: route + '?id=' + self._id + '&model=' + self.constructor.modelName + '&i=' + i
+      };
     });
   });
 }
