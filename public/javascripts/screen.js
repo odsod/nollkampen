@@ -89,6 +89,11 @@ var socket = io.connect('http://nollkampen');
     swapContent($scoreboard, 'scoreboard');
   });
 
+  socket.on('slideshow', function (data) {
+    var $slideshow = $(Handlebars.templates.slideshow(data));
+    swapContent($slideshow, 'slideshow');
+  });
+
   socket.on('revealCompetition', function (data) {
     var $reveal = $(Handlebars.templates['reveal-competition'](data));
     swapContent($reveal, 'reveal');
