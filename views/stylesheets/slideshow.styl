@@ -1,13 +1,17 @@
+gradient-bg(start, end)
+    background start
+    background-image -webkit-linear-gradient(start, end)
+
 .slideshow
     top 0
     left 0
     width 100%
     height 100%
-    background #333
+    gradient-bg(#0095d7, #00628c)
     img
         position absolute
         top 0
         left 0
         height 100%
         width auto
-        display none
+        opacity 0

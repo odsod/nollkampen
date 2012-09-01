@@ -3,6 +3,7 @@
   var NAMESPACE = 'slideshow'
     , DEFAULTS = {
       interval: 2000
+    , fadeTime: 1000
     , easing: 'linear'
     };
 
@@ -14,49 +15,48 @@
         , $images        = $('img', $slideshow)
         , $currImage     = $images.first();
 
-      console.log($slideshow);
-      console.log($images);
-
-
-      // Start by hiding all but the first image
-      $currImage.nextAll().hide();
-
       function rotateImages() {
-        console.log('rotating');
         // Find the next image
         var $nextImage = $currImage.next();
         if ($nextImage.length === 0) {
           $nextImage = $images.first();
         }
 
-        // Make sure next image is positioned below the current image
-        $currImage.css({ 'z-index': 1 });
-        $nextImage.css({ 'z-index': 0 });
-
-        $nextImage.show();
-        $nextImage.css('left', $slideshow.width() / 2 - $nextImage.width() / 2);
-        $currImage.css('left', $slideshow.width() / 2 - $currImage.width() / 2);
-        $currImage
-          .delay(settings.interval)
-          .fadeOut(settings.fadeTime, settings.easing, function () {
-            $currImage.hide();
-            rotateImages();
+        $nextImage
+          .css('left', $slideshow.width() / 2 - $nextImage.width() / 2)
+          .animate({
+            'opacity': 1
+          }, {
+            duration: settings.fadeTime
+          , easing: settings.easing
           });
+        $currImage
+          .animate({
+            'opacity': 0
+          }, {
+            duration: settings.fadeTime
+          , easing: settings.easing
+          });
+        $currImage = $nextImage;
+        if (!$slideshow.data(NAMESPACE) || !$slideshow.data(NAMESPACE).stop) {
+          setTimeout(rotateImages, settings.fadeTime + settings.interval);
+        }
       }
 
-      $images.waitForImages(_.once(function () {
-        rotateImages();
-      }));
+      setTimeout(function () {
+        $images.waitForImages(_.once(function () {
+          rotateImages();
+        }));
+      }, 1000);
 
     });
   }
 
   function destroy() {
     return this.each(function () {
-      // Unbind all scoreboard listeners
-      $(window).unbind('.' + NAMESPACE);
-      // Clear the animation queue
-      $(this).clearQueue();
+      $(this).data(NAMESPACE, {
+        stop: true
+      });
     });
   }
 
