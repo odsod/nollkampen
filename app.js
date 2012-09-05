@@ -93,6 +93,14 @@ app.get('/screen/sequences/:param'
       , ResourceController.loadInstance('Sequence', 'param')
       , ScreenController.showSequence);
 
+app.get('/screen/sketches'
+      , ResourceController.loadCollection('Picture')
+      , ScreenController.listSketchPictures);
+
+app.get('/screen/sketches/:param'
+      , ResourceController.loadInstance('Picture', 'param')
+      , ScreenController.sketchServer);
+
 app.post('/screen', ScreenController.handleAction);
 
 ////

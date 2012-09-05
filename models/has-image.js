@@ -26,9 +26,11 @@ function createServer(options) {
       .select('imageData')
       .slice('imageData', [parseInt(req.query.i, 10), 1])
       .exec(function (err, instance) {
-        var image = instance.imageData.pop();
-        res.contentType(image.mime);
-        res.send(image.data);
+        if (instance) {
+          var image = instance.imageData.pop();
+          res.contentType(image.mime);
+          res.send(image.data);
+        }
       });
   };
 }

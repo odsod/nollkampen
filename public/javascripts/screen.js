@@ -66,18 +66,36 @@ var socket = io.connect('http://nollkampen');
     nextZ += 1;
     if (fadeIn) {
       $element.fadeIn(2000, function () {
-        $element[plugin]();
-        $(window).bind('clear.' + plugin, function () {
-          $element[plugin]('destroy');
-        });
+        if (plugin) {
+          $element[plugin]();
+          $(window).bind('clear.' + plugin, function () {
+            $element[plugin]('destroy');
+          });
+        }
       });
     } else {
       $element.show();
-      $element[plugin]();
-      $(window).bind('clear', function () {
-        $element[plugin]('destroy').remove();
-      });
+      if (plugin) {
+        $element[plugin]();
+        $(window).bind('clear', function () {
+          $element[plugin]('destroy').remove();
+        });
+      }
     }
+  }
+
+  function throwdown(data) {
+    $(window).trigger('clear.throwdown');
+    var $throw = $(Handlebars.templates.throwdown(data));
+    addContent($throw, 'throwdown');
+    // On throwdown clear, keep only the 5 latest throwdowns
+    $(window).unbind('clear.throwdown');
+    $(window).bind('clear.throwdown', function () {
+      var $throwdowns = $('.throwdown');
+      if ($throwdowns.length > 5) {
+        $throwdowns.first().throwdown('destroy').remove();
+      }
+    });
   }
 
   socket.on('clear', function (data) {
@@ -109,19 +127,7 @@ var socket = io.connect('http://nollkampen');
     $('.reveal.plugin').reveal('next');
   });
 
-  socket.on('throwdown', function (data) {
-    $(window).trigger('clear.throwdown');
-    var $throw = $(Handlebars.templates.throwdown(data));
-    addContent($throw, 'throwdown');
-    // On throwdown clear, keep only the 5 latest throwdowns
-    $(window).unbind('clear.throwdown');
-    $(window).bind('clear.throwdown', function () {
-      var $throwdowns = $('.throwdown');
-      if ($throwdowns.length > 5) {
-        $throwdowns.first().throwdown('destroy').remove();
-      }
-    });
-  });
+  socket.on('throwdown', throwdown);
 
   socket.on('countdown', function (data) {
     $(window).trigger('clear.countdown');
@@ -137,6 +143,39 @@ var socket = io.connect('http://nollkampen');
     $(window).trigger('clear.megaCountdown');
     var $count = $(Handlebars.templates['mega-countdown'](data));
     addContent($count, 'megaCountdown', false);
+  });
+
+  socket.on('textmessage', function (data) {
+    var $msg = $(Handlebars.templates.textmessage(data));
+    addContent($msg, null, true);
+  });
+
+  socket.on('fullscreenPicture', function (data) {
+    var $pic = $(Handlebars.templates['fullscreen-picture'](data));
+    addContent($pic, null, true);
+  });
+
+  socket.on('autoThrowdown', function (data) {
+
+    var i = 0;
+    function doThrowdown() {
+      if (i < data.throwdowns.length) {
+        throwdown(data.throwdowns[i]);
+        i += 1;
+        setTimeout(doThrowdown, data.interval);
+      }
+    }
+
+  });
+
+  socket.on('sketch', function (data) {
+    var $sketch = $(Handlebars.templates.sketch(data));
+    swapContent($sketch, 'sketch');
+  });
+
+  socket.on('sketchstroke', function (data) {
+    var $sketch = $('.sketch');
+    $sketch.sketch('stroke', data);
   });
 
 }(jQuery));

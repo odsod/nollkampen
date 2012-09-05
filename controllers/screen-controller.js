@@ -118,6 +118,49 @@ var actions = {
       }
     });
   }
+
+, autoThrowdown: function (req) {
+    db.Slideshow.findByAlias(req.body.slideshow, function (err, slideshow) {
+      if (slideshow) {
+        io.sockets.emit('autoThrowdown', {
+          throwdowns: _.map(slideshow.images, function (image, i) {
+            return {
+              image: image
+            , caption: req.body['cap' + i] || ''
+            };
+          })
+        });
+      }
+    });
+  }
+
+, textmessage: function (req) {
+    log.debug('tm');
+    io.sockets.emit('textmessage', {
+      horizontalPos: req.body.h
+    , verticalPos: req.body.v
+    , message: req.body.message
+    });
+  }
+
+, sketch: function (req) {
+    log.debug('sketchcontr');
+    db.Picture.findByAlias(req.body.picture, function (err, picture) {
+      log.data(picture.toObject({ getters: true }));
+      io.sockets.emit('sketch', {
+        image: picture.image
+      });
+    });
+  }
+
+, fullscreenPicture: function (req) {
+    log.debug('fulpic');
+    db.Picture.findByAlias(req.body.picture, function (err, picture) {
+      io.sockets.emit('fullscreenPicture', {
+        image: picture.image
+      });
+    });
+  }
 };
 
 ScreenController.handleAction = function (req, res) {
@@ -149,8 +192,31 @@ ScreenController.createInstapic = function (req, res) {
   });
 };
 
+ScreenController.sketchServer = function (req, res) {
+  res.render('sketch-server', {
+    image: req.Picture.instance.image
+  });
+};
+
+ScreenController.listSketchPictures = function (req, res) {
+  res.render('list', {
+    title: 'Liveritning'
+  , noCrud: true
+  , modelName: 'ritning'
+  , root: '/screen/pictures'
+  , linkTo: '/screen/sketches'
+  , collection: req.Picture.instances
+  });
+};
+
 ScreenController.listen = function (app) {
   io = io.listen(app, {
     logger: require('../logs').sockets
+  });
+  io.sockets.on('connection', function (socket) {
+    socket.on('sketchstroke', function (data) {
+      log.info('sketchstroke', data);
+      io.sockets.emit('sketchstroke', data);
+    });
   });
 };
