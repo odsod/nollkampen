@@ -24,7 +24,7 @@
           , x = (rangeX * Math.random()) - (rangeX / 2) + midX - w / 2
           , y = (rangeY * Math.random()) - (rangeY * 4) + midY - h / 2
           , rot = (20 * Math.random()) - 10
-          , displaceX = (Math.random() * 4 * $parent.width()) - 2 * $parent.width() - x;
+          , displaceX = (Math.random() * 4 * $parent.width()) - 2.5 * $parent.width() - x;
         $pic
           .css({
             'left': x

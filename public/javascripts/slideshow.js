@@ -2,7 +2,7 @@
 
   var NAMESPACE = 'slideshow'
     , DEFAULTS = {
-      interval: 2000
+      interval: 6000
     , fadeTime: 1000
     , easing: 'linear'
     };

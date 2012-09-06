@@ -46,8 +46,8 @@
         fillStyle: '#F00'
       , x: data.x1 * window.innerWidth
       , y: data.y1 * window.innerHeight
-      , width: 15
-      , height: 15
+      , width: 10
+      , height: 10
       });
     });
   }

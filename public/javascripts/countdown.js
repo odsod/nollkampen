@@ -3,7 +3,7 @@
   var NAMESPACE = 'countdown'
     , DEFAULTS = {
       message: 'Nollkampen börjar om: '
-    , seconds: 15
+    , seconds: 600
     , fullScreenStopTime: 10
     , fontScale: 0.5
     , formatter: function (count) {
@@ -33,7 +33,8 @@
 
       // TODO: move this to stylesheet
       $count.css({
-        'padding-left':  20
+        'padding-top':  5
+      , 'padding-left':  20
       , 'padding-right': 20
       });
 
@@ -60,6 +61,7 @@
           .animate({
             'width':  $countdown.parent().width()
           , 'height': $countdown.parent().height()
+          , 'padding-top': 0
           }, {
             duration: 5000
           })

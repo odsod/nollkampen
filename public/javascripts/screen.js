@@ -46,14 +46,18 @@ var socket = io.connect('http://nollkampen');
       $element
         .css('z-index', bottomZ - 1)
         .appendTo($body);
-      $element[plugin]();
+      if (plugin) {
+        $element[plugin]();
+      }
       $background.fadeOut(2000, function () {
         $element.css('z-index', nextZ);
         nextZ += 1;
         $background.show();
-        $(window).bind('clear.' + plugin, function () {
-          $element[plugin]('destroy').remove();
-        });
+        if (plugin) {
+          $(window).bind('clear.' + plugin, function () {
+            $element[plugin]('destroy').remove();
+          });
+        }
       });
     });
   }
@@ -79,6 +83,10 @@ var socket = io.connect('http://nollkampen');
         $element[plugin]();
         $(window).bind('clear', function () {
           $element[plugin]('destroy').remove();
+        });
+      } else {
+        $(window).bind('clear', function () {
+          $element.remove();
         });
       }
     }
@@ -151,8 +159,10 @@ var socket = io.connect('http://nollkampen');
   });
 
   socket.on('fullscreenPicture', function (data) {
-    var $pic = $(Handlebars.templates['fullscreen-picture'](data));
-    addContent($pic, null, true);
+    clearScreen(function () {
+      var $pic = $(Handlebars.templates['fullscreen-picture'](data));
+      addContent($pic, null, true);
+    });
   });
 
   socket.on('autoThrowdown', function (data) {
