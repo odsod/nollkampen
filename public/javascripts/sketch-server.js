@@ -1,4 +1,4 @@
-var socket = io.connect('http://192.168.1.2');
+var socket = io.connect('http://192.168.1.3');
 
 $(function () {
 

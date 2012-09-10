@@ -173,23 +173,25 @@ ScreenController.handleAction = function (req, res) {
 
 ScreenController.showInstapic = function (req, res) {
   res.render('instapic', {
-    captions: [' ', 'test1', 'test2']
+    captions: ['A', 'AE', 'D', 'E', 'F', 'H', 'K', 'KfKb', 'I', 'IT', 'TD & M', 'V', 'Sjö', 'Z']
   });
 };
 
 ScreenController.createInstapic = function (req, res) {
-  var pic = new db.Picture({
-    name: 'instapic'
-  , caption: req.body.inputCaption.trim() || req.body.selectCaption.trim()
-  });
-  pic.image = req.files.image;
-  pic.save(function (err, pic) {
-    io.sockets.emit('throwdown', {
-      image: pic.image,
-      caption: pic.caption
+  if (req.files && req.files.image) {
+    var pic = new db.Picture({
+      name: 'instapic'
+    , caption: req.body.inputCaption.trim() || req.body.selectCaption.trim()
     });
-    res.redirect('/screen/instapic');
-  });
+    pic.image = req.files.image;
+    pic.save(function (err, pic) {
+      io.sockets.emit('throwdown', {
+        image: pic.image,
+        caption: pic.caption
+      });
+      res.redirect('/screen/instapic');
+    });
+  }
 };
 
 ScreenController.sketchServer = function (req, res) {
